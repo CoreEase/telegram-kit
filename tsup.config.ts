@@ -17,6 +17,8 @@ export default defineConfig([
     entry: {
       index: 'src/index.ts',
       'hooks/index': 'src/hooks/index.ts',
+      'tgs/index': 'src/tgs/index.tsx',
+      'lottie/index': 'src/lottie/index.tsx',
     },
     format: ['cjs', 'esm'],
     dts: true,
@@ -31,6 +33,10 @@ export default defineConfig([
         join(dist, 'index.mjs'),
         join(dist, 'hooks', 'index.js'),
         join(dist, 'hooks', 'index.mjs'),
+        join(dist, 'tgs', 'index.js'),
+        join(dist, 'tgs', 'index.mjs'),
+        join(dist, 'lottie', 'index.js'),
+        join(dist, 'lottie', 'index.mjs'),
       ];
       const chunks = readdirSync(dist).filter(
         (f) => f.startsWith('chunk-') && (f.endsWith('.mjs') || f.endsWith('.js'))
