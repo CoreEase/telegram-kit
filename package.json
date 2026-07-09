@@ -1,0 +1,108 @@
+{
+  "name": "telegram-kit",
+  "version": "1.0.1",
+  "description": "Professional Telegram library : Mini Apps SDK (React hooks, providers, types) + Bot API server-side client. Works with React, Vue, vanilla JS, HTML, and Node.js.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "browser": "./dist/browser.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.mjs",
+      "require": "./dist/hooks/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.mjs",
+      "require": "./dist/core/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js"
+    },
+    "./bot": {
+      "types": "./dist/bot/index.d.ts",
+      "import": "./dist/bot/index.mjs",
+      "require": "./dist/bot/index.js"
+    },
+    "./cdn": {
+      "types": "./dist/cdn/index.d.ts",
+      "import": "./dist/cdn/index.mjs",
+      "require": "./dist/cdn/index.js"
+    },
+    "./dev": {
+      "types": "./dist/dev/index.d.ts",
+      "import": "./dist/dev/index.mjs",
+      "require": "./dist/dev/index.js"
+    },
+    "./browser": "./dist/browser.global.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "telegram",
+    "telegram-web-app",
+    "telegram-mini-app",
+    "twa",
+    "mini-app",
+    "react",
+    "bot-api",
+    "telegram-bot",
+    "nextjs",
+    "tma",
+    "hooks",
+    "server",
+    "tg",
+    "tgs", 
+    "tgs-player", 
+    "player", 
+    "bot-telegram",
+    "telegram-kit"
+  ],
+  "author": "mr-m-apps",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoreEase/telegram-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CoreEase/telegram-kit/issues"
+  },
+  "homepage": "https://github.com/CoreEase/telegram-kit#readme",
+  "license": "MIT",
+  "sideEffects": false,
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^18.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
