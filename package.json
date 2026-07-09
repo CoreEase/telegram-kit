@@ -1,7 +1,7 @@
 {
   "name": "@telegram-kit",
   "version": "1.0.1",
-  "description": "Professional Telegram library : Mini Apps SDK (React hooks, providers, types) + Bot API server-side client. Works with React, Vue, vanilla JS, HTML, and Node.js.",
+  "description": "Professional Telegram library : Mini Apps SDK (React hooks, providers, types) + Bot API server-side client + zero-dependency .tgs sticker player (/tgs) and Lottie JSON player (/lottie). Works with React, Vue, vanilla JS, HTML, and Node.js.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -42,6 +42,16 @@
       "import": "./dist/dev/index.mjs",
       "require": "./dist/dev/index.js"
     },
+    "./tgs": {
+      "types": "./dist/tgs/index.d.ts",
+      "import": "./dist/tgs/index.mjs",
+      "require": "./dist/tgs/index.js"
+    },
+    "./lottie": {
+      "types": "./dist/lottie/index.d.ts",
+      "import": "./dist/lottie/index.mjs",
+      "require": "./dist/lottie/index.js"
+    },
     "./browser": "./dist/browser.global.js"
   },
   "files": [
@@ -70,6 +80,8 @@
     "tgs", 
     "tgs-player", 
     "player", 
+    "lottie",
+    "lottie-player",
     "bot-telegram",
     "telegram-kit"
   ],
