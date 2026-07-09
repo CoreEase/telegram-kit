@@ -1,5 +1,5 @@
 {
-  "name": "telegram-kit",
+  "name": "@telegram-kit",
   "version": "1.0.1",
   "description": "Professional Telegram library : Mini Apps SDK (React hooks, providers, types) + Bot API server-side client. Works with React, Vue, vanilla JS, HTML, and Node.js.",
   "main": "./dist/index.js",
