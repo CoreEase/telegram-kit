@@ -61,6 +61,7 @@ export default defineConfig([
       'dev/index': 'src/dev/index.ts',
       'core/index': 'src/core/index.ts',
       'server/index': 'src/server/index.ts',
+      'qr/index': 'src/qr/index.ts',
     },
     format: ['cjs', 'esm'],
     dts: true,
