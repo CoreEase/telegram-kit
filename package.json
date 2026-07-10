@@ -1,7 +1,7 @@
 {
   "name": "telegram-kit",
-  "version": "1.0.7",
-  "description": "Professional Telegram library : Mini Apps SDK (React hooks, providers, types) + Bot API server-side client + zero-dependency .tgs sticker player and Lottie JSON player. Works with React, Vue, vanilla JS, HTML, and Node.js.",
+  "version": "1.0.8",
+  "description": "Professional Telegram library : Mini Apps SDK (React hooks, providers, types) + Bot API server-side client + zero-dependency .tgs sticker player and Lottie JSON player + standards-compliant zero-dependency QR Code encoder (ISO/IEC 18004). Works with React, Vue, vanilla JS, HTML, and Node.js.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -67,6 +67,11 @@
       "import": "./dist/lottie/index.mjs",
       "require": "./dist/lottie/index.js"
     },
+    "./qr": {
+      "types": "./dist/qr/index.d.ts",
+      "import": "./dist/qr/index.mjs",
+      "require": "./dist/qr/index.js"
+    },
     "./browser": "./dist/browser.global.js"
   },
   "files": [
@@ -99,7 +104,10 @@
     "lottie-player",
     "bot-telegram",
     "telegram-kit",
-    "animation"
+    "animation",
+    "qrcode",
+    "qr-code",
+    "qr-code-generator"
   ],
   "author": "mr-m-apps",
   "repository": {
