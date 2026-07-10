@@ -66,6 +66,8 @@ export class LottieAnimationController {
   private rafHandle: number | null = null;
   private lastTs: number | null = null;
 
+  private shapeScratch: { canvas: HTMLCanvasElement | OffscreenCanvas; ctx: CanvasRenderingContext2D } | null = null;
+
   private listeners: Map<keyof PlayerEventMap, Set<Listener<any>>> = new Map();
 
   constructor(options: AnimationOptions) {
@@ -169,6 +171,7 @@ export class LottieAnimationController {
     this.stopLoop();
     this.state = "destroyed";
     this.doc = null;
+    this.shapeScratch = null;
     this.listeners.clear();
   }
 
@@ -260,7 +263,8 @@ export class LottieAnimationController {
     let next = this.currentFrame + framesDelta;
 
     const span = Math.max(1, outF - inF);
-    const loopLimit = typeof this.loop === "number" ? this.loop : Infinity;
+    const loopLimit =
+      this.loop === true ? Infinity : this.loop === false ? 1 : Math.max(1, this.loop);
 
     if (this.mode === "bounce") {
       if (next >= outF) {
@@ -326,6 +330,27 @@ export class LottieAnimationController {
     });
   }
 
+  private getShapeScratch(
+    w: number,
+    h: number
+  ): { canvas: HTMLCanvasElement | OffscreenCanvas; ctx: CanvasRenderingContext2D } {
+    const cur = this.shapeScratch;
+    if (cur && cur.canvas.width === Math.max(1, w) && cur.canvas.height === Math.max(1, h)) {
+      return cur;
+    }
+    let canvas: HTMLCanvasElement | OffscreenCanvas;
+    if (typeof OffscreenCanvas !== "undefined") {
+      canvas = new OffscreenCanvas(Math.max(1, w), Math.max(1, h));
+    } else {
+      canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, w);
+      canvas.height = Math.max(1, h);
+    }
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+    this.shapeScratch = { canvas, ctx };
+    return this.shapeScratch;
+  }
+
   private renderCurrentFrame(): void {
     if (!this.doc) return;
     const opts: RenderOptions = {
@@ -335,6 +360,7 @@ export class LottieAnimationController {
       imageCache,
       onAssetLoaded: () => this.renderCurrentFrame(),
       warnOnce,
+      getShapeScratch: (w, h) => this.getShapeScratch(w, h),
     };
     try {
       renderDocumentFrame(this.doc, this.currentFrame, opts);
