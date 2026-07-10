@@ -101,22 +101,60 @@ function applyMasks(
   ctx: CanvasRenderingContext2D,
   layer: LottieLayer,
   matrix: Mat2D,
-  frame: number
+  frame: number,
+  canvasWidth: number,
+  canvasHeight: number
 ): boolean {
   const masks = layer.masksProperties;
   if (!masks || masks.length === 0) return false;
 
-  const additive = masks.filter((m) => !m.inv && (m.mode === "a" || m.mode === "n" || m.mode == null));
-  if (additive.length === 0) return false;
+  const active = masks.filter((m) => (m.mode ?? "a") !== "n");
+  if (active.length === 0) return false;
 
-  ctx.beginPath();
-  for (const mask of additive) {
+  let clipped = false;
+  let additiveBatch: typeof active = [];
+
+  const flushAdditive = () => {
+    if (additiveBatch.length === 0) return;
+    ctx.beginPath();
+    for (const mask of additiveBatch) {
+      const sv = getAnimatedShape(mask.pt, frame);
+      tracePathOnContext(ctx, shapeValueToBezierPath(sv), matrix);
+    }
+    ctx.clip("nonzero");
+    clipped = true;
+    additiveBatch = [];
+  };
+
+  for (const mask of active) {
+    const mode = mask.mode ?? "a";
+    const isAdditive = (mode === "a" || mode === "l") && !mask.inv;
+
+    if (isAdditive) {
+      additiveBatch.push(mask);
+      continue;
+    }
+
+    flushAdditive();
+
     const sv = getAnimatedShape(mask.pt, frame);
     const path = shapeValueToBezierPath(sv);
-    tracePathOnContext(ctx, path, matrix);
+    const keepOutside = mode === "s" || mask.inv;
+
+    ctx.beginPath();
+    if (keepOutside) {
+      ctx.rect(0, 0, canvasWidth, canvasHeight);
+      tracePathOnContext(ctx, path, matrix);
+      ctx.clip("evenodd");
+    } else {
+      tracePathOnContext(ctx, path, matrix);
+      ctx.clip("nonzero");
+    }
+    clipped = true;
   }
-  ctx.clip("nonzero");
-  return true;
+
+  flushAdditive();
+  return clipped;
 }
 
 function renderSolidLayer(ctx: CanvasRenderingContext2D, layer: LottieLayer, matrix: Mat2D): void {
@@ -142,13 +180,23 @@ function applyPoint(m: Mat2D, x: number, y: number): [number, number] {
   return [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
 }
 
+function resolveImageSrc(asset: LottieAsset): string | null {
+  if (asset.e === 1) {
+    if (!asset.p) return null;
+    if (asset.p.startsWith("data:")) return asset.p;
+    return `data:image/png;base64,${asset.p}`;
+  }
+  if (asset.u) return asset.u + (asset.p ?? "");
+  return asset.p ?? null;
+}
+
 function renderImageLayer(
   ctx: CanvasRenderingContext2D,
   asset: LottieAsset,
   matrix: Mat2D,
   opts: RenderOptions
 ): void {
-  const src = asset.u ? asset.u + (asset.p ?? "") : asset.p;
+  const src = resolveImageSrc(asset);
   if (!src) return;
 
   let img = opts.imageCache.get(asset.id);
@@ -225,7 +273,7 @@ export function renderLayers(
       drawCtx.globalAlpha = opacity;
     }
 
-    const hadClip = applyMasks(drawCtx, layer, matrix, docFrame);
+    const hadClip = applyMasks(drawCtx, layer, matrix, docFrame, opts.canvasWidth, opts.canvasHeight);
 
     renderSingleLayer(drawCtx, layer, assetsById, matrix, 1, docFrame, opts);
 
