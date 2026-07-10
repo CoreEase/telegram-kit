@@ -10,6 +10,7 @@ export interface BezierVertex {
 export interface BezierPath {
   closed: boolean;
   vertices: BezierVertex[];
+  opacity?: number;
 }
 
 const CIRCLE_K = 0.5522847498307936; 
