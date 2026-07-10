@@ -11,3 +11,9 @@ export {
   installDevMode,
   isDevMode,
 } from './dev';
+
+export {
+  encodeQRCode,
+  qrCodeToSVG,
+} from './qr';
+export type { QrEncodeOptions, QrEncodeResult, QrSvgOptions, ErrorCorrectionLevel } from './qr';
