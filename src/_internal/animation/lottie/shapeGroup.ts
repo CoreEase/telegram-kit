@@ -191,17 +191,19 @@ export function renderShapeItems(
   let currentPaths: BezierPath[] = [];
   let mergeMode: number | null = null;
 
-  for (let idx = items.length - 1; idx >= 0; idx--) {
+  const drawOps: Array<() => void> = [];
+
+  for (let idx = 0; idx < items.length; idx++) {
     const item = items[idx];
     if (item.hd) continue;
 
     switch (item.ty) {
       case "tr":
-        continue; 
+        continue;
 
       case "gr": {
         const group = item as ShapeGroupItem;
-        renderShapeItems(rc, group.it, localMatrix, localOpacity);
+        drawOps.push(() => renderShapeItems(rc, group.it, localMatrix, localOpacity));
         break;
       }
 
@@ -270,43 +272,61 @@ export function renderShapeItems(
 
       case "fl": {
         const fl = item as ShapeFillItem;
-        const color = getAnimatedValue(fl.c, rc.frame);
-        const opacity = (getAnimatedValue(fl.o, rc.frame)[0] ?? 100) / 100;
-        const css = colorToCss(color, opacity * localOpacity);
-        paintFill(rc, currentPaths, localMatrix, css, mergeMode);
+        const paths = currentPaths;
+        const mm = mergeMode;
+        drawOps.push(() => {
+          const color = getAnimatedValue(fl.c, rc.frame);
+          const opacity = (getAnimatedValue(fl.o, rc.frame)[0] ?? 100) / 100;
+          const css = colorToCss(color, opacity * localOpacity);
+          paintFill(rc, paths, localMatrix, css, mm);
+        });
         break;
       }
 
       case "gf": {
         const gf = item as ShapeGradientFillItem;
-        const opacity = (getAnimatedValue(gf.o, rc.frame)[0] ?? 100) / 100;
-        const gradient = buildGradient(rc.ctx, gf, rc.frame, localMatrix, opacity * localOpacity);
-        paintFill(rc, currentPaths, localMatrix, gradient, mergeMode);
+        const paths = currentPaths;
+        const mm = mergeMode;
+        drawOps.push(() => {
+          const opacity = (getAnimatedValue(gf.o, rc.frame)[0] ?? 100) / 100;
+          const gradient = buildGradient(rc.ctx, gf, rc.frame, localMatrix, opacity * localOpacity);
+          paintFill(rc, paths, localMatrix, gradient, mm);
+        });
         break;
       }
 
       case "st": {
         const st = item as ShapeStrokeItem;
-        const color = getAnimatedValue(st.c, rc.frame);
-        const opacity = (getAnimatedValue(st.o, rc.frame)[0] ?? 100) / 100;
-        const css = colorToCss(color, opacity * localOpacity);
-        applyStrokeStyle(rc.ctx, st, rc.frame, localMatrix);
-        paintStroke(rc, currentPaths, localMatrix, css);
+        const paths = currentPaths;
+        drawOps.push(() => {
+          const color = getAnimatedValue(st.c, rc.frame);
+          const opacity = (getAnimatedValue(st.o, rc.frame)[0] ?? 100) / 100;
+          const css = colorToCss(color, opacity * localOpacity);
+          applyStrokeStyle(rc.ctx, st, rc.frame, localMatrix);
+          paintStroke(rc, paths, localMatrix, css);
+        });
         break;
       }
 
       case "gs": {
         const gs = item as ShapeGradientStrokeItem;
-        const opacity = (getAnimatedValue(gs.o, rc.frame)[0] ?? 100) / 100;
-        const gradient = buildGradient(rc.ctx, gs, rc.frame, localMatrix, opacity * localOpacity);
-        applyStrokeStyle(rc.ctx, gs, rc.frame, localMatrix);
-        paintStroke(rc, currentPaths, localMatrix, gradient);
+        const paths = currentPaths;
+        drawOps.push(() => {
+          const opacity = (getAnimatedValue(gs.o, rc.frame)[0] ?? 100) / 100;
+          const gradient = buildGradient(rc.ctx, gs, rc.frame, localMatrix, opacity * localOpacity);
+          applyStrokeStyle(rc.ctx, gs, rc.frame, localMatrix);
+          paintStroke(rc, paths, localMatrix, gradient);
+        });
         break;
       }
 
       default:
         break;
     }
+  }
+
+  for (let i = drawOps.length - 1; i >= 0; i--) {
+    drawOps[i]();
   }
 }
 
