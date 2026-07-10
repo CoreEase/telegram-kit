@@ -128,6 +128,8 @@ export interface ShapeGradientStrokeItem extends ShapeItemBase {
   t: 1 | 2;
   g: GradientColor;
   w: ScalarProperty;
+  h?: ScalarProperty;
+  a?: ScalarProperty;
   lc?: number;
   lj?: number;
   ml?: number;
