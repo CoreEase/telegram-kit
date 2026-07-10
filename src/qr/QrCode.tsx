@@ -1,41 +1,23 @@
 import React, { useMemo } from 'react';
-import { encodeQRCode } from './qr';
-import type { ErrorCorrectionLevel } from './qr';
+import { encodeQRCode } from './Qr';
+import type { ErrorCorrectionLevel } from './Qr';
 
 export interface QRCodeProps {
-  /** The text/URL to encode. */
   value: string;
-  /** Pixel size of the rendered SVG (square). Default: 256. */
   size?: number;
-  /** Error correction level. Default: 'M', or 'H' automatically when `logo` is set. */
   errorCorrectionLevel?: ErrorCorrectionLevel;
-  /** Color of the data modules (dots). Default: '#000'. */
   dotColor?: string;
-  /** Color of the three finder pattern "eyes". Default: same as `dotColor`. */
   eyeColor?: string;
-  /** Background color, or 'transparent'. Default: 'transparent'. */
   backgroundColor?: string;
-  /** Optional logo image (URL or data URI) rendered in the center. */
   logo?: string;
-  /** Logo diameter in pixels. Default: size * 0.2. */
   logoSize?: number;
-  /** Padding (in pixels) between the logo and its background circle. Default: 8. */
   logoPadding?: number;
-  /**
-   * Quiet zone width, in modules, around the QR symbol. ISO/IEC 18004
-   * recommends at least 4 for reliable scanning. Default: 4.
-   */
   quietZone?: number;
-  /** Border radius applied to the outer SVG, in pixels. Default: 0. */
   borderRadius?: number;
   className?: string;
   style?: React.CSSProperties;
 }
 
-/**
- * Renders a real, standards-compliant, scannable QR Code (ISO/IEC 18004)
- * as an inline SVG — not a decorative approximation.
- */
 export const QRCode: React.FC<QRCodeProps> = ({
   value,
   size = 256,
