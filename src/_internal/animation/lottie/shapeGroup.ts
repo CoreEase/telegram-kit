@@ -157,6 +157,20 @@ function paintFill(
     return;
   }
 
+  const hasPerPathOpacity = paths.some((p) => p.opacity !== undefined && p.opacity !== 1);
+  if (hasPerPathOpacity) {
+    const baseAlpha = rc.ctx.globalAlpha;
+    rc.ctx.fillStyle = fillStyle as any;
+    for (const p of paths) {
+      rc.ctx.beginPath();
+      tracePathOnContext(rc.ctx, p, m);
+      rc.ctx.globalAlpha = baseAlpha * (p.opacity ?? 1);
+      rc.ctx.fill(mergeMode === 5 ? "evenodd" : "nonzero");
+    }
+    rc.ctx.globalAlpha = baseAlpha;
+    return;
+  }
+
   tracePathsAsOne(rc.ctx, paths, m);
   rc.ctx.fillStyle = fillStyle as any;
   rc.ctx.fill(mergeMode === 5 ? "evenodd" : "nonzero");
@@ -169,6 +183,21 @@ function paintStroke(
   strokeStyle: string | CanvasGradient
 ): void {
   if (paths.length === 0) return;
+
+  const hasPerPathOpacity = paths.some((p) => p.opacity !== undefined && p.opacity !== 1);
+  if (hasPerPathOpacity) {
+    const baseAlpha = rc.ctx.globalAlpha;
+    rc.ctx.strokeStyle = strokeStyle as any;
+    for (const p of paths) {
+      rc.ctx.beginPath();
+      tracePathOnContext(rc.ctx, p, m);
+      rc.ctx.globalAlpha = baseAlpha * (p.opacity ?? 1);
+      rc.ctx.stroke();
+    }
+    rc.ctx.globalAlpha = baseAlpha;
+    return;
+  }
+
   tracePathsAsOne(rc.ctx, paths, m);
   rc.ctx.strokeStyle = strokeStyle as any;
   rc.ctx.stroke();
@@ -235,14 +264,18 @@ export function renderShapeItems(
         const repScale = getAnimatedValue(rTr.s, rc.frame);
         const repRotation = getAnimatedValue(rTr.r, rc.frame)[0] ?? 0;
 
+        const startOpacityPct = rTr.so ? getAnimatedValue(rTr.so, rc.frame)[0] ?? 100 : 100;
+        const endOpacityPct = rTr.eo ? getAnimatedValue(rTr.eo, rc.frame)[0] ?? 100 : 100;
+
         const basePaths = currentPaths;
         const repeated: BezierPath[] = [];
         for (let c = 0; c < copies; c++) {
           const n = c + offset;
-          let rm = identity();
-          rm = translate(rm, repPos[0] ?? 0, repPos[1] ?? 0);
-          rm = translate(rm, repAnchor[0] ?? 0, repAnchor[1] ?? 0);
-        
+          const copyOpacity =
+            copies > 1
+              ? (startOpacityPct + ((endOpacityPct - startOpacityPct) * c) / (copies - 1)) / 100
+              : startOpacityPct / 100;
+
           let compound = identity();
           for (let k = 0; k < Math.abs(n); k++) {
             compound = translate(compound, repPos[0] ?? 0, repPos[1] ?? 0);
@@ -252,6 +285,7 @@ export function renderShapeItems(
           for (const p of basePaths) {
             repeated.push({
               closed: p.closed,
+              opacity: copyOpacity,
               vertices: p.vertices.map((v) => {
                 const [vx, vy] = applyMat(compound, v.v[0], v.v[1]);
                 const [ix, iy] = applyMatDelta(compound, v.i[0], v.i[1]);
