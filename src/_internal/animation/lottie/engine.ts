@@ -250,14 +250,7 @@ export function renderLayers(
       targetCtx.globalCompositeOperation = BLEND_MODES[layer.bm ?? 0] ?? "source-over";
       targetCtx.drawImage(scratch.canvas as any, 0, 0);
       targetCtx.restore();
-    } else if (isMatteSource && scratch) {
-      targetCtx.save();
-      targetCtx.globalAlpha = opacity;
-      targetCtx.globalCompositeOperation = BLEND_MODES[layer.bm ?? 0] ?? "source-over";
-      targetCtx.drawImage(scratch.canvas as any, 0, 0);
-      targetCtx.restore();
     }
-
     pendingMatte = isMatteSource && scratch ? scratch : null;
     void pendingMatteConsumedBy;
   }
