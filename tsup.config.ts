@@ -17,8 +17,11 @@ export default defineConfig([
     entry: {
       index: 'src/index.ts',
       'hooks/index': 'src/hooks/index.ts',
-      'tgs/index': 'src/tgs/index.tsx',
-      'lottie/index': 'src/lottie/index.tsx',
+      'animation/index': 'src/animation/index.ts',
+      'animation/lottie/index': 'src/animation/lottie/index.tsx',
+      'animation/tgs/index': 'src/animation/tgs/index.tsx',
+      'tgs/index': 'src/animation/tgs/index.tsx',
+      'lottie/index': 'src/animation/lottie/index.tsx',
     },
     format: ['cjs', 'esm'],
     dts: true,
@@ -33,6 +36,12 @@ export default defineConfig([
         join(dist, 'index.mjs'),
         join(dist, 'hooks', 'index.js'),
         join(dist, 'hooks', 'index.mjs'),
+        join(dist, 'animation', 'index.js'),
+        join(dist, 'animation', 'index.mjs'),
+        join(dist, 'animation', 'lottie', 'index.js'),
+        join(dist, 'animation', 'lottie', 'index.mjs'),
+        join(dist, 'animation', 'tgs', 'index.js'),
+        join(dist, 'animation', 'tgs', 'index.mjs'),
         join(dist, 'tgs', 'index.js'),
         join(dist, 'tgs', 'index.mjs'),
         join(dist, 'lottie', 'index.js'),
@@ -42,7 +51,7 @@ export default defineConfig([
         (f) => f.startsWith('chunk-') && (f.endsWith('.mjs') || f.endsWith('.js'))
       );
       prependUseClient([...entryFiles, ...chunks.map((f) => join(dist, f))]);
-      console.log('[tg-kit] "use client" injected into client bundles.');
+      console.log('[telegram-kit] "use client" injected into client bundles.');
     },
   },
   {
