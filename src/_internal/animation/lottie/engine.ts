@@ -37,6 +37,23 @@ function makeCanvas(w: number, h: number): { canvas: HTMLCanvasElement | Offscre
   return { canvas, ctx };
 }
 
+function lumaToAlphaMask(
+  source: HTMLCanvasElement | OffscreenCanvas,
+  w: number,
+  h: number
+): HTMLCanvasElement | OffscreenCanvas {
+  const { canvas, ctx } = makeCanvas(w, h);
+  ctx.drawImage(source as any, 0, 0);
+  const img = ctx.getImageData(0, 0, Math.max(1, w), Math.max(1, h));
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const luma = 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+    d[i + 3] = Math.round((luma / 255) * d[i + 3]);
+  }
+  ctx.putImageData(img, 0, 0);
+  return canvas;
+}
+
 export interface EngineImageCache {
   get(key: string): HTMLImageElement | undefined;
   set(key: string, img: HTMLImageElement): void;
@@ -49,6 +66,10 @@ export interface RenderOptions {
   imageCache: EngineImageCache;
   onAssetLoaded?: () => void;
   warnOnce: (key: string, message: string) => void;
+  getShapeScratch?: (
+    w: number,
+    h: number
+  ) => { canvas: HTMLCanvasElement | OffscreenCanvas; ctx: CanvasRenderingContext2D };
 }
 
 function getLayerMatrix(
@@ -213,11 +234,16 @@ export function renderLayers(
 
     if (needsMatte && scratch && pendingMatte) {
       const tt = layer.tt;
+      const isLuma = tt === 3 || tt === 4;
+      const matteSource = isLuma
+        ? lumaToAlphaMask(pendingMatte.canvas, opts.canvasWidth, opts.canvasHeight)
+        : pendingMatte.canvas;
+
       scratch.ctx.save();
       scratch.ctx.globalCompositeOperation =
         tt === 2 || tt === 4 ? "destination-out" : "destination-in";
       scratch.ctx.setTransform(1, 0, 0, 1, 0, 0);
-      scratch.ctx.drawImage(pendingMatte.canvas as any, 0, 0);
+      scratch.ctx.drawImage(matteSource as any, 0, 0);
       scratch.ctx.restore();
 
       targetCtx.save();
@@ -249,15 +275,17 @@ function renderSingleLayer(
   switch (layer.ty) {
     case 4: {
       if (!layer.shapes) return;
+      const scratch = opts.getShapeScratch
+        ? opts.getShapeScratch(opts.canvasWidth, opts.canvasHeight)
+        : makeCanvas(opts.canvasWidth, opts.canvasHeight);
       const rc: ShapeRenderContext = {
         ctx,
         frame: docFrame,
         canvasWidth: opts.canvasWidth,
         canvasHeight: opts.canvasHeight,
-        scratchCanvas: makeCanvas(opts.canvasWidth, opts.canvasHeight).canvas,
-        scratchCtx: null as any,
+        scratchCanvas: scratch.canvas,
+        scratchCtx: scratch.ctx,
       };
-      rc.scratchCtx = (rc.scratchCanvas.getContext("2d") as CanvasRenderingContext2D);
       renderShapeItems(rc, layer.shapes, matrix, opacity);
       break;
     }
