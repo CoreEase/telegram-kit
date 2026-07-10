@@ -3,7 +3,6 @@ import React, { useMemo } from 'react';
 export interface QRCodeProps {
   value: string;
   size?: number;
-  level?: 'L' | 'M' | 'Q' | 'H';
   dotColor?: string;
   eyeColor?: string;
   backgroundColor?: string;
