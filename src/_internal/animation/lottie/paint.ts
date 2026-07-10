@@ -80,7 +80,19 @@ export function buildGradient(
   let gradient: CanvasGradient;
   if (item.t === 2) {
     const radius = Math.hypot(ex - sx, ey - sy) || 1;
-    gradient = ctx.createRadialGradient(sx, sy, 0, sx, sy, radius);
+    const hRaw = item.h ? getAnimatedValue(item.h, frame)[0] ?? 0 : 0;
+    const h = Math.max(-0.99, Math.min(0.99, Math.abs(hRaw) > 1 ? hRaw / 100 : hRaw));
+    const aDeg = item.a ? getAnimatedValue(item.a, frame)[0] ?? 0 : 0;
+
+    if (h !== 0) {
+      const baseAngle = Math.atan2(ey - sy, ex - sx);
+      const angle = baseAngle + (aDeg * Math.PI) / 180;
+      const hx = sx + Math.cos(angle) * h * radius;
+      const hy = sy + Math.sin(angle) * h * radius;
+      gradient = ctx.createRadialGradient(hx, hy, 0, sx, sy, radius);
+    } else {
+      gradient = ctx.createRadialGradient(sx, sy, 0, sx, sy, radius);
+    }
   } else {
     gradient = ctx.createLinearGradient(sx, sy, ex, ey);
   }
