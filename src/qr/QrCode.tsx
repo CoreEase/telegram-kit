@@ -110,27 +110,30 @@ function dotPath(
   };
 }
 
-export const QRCode: React.FC<QRCodeProps> = ({
-  value,
-  size = 256,
-  errorCorrectionLevel,
-  dotsOptions,
-  cornersSquareOptions,
-  cornersDotOptions,
-  dotColor = '#000',
-  eyeColor,
-  backgroundColor = 'transparent',
-  logo,
-  logoSize,
-  logoPadding = 8,
-  logoShape = 'circle',
-  logoBackgroundColor,
-  onLogoSizeClamped,
-  quietZone = 4,
-  borderRadius = 0,
-  className = '',
-  style = {},
-}) => {
+export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCode(
+  {
+    value,
+    size = 256,
+    errorCorrectionLevel,
+    dotsOptions,
+    cornersSquareOptions,
+    cornersDotOptions,
+    dotColor = '#000',
+    eyeColor,
+    backgroundColor = 'transparent',
+    logo,
+    logoSize,
+    logoPadding = 8,
+    logoShape = 'circle',
+    logoBackgroundColor,
+    onLogoSizeClamped,
+    quietZone = 4,
+    borderRadius = 0,
+    className = '',
+    style = {},
+  },
+  ref
+) {
   const resolvedDotColor = dotsOptions?.color ?? dotColor;
   const resolvedDotShape: QRDotShape = dotsOptions?.style ?? 'square';
   const resolvedCornerSquareColor = cornersSquareOptions?.color ?? eyeColor ?? resolvedDotColor;
@@ -183,6 +186,7 @@ export const QRCode: React.FC<QRCodeProps> = ({
     if (requestedAreaRatio > maxAreaRatio) {
       clearRadiusModules = Math.sqrt((maxAreaRatio * matrixSize * matrixSize) / Math.PI);
     }
+
     const maxRadiusByBorder = Math.max(matrixSize / 2 - 8, 0);
     clearRadiusModules = Math.min(clearRadiusModules, maxRadiusByBorder);
 
@@ -342,6 +346,7 @@ export const QRCode: React.FC<QRCodeProps> = ({
 
   return (
     <svg
+      ref={ref}
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
@@ -360,4 +365,101 @@ export const QRCode: React.FC<QRCodeProps> = ({
       {renderLogo()}
     </svg>
   );
-};
+});
+
+QRCode.displayName = 'QRCode';
+
+export interface DownloadQRCodeOptions {
+  format?: 'svg' | 'png';
+  fileName?: string;
+  scale?: number;
+  pngBackgroundColor?: string;
+}
+
+function triggerBlobDownload(blob: Blob, fileName: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function rasterizeSvgToPngBlob(
+  svgString: string,
+  widthPx: number,
+  heightPx: number,
+  scale: number,
+  backgroundColor: string
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const image = new Image();
+
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(widthPx * scale));
+      canvas.height = Math.max(1, Math.round(heightPx * scale));
+      const ctx = canvas.getContext('2d');
+      URL.revokeObjectURL(svgUrl);
+
+      if (!ctx) {
+        reject(new Error('[telegram-kit] Canvas 2D context is not available in this environment.'));
+        return;
+      }
+
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(
+            new Error(
+              '[telegram-kit] Failed to export PNG. If you set a `logo`, this usually means it is a ' +
+                'cross-origin image without CORS headers, which taints the canvas. Use a same-origin ' +
+                'image, an image served with CORS enabled, or a data URI logo instead.'
+            )
+          );
+        }
+      }, 'image/png');
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(svgUrl);
+      reject(new Error('[telegram-kit] Failed to rasterize the QR code SVG for PNG export.'));
+    };
+
+    image.src = svgUrl;
+  });
+}
+
+export async function downloadQRCode(
+  svgElement: SVGSVGElement | null | undefined,
+  options: DownloadQRCodeOptions = {}
+): Promise<void> {
+  const { format = 'svg', fileName = 'qrcode', scale = 2, pngBackgroundColor = '#ffffff' } = options;
+
+  if (!svgElement) {
+    throw new Error('[telegram-kit] downloadQRCode: no <svg> element was provided (is the ref attached yet?).');
+  }
+  if (typeof document === 'undefined') {
+    throw new Error('[telegram-kit] downloadQRCode can only run in a browser environment.');
+  }
+
+  const svgString = new XMLSerializer().serializeToString(svgElement);
+
+  if (format === 'svg') {
+    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+    triggerBlobDownload(blob, `${fileName}.svg`);
+    return;
+  }
+
+  const width = svgElement.width.baseVal.value || svgElement.clientWidth || 512;
+  const height = svgElement.height.baseVal.value || svgElement.clientHeight || 512;
+  const pngBlob = await rasterizeSvgToPngBlob(svgString, width, height, scale, pngBackgroundColor);
+  triggerBlobDownload(pngBlob, `${fileName}.png`);
+}
