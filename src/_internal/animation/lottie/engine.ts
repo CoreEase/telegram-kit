@@ -233,32 +233,52 @@ export function renderLayers(
   }
   const matrixCache = new Map<number, Mat2D>();
 
-  let pendingMatte: { canvas: HTMLCanvasElement | OffscreenCanvas; ctx: CanvasRenderingContext2D } | null = null;
-  let pendingMatteConsumedBy = -2;
+  const isLayerActive = (layer: LottieLayer): boolean => {
+    if (layer.hd) return false;
+    const startFrame = layer.ip ?? 0;
+    const endFrame = layer.op ?? Infinity;
+    return docFrame >= startFrame && docFrame < endFrame;
+  };
+
+  const renderMatteSource = (
+    matteLayer: LottieLayer
+  ): { canvas: HTMLCanvasElement | OffscreenCanvas; ctx: CanvasRenderingContext2D } | null => {
+    if (!isLayerActive(matteLayer)) return null;
+
+    const ownMatrix = getLayerMatrix(matteLayer, layersByInd, docFrame, matrixCache);
+    const matrix = multiply(parentMatrix, ownMatrix);
+    const { opacity: ownOpacity } = computeLocalTransform(matteLayer.ks, docFrame);
+    const opacity = parentOpacity * ownOpacity;
+
+    const scratch = makeCanvas(opts.canvasWidth, opts.canvasHeight);
+    scratch.ctx.save();
+    scratch.ctx.globalAlpha = opacity;
+    applyMasks(scratch.ctx, matteLayer, matrix, docFrame, opts.canvasWidth, opts.canvasHeight);
+    renderSingleLayer(scratch.ctx, matteLayer, assetsById, matrix, 1, docFrame, opts);
+    scratch.ctx.restore();
+    return scratch;
+  };
 
   for (let idx = layers.length - 1; idx >= 0; idx--) {
     const layer = layers[idx];
     if (layer.hd) continue;
+    if (!isLayerActive(layer)) continue;
 
-    const startFrame = layer.ip ?? 0;
-    const endFrame = layer.op ?? Infinity;
-    if (docFrame < startFrame || docFrame >= endFrame) {
-      if (layer.td === 1) pendingMatte = null;
-      continue;
-    }
+    if (layer.td === 1) continue;
 
     const ownMatrix = getLayerMatrix(layer, layersByInd, docFrame, matrixCache);
     const matrix = multiply(parentMatrix, ownMatrix);
     const { opacity: ownOpacity } = computeLocalTransform(layer.ks, docFrame);
     const opacity = parentOpacity * ownOpacity;
 
+    const matteLayer = layer.tt && idx > 0 ? layers[idx - 1] : null;
+    const pendingMatte = matteLayer && matteLayer.td === 1 ? renderMatteSource(matteLayer) : null;
     const needsMatte = !!layer.tt && !!pendingMatte;
-    const isMatteSource = layer.td === 1;
 
     let drawCtx: CanvasRenderingContext2D;
     let scratch: { canvas: HTMLCanvasElement | OffscreenCanvas; ctx: CanvasRenderingContext2D } | null = null;
 
-    if (needsMatte || isMatteSource) {
+    if (needsMatte) {
       scratch = makeCanvas(opts.canvasWidth, opts.canvasHeight);
       drawCtx = scratch.ctx;
     } else {
@@ -299,10 +319,9 @@ export function renderLayers(
       targetCtx.drawImage(scratch.canvas as any, 0, 0);
       targetCtx.restore();
     }
-    pendingMatte = isMatteSource && scratch ? scratch : null;
-    void pendingMatteConsumedBy;
   }
 }
+
 
 function renderSingleLayer(
   ctx: CanvasRenderingContext2D,
