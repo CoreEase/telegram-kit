@@ -131,9 +131,12 @@ function paintFill(
   paths: BezierPath[],
   m: Mat2D,
   fillStyle: string | CanvasGradient,
-  mergeMode: number | null
+  mergeMode: number | null,
+  fillRule: CanvasFillRule = "nonzero"
 ): void {
   if (paths.length === 0) return;
+
+  const rule: CanvasFillRule = mergeMode === 5 ? "evenodd" : fillRule;
 
   if (mergeMode === 3 || mergeMode === 4) {
 
@@ -144,13 +147,13 @@ function paintFill(
     sctx.beginPath();
     tracePathOnContext(sctx, paths[0], m);
     sctx.fillStyle = fillStyle as any;
-    sctx.fill("nonzero");
+    sctx.fill(rule);
     for (let i = 1; i < paths.length; i++) {
       sctx.globalCompositeOperation = mergeMode === 3 ? "destination-out" : "destination-in";
       sctx.beginPath();
       tracePathOnContext(sctx, paths[i], m);
       sctx.fillStyle = fillStyle as any;
-      sctx.fill("nonzero");
+      sctx.fill(rule);
     }
     sctx.restore();
     rc.ctx.drawImage(rc.scratchCanvas as any, 0, 0);
@@ -165,7 +168,7 @@ function paintFill(
       rc.ctx.beginPath();
       tracePathOnContext(rc.ctx, p, m);
       rc.ctx.globalAlpha = baseAlpha * (p.opacity ?? 1);
-      rc.ctx.fill(mergeMode === 5 ? "evenodd" : "nonzero");
+      rc.ctx.fill(rule);
     }
     rc.ctx.globalAlpha = baseAlpha;
     return;
@@ -173,7 +176,7 @@ function paintFill(
 
   tracePathsAsOne(rc.ctx, paths, m);
   rc.ctx.fillStyle = fillStyle as any;
-  rc.ctx.fill(mergeMode === 5 ? "evenodd" : "nonzero");
+  rc.ctx.fill(rule);
 }
 
 function paintStroke(
@@ -308,11 +311,12 @@ export function renderShapeItems(
         const fl = item as ShapeFillItem;
         const paths = currentPaths;
         const mm = mergeMode;
+        const fillRule: CanvasFillRule = fl.r === 2 ? "evenodd" : "nonzero";
         drawOps.push(() => {
           const color = getAnimatedValue(fl.c, rc.frame);
           const opacity = (getAnimatedValue(fl.o, rc.frame)[0] ?? 100) / 100;
           const css = colorToCss(color, opacity * localOpacity);
-          paintFill(rc, paths, localMatrix, css, mm);
+          paintFill(rc, paths, localMatrix, css, mm, fillRule);
         });
         break;
       }
@@ -321,10 +325,11 @@ export function renderShapeItems(
         const gf = item as ShapeGradientFillItem;
         const paths = currentPaths;
         const mm = mergeMode;
+        const fillRule: CanvasFillRule = (gf as any).r === 2 ? "evenodd" : "nonzero";
         drawOps.push(() => {
           const opacity = (getAnimatedValue(gf.o, rc.frame)[0] ?? 100) / 100;
           const gradient = buildGradient(rc.ctx, gf, rc.frame, localMatrix, opacity * localOpacity);
-          paintFill(rc, paths, localMatrix, gradient, mm);
+          paintFill(rc, paths, localMatrix, gradient, mm, fillRule);
         });
         break;
       }
