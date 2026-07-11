@@ -1,6 +1,6 @@
 {
   "name": "telegram-kit",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Professional Telegram library : Mini Apps SDK (React hooks, providers, types) + Bot API server-side client + zero-dependency .tgs sticker player and Lottie JSON player + standards-compliant zero-dependency QR Code encoder (ISO/IEC 18004). Works with React, Vue, vanilla JS, HTML, and Node.js.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
