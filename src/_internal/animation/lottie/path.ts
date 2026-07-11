@@ -216,9 +216,18 @@ export function trimPaths(
   paths: BezierPath[],
   startPct: number,
   endPct: number,
-  offsetPct: number
+  offsetPct: number,
+  mode: 1 | 2 = 1
 ): BezierPath[] {
   if (paths.length === 0) return paths;
+
+  if (mode === 2) {
+   const out: BezierPath[] = [];
+    for (const p of paths) {
+      out.push(...trimPaths([p], startPct, endPct, offsetPct, 1));
+    }
+    return out;
+  }
 
   const flattened = paths.map((p) => flattenPath(p, 20));
   const combined: Array<{ pathIdx: number; points: Array<[number, number]> }> =
