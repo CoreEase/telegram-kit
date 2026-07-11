@@ -359,7 +359,7 @@ function renderSingleLayer(
       const stretch = layer.sr ?? 1;
       const innerFrame = layer.tm
         ? getAnimatedValue(layer.tm, docFrame)[0] ?? docFrame
-        : (docFrame - (layer.st ?? 0)) / stretch + (layer.st ?? 0);
+        : (docFrame - (layer.st ?? 0)) / stretch;
       renderLayers(ctx, asset.layers, assetsById, matrix, opacity, innerFrame, opts);
       break;
     }
