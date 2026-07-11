@@ -109,7 +109,7 @@
     "qr-code",
     "qr-code-generator"
   ],
-  "author": "mr-m-apps",
+  "author": "mr-m",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CoreEase/telegram-kit.git"
