@@ -253,7 +253,7 @@ export function renderShapeItems(
         const s = getAnimatedValue(tm.s, rc.frame)[0] ?? 0;
         const e = getAnimatedValue(tm.e, rc.frame)[0] ?? 100;
         const o = getAnimatedValue(tm.o, rc.frame)[0] ?? 0;
-        currentPaths = trimPaths(currentPaths, s, e, o);
+        currentPaths = trimPaths(currentPaths, s, e, o, tm.m ?? 1);
         break;
       }
 
