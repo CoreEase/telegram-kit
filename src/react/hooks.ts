@@ -407,7 +407,11 @@ export function useAccelerometer(options?: { refreshRate?: number; autoStart?: b
 
   useTelegramEvent('accelerometerChanged', () => {
     const acc = getWebApp()?.Accelerometer;
-    if (acc) setData({ x: acc.x, y: acc.y, z: acc.z });
+    if (acc) setData({ 
+      x: acc.x ?? 0, 
+      y: acc.y ?? 0, 
+      z: acc.z ?? 0 
+    });
   });
   useTelegramEvent('accelerometerStarted', () => setIsStarted(true));
   useTelegramEvent('accelerometerStopped', () => setIsStarted(false));
@@ -433,7 +437,11 @@ export function useGyroscope(options?: { refreshRate?: number; autoStart?: boole
 
   useTelegramEvent('gyroscopeChanged', () => {
     const g = getWebApp()?.Gyroscope;
-    if (g) setData({ x: g.x, y: g.y, z: g.z });
+    if (g) setData({ 
+      x: g.x ?? 0, 
+      y: g.y ?? 0, 
+      z: g.z ?? 0 
+    });
   });
   useTelegramEvent('gyroscopeStarted', () => setIsStarted(true));
   useTelegramEvent('gyroscopeStopped', () => setIsStarted(false));
