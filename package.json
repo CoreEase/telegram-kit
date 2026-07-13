@@ -1,0 +1,165 @@
+{
+  "name": "@core-ease/telegram-kit",
+  "version": "3.0.0",
+  "description": "Professional Telegram library : Mini Apps SDK bundled in full (a complete typed TypeScript re-implementation of Telegram's official telegram-web-app.js - no CDN script required) + React hooks, providers, types + Bot API server-side client + zero-dependency .tgs sticker player and Lottie JSON player + standards-compliant zero-dependency QR Code encoder (ISO/IEC 18004) + safe Markdown/HTML formatting, deep-link, and keyboard-builder utilities. Works with React, Vue, vanilla JS, HTML, and Node.js.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "browser": "./dist/browser.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./hooks": {
+      "types": "./dist/hooks/index.d.ts",
+      "import": "./dist/hooks/index.mjs",
+      "require": "./dist/hooks/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.mjs",
+      "require": "./dist/core/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js"
+    },
+    "./bot": {
+      "types": "./dist/bot/index.d.ts",
+      "import": "./dist/bot/index.mjs",
+      "require": "./dist/bot/index.js"
+    },
+    "./sdk": {
+      "types": "./dist/sdk/index.d.ts",
+      "import": "./dist/sdk/index.mjs",
+      "require": "./dist/sdk/index.js"
+    },
+    "./dev": {
+      "types": "./dist/dev/index.d.ts",
+      "import": "./dist/dev/index.mjs",
+      "require": "./dist/dev/index.js"
+    },
+    "./animation": {
+      "types": "./dist/animation/index.d.ts",
+      "import": "./dist/animation/index.mjs",
+      "require": "./dist/animation/index.js"
+    },
+    "./animation/lottie": {
+      "types": "./dist/animation/lottie/index.d.ts",
+      "import": "./dist/animation/lottie/index.mjs",
+      "require": "./dist/animation/lottie/index.js"
+    },
+    "./animation/tgs": {
+      "types": "./dist/animation/tgs/index.d.ts",
+      "import": "./dist/animation/tgs/index.mjs",
+      "require": "./dist/animation/tgs/index.js"
+    },
+    "./tgs": {
+      "types": "./dist/tgs/index.d.ts",
+      "import": "./dist/tgs/index.mjs",
+      "require": "./dist/tgs/index.js"
+    },
+    "./lottie": {
+      "types": "./dist/lottie/index.d.ts",
+      "import": "./dist/lottie/index.mjs",
+      "require": "./dist/lottie/index.js"
+    },
+    "./qr": {
+      "types": "./dist/qr/index.d.ts",
+      "import": "./dist/qr/index.mjs",
+      "require": "./dist/qr/index.js"
+    },
+    "./format": {
+      "types": "./dist/format/index.d.ts",
+      "import": "./dist/format/index.mjs",
+      "require": "./dist/format/index.js"
+    },
+    "./links": {
+      "types": "./dist/links/index.d.ts",
+      "import": "./dist/links/index.mjs",
+      "require": "./dist/links/index.js"
+    },
+    "./keyboards": {
+      "types": "./dist/keyboards/index.d.ts",
+      "import": "./dist/keyboards/index.mjs",
+      "require": "./dist/keyboards/index.js"
+    },
+    "./browser": "./dist/browser.global.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "telegram",
+    "telegram-web-app",
+    "telegram-mini-app",
+    "twa",
+    "mini-app",
+    "react",
+    "bot-api",
+    "telegram-bot",
+    "nextjs",
+    "tma",
+    "hooks",
+    "server",
+    "tg",
+    "tgs",
+    "tgs-player",
+    "player",
+    "lottie",
+    "lottie-player",
+    "bot-telegram",
+    "telegram-kit",
+    "animation",
+    "qrcode",
+    "qr-code",
+    "qr-code-generator",
+    "markdown-v2",
+    "deep-link",
+    "inline-keyboard"
+  ],
+  "author": "mr-m-apps",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoreEase/telegram-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CoreEase/telegram-kit/issues"
+  },
+  "homepage": "https://github.com/CoreEase/telegram-kit#readme",
+  "license": "MIT",
+  "sideEffects": false,
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
