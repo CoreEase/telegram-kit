@@ -352,11 +352,14 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
 
     const clipPath = getLogoClipPath(center, logoClearRadiusPx, logoShape);
 
-    let imageBorderRadius = 0;
+    const imageStyle: React.CSSProperties = {
+      clipPath: clipPath,
+    };
+
     if (logoShape === 'circle') {
-      imageBorderRadius = '50%';
+      imageStyle.borderRadius = '50%';
     } else if (logoShape === 'rounded') {
-      imageBorderRadius = `${logoClearRadiusPx * 0.25}px`;
+      imageStyle.borderRadius = `${logoClearRadiusPx * 0.25}px`;
     }
 
     return (
@@ -369,10 +372,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
           width={effectiveLogoImageSize}
           height={effectiveLogoImageSize}
           preserveAspectRatio="xMidYMid meet"
-          style={{
-            clipPath: clipPath,
-            borderRadius: imageBorderRadius,
-          }}
+          style={imageStyle}
         />
       </g>
     );
