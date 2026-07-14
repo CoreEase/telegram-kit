@@ -1,6 +1,6 @@
 {
   "name": "@core-ease/telegram-kit",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Professional Telegram library : Mini Apps SDK bundled in full (a complete typed TypeScript re-implementation of Telegram's official telegram-web-app.js - no CDN script required) + React hooks, providers, types + Bot API server-side client + zero-dependency .tgs sticker player and Lottie JSON player + standards-compliant zero-dependency QR Code encoder (ISO/IEC 18004) + safe Markdown/HTML formatting, deep-link, and keyboard-builder utilities. Works with React, Vue, vanilla JS, HTML, and Node.js.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
