@@ -4,6 +4,7 @@
 
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
+import { ALLOWED_TELEGRAM_HOSTS } from '../../_internal/core/utils';
 
 type InvoiceStatus = 'paid' | 'cancelled' | 'failed' | 'pending';
 type InvoiceCallback = (status: InvoiceStatus) => void;
@@ -34,7 +35,7 @@ export class InvoiceManager {
     a.href = url;
     const match = a.pathname.match(/^\/(\$|invoice\/)([A-Za-z0-9\-_=]+)$/);
     const slug = match?.[2];
-    if ((a.protocol != 'http:' && a.protocol != 'https:') || a.hostname != 't.me' || !match || !slug) {
+    if ((a.protocol != 'http:' && a.protocol != 'https:') || !ALLOWED_TELEGRAM_HOSTS.includes(a.hostname) || !match || !slug) {
       // eslint-disable-next-line no-console
       console.error('[@core-ease/telegram-kit] Invoice url is invalid', url);
       throwWebAppError(WebAppErrorName.InvoiceUrlInvalid);
