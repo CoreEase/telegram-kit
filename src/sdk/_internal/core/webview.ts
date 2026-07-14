@@ -119,8 +119,6 @@ export class TelegramWebView {
   /** Sends a named event + payload to the native Telegram client. */
   postEvent(eventType: string, callback?: PostEventCallback, eventData: unknown = ''): void {
     const cb: PostEventCallback = callback || (() => {});
-    // eslint-disable-next-line no-console
-    console.log('[@core-ease/telegram-kit:webview] > postEvent', eventType, eventData);
 
     if (window.TelegramWebviewProxy !== undefined) {
       window.TelegramWebviewProxy.postEvent(eventType, JSON.stringify(eventData));
@@ -144,8 +142,6 @@ export class TelegramWebView {
 
   /** Dispatches an incoming event to every subscriber of `eventType`. */
   receiveEvent = (eventType: string, eventData: any): void => {
-    // eslint-disable-next-line no-console
-    console.log('[@core-ease/telegram-kit:webview] < receiveEvent', eventType, eventData);
     this.callEventCallbacks(eventType, (callback) => callback(eventType, eventData));
   };
 
