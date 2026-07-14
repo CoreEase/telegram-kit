@@ -8,6 +8,8 @@ import { WebAppErrorName, throwWebAppError } from '../core/errors';
 import type { OpenLinkOptions, OpenTelegramLinkOptions } from '../types';
 
 export class LinkManager {
+  private readonly ALLOWED_TELEGRAM_HOSTS = ['t.me', 'telegram.me'];
+
   constructor(private readonly kernel: WebAppKernel) {}
 
   openLink(url: string, options: OpenLinkOptions = {}): void {
@@ -36,17 +38,21 @@ export class LinkManager {
   openTelegramLink(url: string, options: OpenTelegramLinkOptions = {}): void {
     const a = document.createElement('A') as HTMLAnchorElement;
     a.href = url;
+
     if (a.protocol != 'http:' && a.protocol != 'https:') {
       // eslint-disable-next-line no-console
       console.error('[@core-ease/telegram-kit] Url protocol is not supported', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
-    if (a.hostname != 't.me') {
+    
+    if (!this.ALLOWED_TELEGRAM_HOSTS.includes(a.hostname)) {
       // eslint-disable-next-line no-console
-      console.error('[@core-ease/telegram-kit] Url host is not supported', url);
+      console.error('[@core-ease/telegram-kit] Url host is not supported. Allowed hosts: t.me, telegram.me', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
+    
     const pathFull = a.pathname + a.search;
+    
     if (this.kernel.webView.isIframe || this.kernel.versionAtLeast('6.1')) {
       const reqParams: Record<string, any> = { path_full: pathFull };
       if (options.force_request) {
@@ -54,27 +60,29 @@ export class LinkManager {
       }
       this.kernel.webView.postEvent('web_app_open_tg_link', undefined, reqParams);
     } else {
-      location.href = 'https://t.me' + pathFull;
+      location.href = a.protocol + '//' + a.hostname + pathFull;
     }
   }
 
   /**
-   * Intercepts clicks on in-page `t.me` links while running inside an
+   * Intercepts clicks on in-page `t.me` / `telegram.me` links while running inside an
    * iframe (web.telegram.org) and routes them through `openTelegramLink`
    * instead of letting the browser navigate directly.
    */
   handleDocumentClick = (e: MouseEvent): void => {
     if (e.metaKey || e.ctrlKey) return;
+    
     let el = e.target as HTMLElement | null;
     while (el && el.tagName != 'A' && el.parentNode) {
       el = el.parentNode as HTMLElement;
     }
+    
     if (
       el &&
       el.tagName == 'A' &&
       (el as HTMLAnchorElement).target != '_blank' &&
       ((el as HTMLAnchorElement).protocol == 'http:' || (el as HTMLAnchorElement).protocol == 'https:') &&
-      (el as HTMLAnchorElement).hostname == 't.me'
+      this.ALLOWED_TELEGRAM_HOSTS.includes((el as HTMLAnchorElement).hostname)
     ) {
       this.openTelegramLink((el as HTMLAnchorElement).href);
       e.preventDefault();
