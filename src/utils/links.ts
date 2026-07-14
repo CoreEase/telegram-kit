@@ -63,7 +63,7 @@ export interface BuildStartLinkOptions extends StartParamInput {
 
 export function buildStartLink(options: BuildStartLinkOptions): string {
   const param = resolveStartParam(options);
-  const base = `https://t.me/${options.botUsername}`;
+  const base = `https://telegram.me/${options.botUsername}`;
   return param ? `${base}?start=${param}` : base;
 }
 
@@ -76,8 +76,8 @@ export interface BuildStartAppLinkOptions extends StartParamInput {
 export function buildStartAppLink(options: BuildStartAppLinkOptions): string {
   const param = resolveStartParam(options);
   const base = options.appName
-    ? `https://t.me/${options.botUsername}/${options.appName}`
-    : `https://t.me/${options.botUsername}`;
+    ? `https://telegram.me/${options.botUsername}/${options.appName}`
+    : `https://telegram.me/${options.botUsername}`;
   const query = new URLSearchParams();
   if (param) query.set('startapp', param);
   if (options.mode) query.set('mode', options.mode);
@@ -93,7 +93,7 @@ export interface BuildShareLinkOptions {
 export function buildShareLink(options: BuildShareLinkOptions): string {
   const query = new URLSearchParams({ url: options.url });
   if (options.text) query.set('text', options.text);
-  return `https://t.me/share/url?${query.toString()}`;
+  return `https://telegram.me/share/url?${query.toString()}`;
 }
 
 export type ParsedTelegramLink =
