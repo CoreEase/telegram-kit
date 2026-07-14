@@ -115,8 +115,14 @@ export function useTelegramBackButton(options?: {
   pathname?: string;
   onBack?: () => void;
   hideOnRoot?: boolean;
+  rootPath?: string;
 }): void {
-  const { pathname = '/', onBack, hideOnRoot = true } = options ?? {};
+  const { 
+    pathname = '/', 
+    onBack, 
+    hideOnRoot = true,
+    rootPath = '/' 
+  } = options ?? {};
 
   useEffect(() => {
     const wa = getWebApp();
@@ -132,7 +138,7 @@ export function useTelegramBackButton(options?: {
 
     wa.onEvent('backButtonClicked', handleBack);
 
-    if (hideOnRoot && pathname === '/') {
+    if (hideOnRoot && pathname === rootPath) {
       wa.BackButton.hide();
     } else {
       wa.BackButton.show();
@@ -142,7 +148,7 @@ export function useTelegramBackButton(options?: {
       wa.offEvent('backButtonClicked', handleBack);
       wa.BackButton?.hide();
     };
-  }, [pathname, onBack, hideOnRoot]);
+  }, [pathname, onBack, hideOnRoot, rootPath]);
 }
 
 export function useTelegramMainButton(options: {
