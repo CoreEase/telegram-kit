@@ -123,12 +123,12 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     backgroundColor = 'transparent',
     logo,
     logoSize,
-    logoPadding = 8,
+    logoPadding = 6,
     logoShape = 'circle',
     logoBackgroundColor,
     onLogoSizeClamped,
     quietZone = 4,
-    borderRadius = 0,
+    borderRadius = 25,
     className = '',
     style = {},
   },
@@ -144,7 +144,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   const isStylized =
     resolvedDotShape !== 'square' || resolvedCornerSquareShape !== 'square' || resolvedCornerDotShape !== 'square';
   const resolvedLevel: ErrorCorrectionLevel =
-    errorCorrectionLevel ?? (logo ? 'H' : isStylized ? 'Q' : 'M');
+    errorCorrectionLevel ?? (logo ? 'L' : isStylized ? 'Q' : 'M');
   const requestedLogoSize = logoSize ?? size * 0.2;
 
   const result = useMemo(() => {
