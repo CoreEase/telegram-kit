@@ -110,6 +110,26 @@ function dotPath(
   };
 }
 
+function getLogoClipPath(
+  center: number,
+  radius: number,
+  shape: QRLogoShape,
+  borderRadius?: number
+): string | undefined {
+  if (shape === 'none') return undefined;
+  
+  if (shape === 'circle') {
+    return `circle(${radius}px at ${center}px ${center}px)`;
+  }
+  
+  if (shape === 'rounded') {
+    const r = borderRadius ?? radius * 0.25;
+    return `inset(0px round ${r}px)`;
+  }
+  
+  return undefined;
+}
+
 export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCode(
   {
     value,
@@ -125,7 +145,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     logoSize,
     logoPadding = 6,
     logoShape = 'circle',
-    logoBackgroundColor,
+    logoBackgroundColor = 'transparent',
     onLogoSizeClamped,
     quietZone = 4,
     borderRadius = 25,
@@ -315,18 +335,28 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   const renderLogo = () => {
     if (!logo || logoClearRadiusPx <= 0) return null;
     const center = size / 2;
-    const backdropColor =
-      logoBackgroundColor ?? (backgroundColor === 'transparent' ? '#ffffff' : backgroundColor);
+
+    const backdropColor = logoBackgroundColor ?? 'transparent';
 
     let backdrop: React.ReactElement | null = null;
-    if (logoShape === 'circle') {
-      backdrop = <circle cx={center} cy={center} r={logoClearRadiusPx} fill={backdropColor} />;
-    } else if (logoShape === 'square' || logoShape === 'rounded') {
-      const radii =
-        logoShape === 'rounded'
+    if (backdropColor !== 'transparent') {
+      if (logoShape === 'circle') {
+        backdrop = <circle cx={center} cy={center} r={logoClearRadiusPx} fill={backdropColor} />;
+      } else if (logoShape === 'square' || logoShape === 'rounded') {
+        const radii = logoShape === 'rounded'
           ? { tl: logoClearRadiusPx * 0.25, tr: logoClearRadiusPx * 0.25, br: logoClearRadiusPx * 0.25, bl: logoClearRadiusPx * 0.25 }
           : { tl: 0, tr: 0, br: 0, bl: 0 };
-      backdrop = <path d={roundedRectPath(center, center, logoClearRadiusPx, radii)} fill={backdropColor} />;
+        backdrop = <path d={roundedRectPath(center, center, logoClearRadiusPx, radii)} fill={backdropColor} />;
+      }
+    }
+
+    const clipPath = getLogoClipPath(center, logoClearRadiusPx, logoShape);
+
+    let imageBorderRadius = 0;
+    if (logoShape === 'circle') {
+      imageBorderRadius = '50%';
+    } else if (logoShape === 'rounded') {
+      imageBorderRadius = `${logoClearRadiusPx * 0.25}px`;
     }
 
     return (
@@ -339,6 +369,10 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
           width={effectiveLogoImageSize}
           height={effectiveLogoImageSize}
           preserveAspectRatio="xMidYMid meet"
+          style={{
+            clipPath: clipPath,
+            borderRadius: imageBorderRadius,
+          }}
         />
       </g>
     );
