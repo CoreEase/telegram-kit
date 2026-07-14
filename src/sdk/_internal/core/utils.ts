@@ -78,7 +78,7 @@ export function urlAppendHashParams(url: string, addHash: string): string {
   return url + addHash;
 }
 
-const SESSION_STORAGE_PREFIX = '__telegram__';
+const SESSION_STORAGE_PREFIX = '__telegram-kit__';
 
 export function sessionStorageSet(key: string, value: unknown): boolean {
   try {
