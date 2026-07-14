@@ -11,6 +11,8 @@ export const ALLOWED_TELEGRAM_HOSTS = [
   'telegram.dog',
 ];
 
+const SESSION_STORAGE_PREFIX = 'telegram-kit__';
+
 export function urlSafeDecode(urlencoded: string): string {
   try {
     urlencoded = urlencoded.replace(/\+/g, '%20');
@@ -83,8 +85,6 @@ export function urlAppendHashParams(url: string, addHash: string): string {
   // https://game.com/# -> https://game.com/#tgShareScoreUrl=etc
   return url + addHash;
 }
-
-const SESSION_STORAGE_PREFIX = '__telegram-kit__';
 
 export function sessionStorageSet(key: string, value: unknown): boolean {
   try {
