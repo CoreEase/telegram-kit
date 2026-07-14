@@ -5,6 +5,12 @@
  * IIFE (strTrim, byteLength, versionCompare, parseColorToHex, isColorDark).
  */
 
+export const ALLOWED_TELEGRAM_HOSTS = [
+  't.me',
+  'telegram.me',
+  'telegram.dog',
+];
+
 export function urlSafeDecode(urlencoded: string): string {
   try {
     urlencoded = urlencoded.replace(/\+/g, '%20');
