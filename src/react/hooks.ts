@@ -138,7 +138,14 @@ export function useTelegramBackButton(options?: {
 
     wa.onEvent('backButtonClicked', handleBack);
 
-    if (hideOnRoot && pathname === rootPath) {
+    const isRoot = hideOnRoot && (
+      pathname === rootPath || 
+      pathname === `${rootPath}/` || 
+      pathname.startsWith(`${rootPath}?`) ||
+      pathname.startsWith(`${rootPath}/?`)
+    );
+
+    if (isRoot) {
       wa.BackButton.hide();
     } else {
       wa.BackButton.show();
