@@ -86,14 +86,18 @@ export function buildStartAppLink(options: BuildStartAppLinkOptions): string {
 }
 
 export interface BuildShareLinkOptions {
-  url: string;
+  url?: string;
   text?: string;
 }
 
-export function buildShareLink(options: BuildShareLinkOptions): string {
-  const query = new URLSearchParams({ url: options.url });
+export function buildShareLink(options: BuildShareLinkOptions = {}): string {
+  const query = new URLSearchParams();
+  
+  if (options.url) query.set('url', options.url);
   if (options.text) query.set('text', options.text);
-  return `https://telegram.me/share/url?${query.toString()}`;
+  
+  const queryString = query.toString();
+  return queryString ? `https://telegram.me/share/url?${queryString}` : 'https://telegram.me/share/url';
 }
 
 export type ParsedTelegramLink =
