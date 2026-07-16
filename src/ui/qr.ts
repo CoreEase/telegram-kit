@@ -13,3 +13,6 @@ export type {
 
 export { encodeQRCode, qrCodeToSVG } from '../_internal/qr/Qr';
 export type { QrEncodeOptions, QrEncodeResult, ErrorCorrectionLevel, QrSvgOptions } from '../_internal/qr/Qr';
+
+export { QRCodeGram } from '../_internal/qr/QrCodeGram';
+export type { QRCodeGramProps} from '../_internal/qr/QrCodeGram';
