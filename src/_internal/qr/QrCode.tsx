@@ -11,13 +11,18 @@ export interface QRDotsOptions {
   color?: string;
   style?: QRDotShape;
 }
+
 export interface QRCornersSquareOptions {
   color?: string;
   style?: QRCornerSquareShape;
+  outerSize?: number;
+  innerSize?: number;
 }
+
 export interface QRCornersDotOptions {
   color?: string;
   style?: QRCornerDotShape;
+  dotSize?: number;
 }
 
 export interface QRCodeProps {
@@ -133,7 +138,7 @@ function getLogoClipPath(
 export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCode(
   {
     value,
-    size = 256,
+    size = 250,
     errorCorrectionLevel,
     dotsOptions,
     cornersSquareOptions,
@@ -143,7 +148,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     backgroundColor = 'transparent',
     logo,
     logoSize,
-    logoPadding = 6,
+    logoPadding = 2,
     logoShape = 'circle',
     logoBackgroundColor = 'transparent',
     onLogoSizeClamped,
@@ -160,6 +165,9 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   const resolvedCornerSquareShape: QRCornerSquareShape = cornersSquareOptions?.style ?? 'square';
   const resolvedCornerDotColor = cornersDotOptions?.color ?? resolvedCornerSquareColor;
   const resolvedCornerDotShape: QRCornerDotShape = cornersDotOptions?.style ?? 'square';
+  const resolvedCornerOuterSize = cornersSquareOptions?.outerSize ?? 3.5;
+  const resolvedCornerInnerSize = cornersSquareOptions?.innerSize ?? 2.5;
+  const resolvedCornerDotSize = cornersDotOptions?.dotSize ?? 1.5;
 
   const isStylized =
     resolvedDotShape !== 'square' || resolvedCornerSquareShape !== 'square' || resolvedCornerDotShape !== 'square';
@@ -263,8 +271,8 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   };
 
   const renderCornerSquare = (cx: number, cy: number, key: string) => {
-    const outerHalf = cellSize * 3.5;
-    const innerHalf = cellSize * 2.5;
+    const outerHalf = cellSize * resolvedCornerOuterSize;
+    const innerHalf = cellSize * resolvedCornerInnerSize;
     const strokeMid = (outerHalf + innerHalf) / 2;
     const strokeWidth = outerHalf - innerHalf;
 
@@ -300,7 +308,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   };
 
   const renderCornerDot = (cx: number, cy: number, key: string) => {
-    const half = cellSize * 1.5;
+    const half = cellSize * resolvedCornerDotSize;
     if (resolvedCornerDotShape === 'dot') {
       return <circle key={key} cx={cx} cy={cy} r={half} fill={resolvedCornerDotColor} />;
     }
