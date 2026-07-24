@@ -117,33 +117,36 @@ export function useTelegramBackButton(options?: {
   hideOnRoot?: boolean;
   rootPath?: string;
 }): void {
-  const { 
-    pathname = '/', 
-    onBack, 
+  const {
+    pathname = "/",
+    onBack,
     hideOnRoot = true,
-    rootPath = '/' 
+    rootPath = "/",
   } = options ?? {};
 
   useEffect(() => {
     const wa = getWebApp();
     if (!wa?.BackButton) return;
 
-    const handleBack = onBack ?? (() => {
-      if (typeof window !== 'undefined' && window.history.length > 1) {
-        window.history.back();
-      } else {
-        wa.close();
-      }
-    });
+    const handleBack =
+      onBack ??
+      (() => {
+        if (typeof window !== "undefined" && window.history.length > 1) {
+          window.history.back();
+        } else {
+          wa.close();
+        }
+      });
 
-    wa.onEvent('backButtonClicked', handleBack);
+    wa.offEvent("backButtonClicked", handleBack);
+    wa.onEvent("backButtonClicked", handleBack);
 
-    const isRoot = hideOnRoot && (
-      pathname === rootPath || 
-      pathname === `${rootPath}/` || 
-      pathname.startsWith(`${rootPath}?`) ||
-      pathname.startsWith(`${rootPath}/?`)
-    );
+    const isRoot =
+      hideOnRoot &&
+      (pathname === rootPath ||
+        pathname === `${rootPath}/` ||
+        pathname.startsWith(`${rootPath}?`) ||
+        pathname.startsWith(`${rootPath}/?`));
 
     if (isRoot) {
       wa.BackButton.hide();
@@ -152,8 +155,7 @@ export function useTelegramBackButton(options?: {
     }
 
     return () => {
-      wa.offEvent('backButtonClicked', handleBack);
-      wa.BackButton?.hide();
+      wa.offEvent("backButtonClicked", handleBack);
     };
   }, [pathname, onBack, hideOnRoot, rootPath]);
 }
