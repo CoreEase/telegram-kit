@@ -534,7 +534,7 @@ export function scanQr(text?: string): Promise<string | null> {
           return true;
         });
       }),
-    fallback: () => false, // fallback: () => scanQrFallback(text),
+    fallback: () => Promise.resolve(null), // fallback: () => scanQrFallback(text),
   });
 }
 
