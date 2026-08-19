@@ -116,27 +116,40 @@ export function useTelegramBackButton(options?: {
   onBack?: () => void;
   hideOnRoot?: boolean;
   rootPath?: string;
+  onBeforeBack?: () => boolean;
 }): void {
   const {
     pathname = "/",
     onBack,
     hideOnRoot = true,
     rootPath = "/",
+    onBeforeBack,
   } = options ?? {};
+
+  const onBeforeBackRef = useRef(onBeforeBack);
+  onBeforeBackRef.current = onBeforeBack;
+
+  const onBackRef = useRef(onBack);
+  onBackRef.current = onBack;
 
   useEffect(() => {
     const wa = getWebApp();
     if (!wa?.BackButton) return;
 
-    const handleBack =
-      onBack ??
-      (() => {
-        if (typeof window !== "undefined" && window.history.length > 1) {
-          window.history.back();
-        } else {
-          wa.close();
-        }
-      });
+    const handleBack = () => {
+      if (onBeforeBackRef.current?.()) return;
+
+      if (onBackRef.current) {
+        onBackRef.current();
+        return;
+      }
+
+      if (typeof window !== "undefined" && window.history.length > 1) {
+        window.history.back();
+      } else {
+        wa.close();
+      }
+    };
 
     wa.offEvent("backButtonClicked", handleBack);
     wa.onEvent("backButtonClicked", handleBack);
@@ -157,7 +170,7 @@ export function useTelegramBackButton(options?: {
     return () => {
       wa.offEvent("backButtonClicked", handleBack);
     };
-  }, [pathname, onBack, hideOnRoot, rootPath]);
+  }, [pathname, hideOnRoot, rootPath]);
 }
 
 export function useTelegramMainButton(options: {
