@@ -117,6 +117,7 @@ export function useTelegramBackButton(options?: {
   hideOnRoot?: boolean;
   rootPath?: string;
   onBeforeBack?: () => boolean;
+  forceShow?: boolean;
 }): void {
   const {
     pathname = "/",
@@ -124,6 +125,7 @@ export function useTelegramBackButton(options?: {
     hideOnRoot = true,
     rootPath = "/",
     onBeforeBack,
+    forceShow = false,
   } = options ?? {};
 
   const onBeforeBackRef = useRef(onBeforeBack);
@@ -161,7 +163,7 @@ export function useTelegramBackButton(options?: {
         pathname.startsWith(`${rootPath}?`) ||
         pathname.startsWith(`${rootPath}/?`));
 
-    if (isRoot) {
+    if (isRoot && !forceShow) {
       wa.BackButton.hide();
     } else {
       wa.BackButton.show();
@@ -170,7 +172,7 @@ export function useTelegramBackButton(options?: {
     return () => {
       wa.offEvent("backButtonClicked", handleBack);
     };
-  }, [pathname, hideOnRoot, rootPath]);
+  }, [pathname, hideOnRoot, rootPath, forceShow]);
 }
 
 export function useTelegramMainButton(options: {
