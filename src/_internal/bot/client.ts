@@ -111,6 +111,43 @@ import type {
   TelegramApiResponse,
   ResponseParameters,
   ReplyMarkup,
+  SendLivePhotoParams,
+  SendMessageDraftParams,
+  GetUserProfileAudiosParams,
+  SetChatMemberTagParams,
+  AnswerChatJoinRequestQueryParams,
+  SendChatJoinRequestWebAppParams,
+  GetUserPersonalChatMessagesParams,
+  AnswerGuestQueryParams,
+  GetManagedBotTokenParams,
+  ReplaceManagedBotTokenParams,
+  GetManagedBotAccessSettingsParams,
+  SetManagedBotAccessSettingsParams,
+  SetMyProfilePhotoParams,
+  RemoveMyProfilePhotoParams,
+  GiftPremiumSubscriptionParams,
+  GetUserGiftsParams,
+  GetChatGiftsParams,
+  RepostStoryParams,
+  SavePreparedKeyboardButtonParams,
+  EditEphemeralMessageTextParams,
+  EditEphemeralMessageMediaParams,
+  EditEphemeralMessageCaptionParams,
+  EditEphemeralMessageReplyMarkupParams,
+  ApproveSuggestedPostParams,
+  DeclineSuggestedPostParams,
+  DeleteEphemeralMessageParams,
+  DeleteMessageReactionParams,
+  DeleteAllMessageReactionsParams,
+  SendRichMessageParams,
+  SendRichMessageDraftParams,
+  GetMyStarBalanceParams,
+  UserProfileAudios,
+  BotAccessSettings,
+  PreparedKeyboardButton,
+  SentGuestMessage,
+  OwnedGifts,
+  StarAmount,
 } from '../../types/bot';
 
 export { TelegramApiError } from '../../types/bot';
@@ -864,5 +901,129 @@ export class TelegramBot {
 
   callMethod<T = unknown>(method: string, params?: unknown): Promise<T> {
     return this.request<T>(method, params);
+  }
+
+  sendLivePhoto(params: SendLivePhotoParams): Promise<Message> {
+    return this.request<Message>('sendLivePhoto', params);
+  }
+
+  sendMessageDraft(params: SendMessageDraftParams): Promise<true> {
+    return this.request<true>('sendMessageDraft', params);
+  }
+
+  getUserProfileAudios(params: GetUserProfileAudiosParams): Promise<UserProfileAudios> {
+    return this.request<UserProfileAudios>('getUserProfileAudios', params);
+  }
+
+  setChatMemberTag(params: SetChatMemberTagParams): Promise<true> {
+    return this.request<true>('setChatMemberTag', params);
+  }
+
+  answerChatJoinRequestQuery(params: AnswerChatJoinRequestQueryParams): Promise<true> {
+    return this.request<true>('answerChatJoinRequestQuery', params);
+  }
+
+  sendChatJoinRequestWebApp(params: SendChatJoinRequestWebAppParams): Promise<true> {
+    return this.request<true>('sendChatJoinRequestWebApp', params);
+  }
+
+  getUserPersonalChatMessages(params: GetUserPersonalChatMessagesParams): Promise<Message[]> {
+    return this.request<Message[]>('getUserPersonalChatMessages', params);
+  }
+
+  answerGuestQuery(params: AnswerGuestQueryParams): Promise<SentGuestMessage> {
+    return this.request<SentGuestMessage>('answerGuestQuery', params);
+  }
+
+  getManagedBotToken(params: GetManagedBotTokenParams): Promise<string> {
+    return this.request<string>('getManagedBotToken', params);
+  }
+
+  replaceManagedBotToken(params: ReplaceManagedBotTokenParams): Promise<string> {
+    return this.request<string>('replaceManagedBotToken', params);
+  }
+
+  getManagedBotAccessSettings(params: GetManagedBotAccessSettingsParams): Promise<BotAccessSettings> {
+    return this.request<BotAccessSettings>('getManagedBotAccessSettings', params);
+  }
+
+  setManagedBotAccessSettings(params: SetManagedBotAccessSettingsParams): Promise<true> {
+    return this.request<true>('setManagedBotAccessSettings', params);
+  }
+
+  setMyProfilePhoto(params: SetMyProfilePhotoParams): Promise<true> {
+    return this.request<true>('setMyProfilePhoto', params);
+  }
+
+  removeMyProfilePhoto(params?: RemoveMyProfilePhotoParams): Promise<true> {
+    return this.request<true>('removeMyProfilePhoto', params);
+  }
+
+  giftPremiumSubscription(params: GiftPremiumSubscriptionParams): Promise<true> {
+    return this.request<true>('giftPremiumSubscription', params);
+  }
+
+  getUserGifts(params: GetUserGiftsParams): Promise<OwnedGifts> {
+    return this.request<OwnedGifts>('getUserGifts', params);
+  }
+
+  getChatGifts(params: GetChatGiftsParams): Promise<OwnedGifts> {
+    return this.request<OwnedGifts>('getChatGifts', params);
+  }
+
+  repostStory(params: RepostStoryParams): Promise<true> {
+    return this.request<true>('repostStory', params);
+  }
+
+  savePreparedKeyboardButton(params: SavePreparedKeyboardButtonParams): Promise<PreparedKeyboardButton> {
+    return this.request<PreparedKeyboardButton>('savePreparedKeyboardButton', params);
+  }
+
+  editEphemeralMessageText(params: EditEphemeralMessageTextParams): Promise<true> {
+    return this.request<true>('editEphemeralMessageText', params);
+  }
+
+  editEphemeralMessageMedia(params: EditEphemeralMessageMediaParams): Promise<true> {
+    return this.request<true>('editEphemeralMessageMedia', params);
+  }
+
+  editEphemeralMessageCaption(params: EditEphemeralMessageCaptionParams): Promise<true> {
+    return this.request<true>('editEphemeralMessageCaption', params);
+  }
+
+  editEphemeralMessageReplyMarkup(params: EditEphemeralMessageReplyMarkupParams): Promise<true> {
+    return this.request<true>('editEphemeralMessageReplyMarkup', params);
+  }
+
+  approveSuggestedPost(params: ApproveSuggestedPostParams): Promise<true> {
+    return this.request<true>('approveSuggestedPost', params);
+  }
+
+  declineSuggestedPost(params: DeclineSuggestedPostParams): Promise<true> {
+    return this.request<true>('declineSuggestedPost', params);
+  }
+
+  deleteEphemeralMessage(params: DeleteEphemeralMessageParams): Promise<true> {
+    return this.request<true>('deleteEphemeralMessage', params);
+  }
+
+  deleteMessageReaction(params: DeleteMessageReactionParams): Promise<true> {
+    return this.request<true>('deleteMessageReaction', params);
+  }
+
+  deleteAllMessageReactions(params: DeleteAllMessageReactionsParams): Promise<true> {
+    return this.request<true>('deleteAllMessageReactions', params);
+  }
+
+  sendRichMessage(params: SendRichMessageParams): Promise<Message> {
+    return this.request<Message>('sendRichMessage', params);
+  }
+
+  sendRichMessageDraft(params: SendRichMessageDraftParams): Promise<true> {
+    return this.request<true>('sendRichMessageDraft', params);
+  }
+
+  getMyStarBalance(params?: GetMyStarBalanceParams): Promise<StarAmount> {
+    return this.request<StarAmount>('getMyStarBalance', params);
   }
 }

@@ -12,6 +12,9 @@ export interface User {
   supports_inline_queries?: boolean;
   can_connect_to_business?: boolean;
   has_main_web_app?: boolean;
+  has_topics_enabled?: boolean;
+  supports_guest_queries?: boolean;
+  supports_join_request_queries?: boolean;
 }
 
 export type ChatType = 'private' | 'group' | 'supergroup' | 'channel';
@@ -63,6 +66,13 @@ export interface ChatFullInfo extends Chat {
   business_opening_hours?: BusinessOpeningHours;
   personal_chat?: Chat;
   birthdate?: Birthdate;
+  accepted_gift_types?: AcceptedGiftTypes;
+  is_direct_messages?: boolean;
+  guard_bot?: User;
+  paid_message_star_count?: number;
+  parent_chat?: Chat;
+  rating?: UserRating;
+  unique_gift_colors?: UniqueGiftColors;
 }
 
 export interface Message {
@@ -718,6 +728,9 @@ export interface ReplyParameters {
   quote_parse_mode?: string;
   quote_entities?: MessageEntity[];
   quote_position?: number;
+  ephemeral_message_id?: number;
+  poll_option_id?: string;
+  checklist_task_id?: number;
 }
 
 export interface LinkPreviewOptions {
@@ -915,6 +928,8 @@ export interface ExternalReplyInfo {
   location?: Location;
   poll?: Poll;
   venue?: Venue;
+  live_photo?: LivePhoto;
+  checklist?: Checklist;
 }
 
 export interface TextQuote {
@@ -2047,6 +2062,8 @@ export interface StarTransactions {
 
 export type TransactionPartner =
   | TransactionPartnerUser
+  | TransactionPartnerChat
+  | TransactionPartnerAffiliateProgram
   | TransactionPartnerFragment
   | TransactionPartnerTelegramAds
   | TransactionPartnerTelegramApi
@@ -2055,12 +2072,24 @@ export type TransactionPartner =
 export interface TransactionPartnerUser {
   type: 'user';
   user: User;
+  transaction_type?: string;
   affiliate?: AffiliateInfo;
   invoice_payload?: string;
   subscription_period?: number;
   paid_media?: PaidMedia[];
   paid_media_payload?: string;
   gift?: Gift;
+  premium_subscription_duration?: number;
+}
+export interface TransactionPartnerChat {
+  type: 'chat';
+  chat: Chat;
+  gift?: Gift;
+}
+export interface TransactionPartnerAffiliateProgram {
+  type: 'affiliate_program';
+  sponsor_user: User;
+  commission_per_mille: number;
 }
 
 export interface TransactionPartnerFragment { type: 'fragment'; withdrawal_state?: RevenueWithdrawalState; }
@@ -2076,10 +2105,22 @@ export interface AffiliateInfo {
   nanostar_amount?: number;
 }
 
-export interface RevenueWithdrawalState {
-  type: 'pending' | 'succeeded' | 'failed';
-  date?: number;
-  url?: string;
+export type RevenueWithdrawalState =
+  | RevenueWithdrawalStatePending
+  | RevenueWithdrawalStateSucceeded
+  | RevenueWithdrawalStateFailed;
+export interface RevenueWithdrawalStatePending {
+  type: 'pending';
+}
+export interface RevenueWithdrawalStateSucceeded {
+  type: 'succeeded';
+  date: number;
+  url: string;
+}
+export interface RevenueWithdrawalStateFailed {
+  type: 'failed';
+  date: number;
+  url: string;
 }
 
 export interface PaidMediaPurchased {
@@ -2258,4 +2299,902 @@ export class TelegramApiError extends Error {
     super(`Telegram API error ${errorCode}: ${description}`);
     this.name = 'TelegramApiError';
   }
+}
+
+export interface LivePhoto {
+  photo?: PhotoSize[];
+  file_id: string;
+  file_unique_id: string;
+  width?: number;
+  height?: number;
+  duration?: number;
+  mime_type?: string;
+  file_size?: number;
+}
+
+export interface InputMediaLivePhoto {
+  type: 'live_photo';
+  media: string;
+  photo?: string;
+  caption?: string;
+  parse_mode?: string;
+  caption_entities?: MessageEntity[];
+  show_caption_above_media?: boolean;
+  has_spoiler?: boolean;
+}
+
+export interface VideoQuality {
+  file_id: string;
+  file_unique_id: string;
+  width: number;
+  height: number;
+  codec: string;
+  file_size?: number;
+}
+
+export interface RichMessage {
+  blocks: RichBlock[];
+  is_rtl?: boolean;
+}
+
+export interface RichBlock {
+  type: string;
+  text: RichText;
+}
+
+export type RichText =
+  | RichTextText
+  | RichTextCustomEmoji
+  | RichTextUrl
+  | RichTextMention
+  | RichTextPremium
+  | RichTextLink;
+
+export interface RichTextText {
+  type: 'text';
+  text: string;
+}
+
+export interface RichTextCustomEmoji {
+  type: 'custom_emoji';
+  custom_emoji_id: string;
+}
+
+export interface RichTextUrl {
+  type: 'url';
+  url: string;
+  text: RichText;
+}
+
+export interface RichTextMention {
+  type: 'mention';
+  user?: User;
+  text: RichText;
+}
+
+export interface RichTextPremium {
+  type: 'premium';
+  user?: User;
+  text: RichText;
+}
+
+export interface RichTextLink {
+  type: 'link';
+  url: string;
+  text: RichText;
+}
+
+export interface InputRichMessage {
+  blocks?: InputRichBlock[];
+  html?: string;
+  markdown?: string;
+  media?: InputRichMessageMedia[];
+  is_rtl?: boolean;
+  skip_entity_detection?: boolean;
+}
+
+export type InputRichBlock =
+  | InputRichBlockText
+  | InputRichBlockReaction
+  | InputRichBlockLink
+  | InputRichBlockMention
+  | InputRichBlockCustomEmoji
+  | InputRichBlockPremium
+  | InputRichBlockPaidMedia;
+
+export interface InputRichBlockText {
+  type: 'text';
+  text: RichText;
+}
+
+export interface InputRichBlockReaction {
+  type: 'reaction';
+  text: RichText;
+}
+
+export interface InputRichBlockLink {
+  type: 'link';
+  url: string;
+  text: RichText;
+}
+
+export interface InputRichBlockMention {
+  type: 'mention';
+  user_id?: number;
+  text: RichText;
+}
+
+export interface InputRichBlockCustomEmoji {
+  type: 'custom_emoji';
+  custom_emoji_id: string;
+}
+
+export interface InputRichBlockPremium {
+  type: 'premium';
+  user_id?: number;
+  text: RichText;
+}
+
+export interface InputRichBlockPaidMedia {
+  type: 'paid_media';
+  media: string;
+}
+
+export interface InputRichMessageMedia {
+  id: string;
+  media: InputMediaAnimation | InputMediaAudio | InputMediaPhoto | InputMediaVideo | InputMediaVoiceNote;
+}
+
+export interface InputRichMessageLink {
+  type: 'link';
+  url: string;
+  text: RichText;
+}
+
+export interface InputRichMessageReaction {
+  type: 'reaction';
+  text: RichText;
+}
+
+export interface InputRichMessagePaidMedia {
+  type: 'paid_media';
+  media: InputMedia;
+}
+
+export interface InputRichMessageMention {
+  type: 'mention';
+  user_id?: number;
+  text: RichText;
+}
+
+export interface InputRichMessageCustomEmoji {
+  type: 'custom_emoji';
+  custom_emoji_id: string;
+}
+
+export interface InputRichMessagePremium {
+  type: 'premium';
+  user_id?: number;
+  text: RichText;
+}
+
+export interface InputMediaVoiceNote {
+  type: 'voice_note';
+  media: string;
+  caption?: string;
+  parse_mode?: string;
+  caption_entities?: MessageEntity[];
+  duration?: number;
+}
+
+export interface Checklist {
+  title?: string;
+  title_entities?: MessageEntity[];
+  tasks: ChecklistTask[];
+  others_can_add_tasks?: boolean;
+  others_can_mark_tasks_as_done?: boolean;
+}
+
+export interface ChecklistTask {
+  id: number;
+  text: string;
+  text_entities?: MessageEntity[];
+  completed_by_user?: User;
+  completed_by_chat?: Chat;
+  completion_date?: number;
+}
+
+export interface ChecklistTasksAdded {
+  checklist_message: Message;
+  tasks: ChecklistTask[];
+}
+
+export interface ChecklistTasksDone {
+  checklist_message: Message;
+  marked_as_done_task_ids: number[];
+  marked_as_not_done_task_ids: number[];
+}
+
+export interface PollOptionAdded {
+  poll_message: MaybeInaccessibleMessage;
+  option_persistent_id: string;
+  option_text: string;
+  option_text_entities?: MessageEntity[];
+}
+
+export interface PollOptionDeleted {
+  poll_message: MaybeInaccessibleMessage;
+  option_persistent_id: string;
+  option_text: string;
+  option_text_entities?: MessageEntity[];
+}
+
+export interface ChatOwnerChanged {
+  new_owner: User;
+}
+
+export interface ChatOwnerLeft {
+  new_owner: User;
+}
+
+export interface CommunityChatAdded {
+  community: Community;
+}
+
+export interface CommunityChatRemoved {
+  name?: string;
+  icon_color?: number;
+  icon_custom_emoji_id?: string;
+  is_name_implicit?: boolean;
+}
+
+export interface DirectMessagePriceChanged {
+  are_direct_messages_enabled: boolean;
+  direct_message_star_count: number;
+}
+
+export interface PaidMessagePriceChanged {
+  paid_message_star_count: number;
+}
+
+export interface ManagedBotCreated {
+  bot: User;
+}
+
+export interface SuggestedPostInfo {
+  state: string;
+  price?: SuggestedPostPrice;
+  send_date?: number;
+}
+
+export interface SuggestedPostApproved {
+  suggested_post_message?: Message;
+  price?: SuggestedPostPrice;
+  send_date?: number;
+}
+
+export interface SuggestedPostDeclined {
+  suggested_post_message?: Message;
+  comment?: string;
+}
+
+export interface SuggestedPostPaid {
+  suggested_post_message?: Message;
+  currency: string;
+  amount?: number;
+  star_amount?: StarAmount;
+}
+
+export interface SuggestedPostRefunded {
+  suggested_post_message?: Message;
+  reason: string;
+}
+
+export interface SuggestedPostApprovalFailed {
+  suggested_post_message?: Message;
+  price: SuggestedPostPrice;
+}
+
+export interface SuggestedPostParameters {
+  price?: SuggestedPostPrice;
+  send_date?: number;
+}
+
+export interface SuggestedPostPrice {
+  currency: string;
+  amount: number;
+}
+
+export interface DirectMessagesTopic {
+  topic_id: number;
+  user: User;
+}
+
+export interface ManagedBotUpdated {
+  user: User;
+  bot: User;
+}
+
+export interface BotSubscriptionUpdated {
+  user: User;
+  invoice_payload: string;
+  state: string;
+}
+
+export interface BotAccessSettings {
+  is_access_restricted: boolean;
+  added_users?: User[];
+}
+
+export interface UserProfileAudios {
+  total_count: number;
+  audios: Audio[];
+}
+
+export interface UserRating {
+  level: number;
+  rating: number;
+  current_level_rating: number;
+  next_level_rating?: number;
+}
+
+export interface AcceptedGiftTypes {
+  unlimited_gifts?: boolean;
+  limited_gifts?: boolean;
+  unique_gifts?: boolean;
+  premium_subscription?: boolean;
+  gifts_from_channels?: boolean;
+}
+
+export interface Gifts {
+  gifts: Gift[];
+}
+
+export interface OwnedGifts {
+  total_count: number;
+  gifts: OwnedGift[];
+  next_offset?: string;
+}
+
+export interface OwnedGift {
+  type: string;
+  gift: Gift;
+  owned_gift_id?: string;
+  sender_user?: User;
+  send_date?: number;
+  text?: string;
+  entities?: MessageEntity[];
+  is_private?: boolean;
+  is_saved?: boolean;
+  can_be_upgraded?: boolean;
+  was_refunded?: boolean;
+  convert_star_count?: number;
+  prepaid_upgrade_star_count?: number;
+  is_upgrade_separate?: boolean;
+  unique_gift_number?: number;
+}
+
+export interface GiftBackground {
+  center_color?: number;
+  edge_color?: number;
+  text_color?: number;
+}
+
+export interface GiftInfo {
+  gift: Gift;
+  owned_gift_id?: string;
+  convert_star_count?: number;
+  prepaid_upgrade_star_count?: number;
+  is_upgrade_separate?: boolean;
+  can_be_upgraded?: boolean;
+  text?: string;
+  entities?: MessageEntity[];
+  is_private?: boolean;
+  unique_gift_number?: number;
+}
+
+export interface StarAmount {
+  amount: number;
+  nanostar_amount?: number;
+}
+export interface Link {
+  url: string;
+}
+
+export interface PollMedia {
+  photo?: PhotoSize[];
+  video?: Video;
+  live_photo?: LivePhoto;
+  animation?: Animation;
+  audio?: Audio;
+  document?: Document;
+  sticker?: Sticker;
+  location?: Location;
+  venue?: Venue;
+  link?: Link;
+}
+
+export interface StoryAreaPosition {
+  x_percentage: number;
+  y_percentage: number;
+  width_percentage: number;
+  height_percentage: number;
+  rotation_angle?: number;
+  corner_radius_percentage?: number;
+}
+
+export interface StoryArea {
+  position: StoryAreaPosition;
+  type: StoryAreaType;
+}
+
+export type StoryAreaType =
+  | StoryAreaTypeLink
+  | StoryAreaTypeLocation
+  | StoryAreaTypeSuggestedReaction
+  | StoryAreaTypeWeather
+  | StoryAreaTypeUniqueGift;
+
+export interface StoryAreaTypeLink {
+  type: 'link';
+  url: string;
+}
+
+export interface StoryAreaTypeLocation {
+  type: 'location';
+  latitude: number;
+  longitude: number;
+  address?: LocationAddress;
+}
+
+export interface StoryAreaTypeSuggestedReaction {
+  type: 'suggested_reaction';
+  reaction_type: ReactionType;
+  is_dark?: boolean;
+  is_flipped?: boolean;
+}
+
+export interface StoryAreaTypeWeather {
+  type: 'weather';
+  temperature: number;
+  emoji?: string;
+  background_color?: number;
+}
+
+export interface StoryAreaTypeUniqueGift {
+  type: 'unique_gift';
+  name: string;
+}
+
+export interface LocationAddress {
+  country_code?: string;
+  state?: string;
+  city?: string;
+  street?: string;
+}
+
+export type MaybeInaccessibleMessage = Message | InaccessibleMessage;
+
+export interface InaccessibleMessage {
+  chat: Chat;
+  message_id: number;
+  date: number;
+}
+
+export interface PassportData {
+  data: EncryptedPassportElement[];
+  credentials: EncryptedCredentials;
+}
+
+export interface InputProfilePhoto {
+  type: string;
+  photo?: string;
+}
+
+export interface PreparedKeyboardButton {
+  id: string;
+}
+
+export interface SentGuestMessage {
+  inline_message_id?: string;
+}
+
+export interface UniqueGift {
+  gift_id: string;
+  base_name: string;
+  name: string;
+  number: number;
+  model: UniqueGiftModel;
+  symbol: UniqueGiftSymbol;
+  backdrop: UniqueGiftBackdrop;
+  is_premium?: boolean;
+  is_burned?: boolean;
+  is_from_blockchain?: boolean;
+  colors?: UniqueGiftColors;
+  publisher_chat?: Chat;
+}
+
+export interface UniqueGiftInfo {
+  gift: UniqueGift;
+  origin: string;
+  last_resale_currency?: string;
+  last_resale_amount?: number;
+  owned_gift_id?: string;
+  transfer_star_count?: number;
+  next_transfer_date?: number;
+}
+
+export interface UniqueGiftBackdrop {
+  name: string;
+  colors: UniqueGiftBackdropColors;
+  rarity_per_mille: number;
+}
+
+export interface UniqueGiftBackdropColors {
+  center_color: number;
+  edge_color: number;
+  symbol_color: number;
+  text_color: number;
+}
+
+export interface UniqueGiftColors {
+  model_custom_emoji_id?: string;
+  symbol_custom_emoji_id?: string;
+  light_theme_main_color?: number;
+  light_theme_other_colors?: number[];
+  dark_theme_main_color?: number;
+  dark_theme_other_colors?: number[];
+}
+
+export interface UniqueGiftModel {
+  name: string;
+  sticker: Sticker;
+  rarity_per_mille: number;
+  rarity?: string;
+}
+
+export interface UniqueGiftSymbol {
+  name: string;
+  sticker: Sticker;
+  rarity_per_mille: number;
+}
+
+export type PassportElementError =
+  | PassportElementErrorDataField
+  | PassportElementErrorFrontSide
+  | PassportElementErrorReverseSide
+  | PassportElementErrorSelfie
+  | PassportElementErrorFile
+  | PassportElementErrorFiles
+  | PassportElementErrorTranslationFile
+  | PassportElementErrorTranslationFiles
+  | PassportElementErrorUnspecified;
+
+export interface PassportElementErrorDataField {
+  source: 'data';
+  type: string;
+  field_name: string;
+  data_hash: string;
+  message: string;
+}
+
+export interface PassportElementErrorFrontSide {
+  source: 'front_side';
+  type: string;
+  file_hash: string;
+  message: string;
+}
+
+export interface PassportElementErrorReverseSide {
+  source: 'reverse_side';
+  type: string;
+  file_hash: string;
+  message: string;
+}
+
+export interface PassportElementErrorSelfie {
+  source: 'selfie';
+  type: string;
+  file_hash: string;
+  message: string;
+}
+
+export interface PassportElementErrorFile {
+  source: 'file';
+  type: string;
+  file_hash: string;
+  message: string;
+}
+
+export interface PassportElementErrorFiles {
+  source: 'files';
+  type: string;
+  file_hashes: string[];
+  message: string;
+}
+
+export interface PassportElementErrorTranslationFile {
+  source: 'translation_file';
+  type: string;
+  file_hash: string;
+  message: string;
+}
+
+export interface PassportElementErrorTranslationFiles {
+  source: 'translation_files';
+  type: string;
+  file_hashes: string[];
+  message: string;
+}
+
+export interface PassportElementErrorUnspecified {
+  source: 'unspecified';
+  type: string;
+  element_hash: string;
+  message: string;
+}
+
+export interface Community {
+  id: number;
+  name: string;
+}
+
+export interface EncryptedPassportElement {
+  type: string;
+  data?: string;
+  phone_number?: string;
+  email?: string;
+  files?: PassportFile[];
+  front_side?: PassportFile;
+  reverse_side?: PassportFile;
+  selfie?: PassportFile;
+  translation?: PassportFile[];
+  hash: string;
+}
+
+export interface EncryptedCredentials {
+  data: string;
+  hash: string;
+  secret: string;
+}
+
+export interface PassportFile {
+  file_id: string;
+  file_unique_id: string;
+  file_size: number;
+  file_date: number;
+}
+
+export interface SendLivePhotoParams {
+  business_connection_id?: string;
+  chat_id: number | string;
+  message_thread_id?: number;
+  direct_messages_topic_id?: number;
+  receiver_user_id?: number;
+  callback_query_id?: string;
+  live_photo: string;
+  photo?: string;
+  caption?: string;
+  parse_mode?: string;
+  caption_entities?: MessageEntity[];
+  show_caption_above_media?: boolean;
+  has_spoiler?: boolean;
+  disable_notification?: boolean;
+  protect_content?: boolean;
+  allow_paid_broadcast?: boolean;
+  message_effect_id?: string;
+  suggested_post_parameters?: SuggestedPostParameters;
+  reply_parameters?: ReplyParameters;
+  reply_markup?: ReplyMarkup;
+}
+
+export interface SendMessageDraftParams {
+  chat_id: number | string;
+  message_thread_id?: number;
+  draft_id?: number;
+  text: string;
+  parse_mode?: string;
+  entities?: MessageEntity[];
+}
+
+export interface GetUserProfileAudiosParams {
+  user_id: number;
+  offset?: number;
+  limit?: number;
+}
+
+export interface SetChatMemberTagParams {
+  chat_id: number | string;
+  user_id: number;
+  tag?: string;
+}
+
+export interface AnswerChatJoinRequestQueryParams {
+  chat_join_request_query_id: string;
+  result: string;
+}
+
+export interface SendChatJoinRequestWebAppParams {
+  chat_join_request_query_id: string;
+  web_app_url: string;
+}
+
+export interface GetUserPersonalChatMessagesParams {
+  user_id: number;
+  limit?: number;
+}
+
+export interface AnswerGuestQueryParams {
+  guest_query_id: string;
+  result: InlineQueryResult;
+}
+
+export interface GetManagedBotTokenParams {
+  user_id: number;
+}
+
+export interface ReplaceManagedBotTokenParams {
+  user_id: number;
+}
+
+export interface GetManagedBotAccessSettingsParams {
+  user_id: number;
+}
+
+export interface SetManagedBotAccessSettingsParams {
+  user_id: number;
+  is_access_restricted: boolean;
+  added_user_ids?: number[];
+}
+
+export interface SetMyProfilePhotoParams {
+  photo: InputProfilePhoto;
+}
+
+export interface RemoveMyProfilePhotoParams {
+  chat_id?: number;
+  menu_button?: MenuButton;
+}
+
+export interface GiftPremiumSubscriptionParams {
+  user_id: number;
+  month_count: number;
+  star_count: number;
+  text?: string;
+  text_parse_mode?: string;
+  text_entities?: MessageEntity[];
+}
+
+export interface GetUserGiftsParams {
+  user_id: number;
+  exclude_unlimited?: boolean;
+  exclude_limited_upgradable?: boolean;
+  exclude_limited_non_upgradable?: boolean;
+  exclude_from_blockchain?: boolean;
+  exclude_unique?: boolean;
+  sort_by_price?: boolean;
+  offset?: string;
+  limit?: number;
+}
+
+export interface GetChatGiftsParams {
+  chat_id: number | string;
+  exclude_unsaved?: boolean;
+  exclude_saved?: boolean;
+  exclude_unlimited?: boolean;
+  exclude_limited_upgradable?: boolean;
+  exclude_limited_non_upgradable?: boolean;
+  exclude_from_blockchain?: boolean;
+  exclude_unique?: boolean;
+  sort_by_price?: boolean;
+  offset?: string;
+  limit?: number;
+}
+
+export interface RepostStoryParams {
+  business_connection_id?: string;
+  from_chat_id: number;
+  from_story_id: number;
+  active_period: number;
+  post_to_chat_page?: boolean;
+  protect_content?: boolean;
+}
+
+export interface SavePreparedKeyboardButtonParams {
+  user_id: number;
+  button: KeyboardButton;
+}
+
+export interface EditEphemeralMessageTextParams {
+  chat_id: number | string;
+  receiver_user_id: number;
+  ephemeral_message_id: number;
+  text: string;
+  parse_mode?: string;
+  entities?: MessageEntity[];
+  link_preview_options?: LinkPreviewOptions;
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface EditEphemeralMessageMediaParams {
+  chat_id: number | string;
+  receiver_user_id: number;
+  ephemeral_message_id: number;
+  media: InputMedia;
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface EditEphemeralMessageCaptionParams {
+  chat_id: number | string;
+  receiver_user_id: number;
+  ephemeral_message_id: number;
+  caption?: string;
+  parse_mode?: string;
+  caption_entities?: MessageEntity[];
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface EditEphemeralMessageReplyMarkupParams {
+  chat_id: number | string;
+  receiver_user_id: number;
+  ephemeral_message_id: number;
+  reply_markup?: InlineKeyboardMarkup;
+}
+
+export interface ApproveSuggestedPostParams {
+  chat_id: number;
+  message_id: number;
+  send_date?: number;
+}
+
+export interface DeclineSuggestedPostParams {
+  chat_id: number;
+  message_id: number;
+  comment?: string;
+}
+
+export interface DeleteEphemeralMessageParams {
+  chat_id: number | string;
+  receiver_user_id: number;
+  ephemeral_message_id: number;
+}
+
+export interface DeleteMessageReactionParams {
+  chat_id: number | string;
+  message_id: number;
+  user_id?: number;
+  actor_chat_id?: number;
+}
+
+export interface DeleteAllMessageReactionsParams {
+  chat_id: number | string;
+  user_id?: number;
+  actor_chat_id?: number;
+}
+
+export interface SendRichMessageParams {
+  business_connection_id?: string;
+  chat_id: number | string;
+  message_thread_id?: number;
+  direct_messages_topic_id?: number;
+  rich_message: InputRichMessage;
+  disable_notification?: boolean;
+  protect_content?: boolean;
+  allow_paid_broadcast?: boolean;
+  message_effect_id?: string;
+  suggested_post_parameters?: SuggestedPostParameters;
+  reply_parameters?: ReplyParameters;
+  reply_markup?: ReplyMarkup;
+}
+
+export interface SendRichMessageDraftParams {
+  chat_id: number | string;
+  message_thread_id?: number;
+  draft_id?: number;
+  rich_message: InputRichMessage;
+}
+
+export interface GetMyStarBalanceParams {
+  offset?: number;
+  limit?: number;
 }
