@@ -3,7 +3,7 @@ import { computeLocalTransform, renderShapeItems, type ShapeRenderContext } from
 import { shapeValueToBezierPath, tracePathOnContext } from "./path";
 import { getAnimatedShape } from "./interpolate";
 import { identity, multiply, type Mat2D } from "./matrix";
-import type { LottieAnimation, LottieAsset, LottieLayer } from "./types";
+import type { LottieAnimation, LottieAsset, LottieLayer, TextDocumentData } from "./types";
 
 const BLEND_MODES: Record<number, GlobalCompositeOperation> = {
   0: "source-over",
@@ -82,7 +82,7 @@ function getLayerMatrix(
   const cached = cache.get(ind);
   if (cached) return cached;
 
-  const { matrix: own } = computeLocalTransform(layer.ks, frame);
+  const { matrix: own } = computeLocalTransform(layer.ks, frame - (layer.st ?? 0));
 
   let result = own;
   if (layer.parent != null) {
@@ -157,6 +157,71 @@ function applyMasks(
   return clipped;
 }
 
+function renderMaskedLayer(
+  targetCtx: CanvasRenderingContext2D,
+  layer: LottieLayer,
+  assetsById: Map<string, LottieAsset>,
+  matrix: Mat2D,
+  frame: number,
+  opts: RenderOptions
+): void {
+  const masks = (layer.masksProperties ?? []).filter((mask) => (mask.mode ?? "a") !== "n");
+  if (masks.length === 0) {
+    renderSingleLayer(targetCtx, layer, assetsById, matrix, 1, frame, opts);
+    return;
+  }
+
+  const content = makeCanvas(opts.canvasWidth, opts.canvasHeight);
+  renderSingleLayer(content.ctx, layer, assetsById, matrix, 1, frame, opts);
+
+  const maskSurface = makeCanvas(opts.canvasWidth, opts.canvasHeight);
+  for (let index = 0; index < masks.length; index++) {
+    const mask = masks[index];
+    const mode = mask.mode ?? "a";
+    const opacity = Math.max(0, Math.min(1, (getAnimatedValue(mask.o, frame)[0] ?? 100) / 100));
+    const shape = shapeValueToBezierPath(getAnimatedShape(mask.pt, frame));
+    if (!shape) continue;
+
+    if (
+      index === 0 &&
+      (mask.inv || mode === "s" || mode === "i" || mode === "d")
+    ) {
+      maskSurface.ctx.fillStyle = "#fff";
+      maskSurface.ctx.fillRect(0, 0, opts.canvasWidth, opts.canvasHeight);
+    }
+
+    maskSurface.ctx.save();
+    maskSurface.ctx.globalAlpha = opacity;
+    if (mask.inv) {
+      maskSurface.ctx.fillStyle = "#fff";
+      maskSurface.ctx.fillRect(0, 0, opts.canvasWidth, opts.canvasHeight);
+      maskSurface.ctx.globalCompositeOperation = "destination-out";
+    } else if (mode === "s") {
+      maskSurface.ctx.globalCompositeOperation = "destination-out";
+    } else if (mode === "i") {
+      maskSurface.ctx.globalCompositeOperation = "destination-in";
+    } else if (mode === "d") {
+      maskSurface.ctx.globalCompositeOperation = "darken";
+    } else if (mode === "l") {
+      maskSurface.ctx.globalCompositeOperation = "lighter";
+    } else {
+      maskSurface.ctx.globalCompositeOperation = "source-over";
+    }
+    maskSurface.ctx.beginPath();
+    tracePathOnContext(maskSurface.ctx, shape, matrix);
+    maskSurface.ctx.fillStyle = "#fff";
+    maskSurface.ctx.fill("nonzero");
+    maskSurface.ctx.restore();
+  }
+
+  content.ctx.save();
+  content.ctx.globalCompositeOperation = "destination-in";
+  content.ctx.setTransform(1, 0, 0, 1, 0, 0);
+  content.ctx.drawImage(maskSurface.canvas as any, 0, 0);
+  content.ctx.restore();
+  targetCtx.drawImage(content.canvas as any, 0, 0);
+}
+
 function renderSolidLayer(ctx: CanvasRenderingContext2D, layer: LottieLayer, matrix: Mat2D): void {
   const w = layer.sw ?? 0;
   const h = layer.sh ?? 0;
@@ -218,6 +283,68 @@ function renderImageLayer(
   ctx.restore();
 }
 
+function getTextDocument(layer: LottieLayer, frame: number): TextDocumentData | null {
+  const keyframes = layer.t?.d?.k;
+  if (!keyframes || keyframes.length === 0) return null;
+  let selected = keyframes[0]?.s;
+  for (const keyframe of keyframes) {
+    if ((keyframe.t ?? 0) <= frame && keyframe.s) selected = keyframe.s;
+  }
+  return selected ?? null;
+}
+
+function renderTextLayer(ctx: CanvasRenderingContext2D, layer: LottieLayer, matrix: Mat2D, frame: number): void {
+  const data = getTextDocument(layer, frame);
+  const text = data?.t ?? "";
+  if (!data || !text) return;
+  const size = Math.max(1, data.s ?? data.sz ?? 16);
+  const family = data.f || "sans-serif";
+  const color = data.fc ?? [0, 0, 0];
+  const strokeColor = data.sc ?? null;
+  const tracking = (data.tr ?? data.ls ?? 0) / 10;
+  const lineHeight = data.lh ?? size * 1.2;
+  const lines = text.split(/\r?\n/);
+  ctx.save();
+  ctx.transform(matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5]);
+  ctx.font = `${size}px ${family}`;
+  ctx.fillStyle = `rgba(${Math.round((color[0] ?? 0) * 255)}, ${Math.round((color[1] ?? 0) * 255)}, ${Math.round((color[2] ?? 0) * 255)}, 1)`;
+  if (strokeColor) {
+    ctx.strokeStyle = `rgba(${Math.round((strokeColor[0] ?? 0) * 255)}, ${Math.round((strokeColor[1] ?? 0) * 255)}, ${Math.round((strokeColor[2] ?? 0) * 255)}, 1)`;
+    ctx.lineWidth = Math.max(0, data.sw ?? 0);
+  }
+  ctx.textBaseline = "alphabetic";
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const width = ctx.measureText(line).width + Math.max(0, line.length - 1) * tracking;
+    const x = data.j === 1 ? -width : data.j === 2 ? -width / 2 : 0;
+    if (tracking === 0) {
+      ctx.fillText(line, x, index * lineHeight);
+      if (strokeColor && (data.sw ?? 0) > 0) ctx.strokeText(line, x, index * lineHeight);
+    } else {
+      let cursor = x;
+      for (const character of line) {
+        ctx.fillText(character, cursor, index * lineHeight);
+        if (strokeColor && (data.sw ?? 0) > 0) ctx.strokeText(character, cursor, index * lineHeight);
+        cursor += ctx.measureText(character).width + tracking;
+      }
+    }
+  }
+  ctx.restore();
+}
+
+function applyLayerEffects(ctx: CanvasRenderingContext2D, layer: LottieLayer): void {
+  const filters: string[] = [];
+  for (const effect of layer.ef ?? []) {
+    if (effect.en === 0) continue;
+    if (effect.ty === 29 || effect.nm?.toLowerCase().includes("blur")) {
+      const raw = effect.ef?.find((entry) => entry.ty === 0)?.v?.k;
+      const amount = typeof raw === "number" ? raw : Array.isArray(raw) && typeof raw[0] === "number" ? raw[0] : 0;
+      filters.push(`blur(${Math.max(0, amount ?? 0)}px)`);
+    }
+  }
+  if (filters.length) ctx.filter = filters.join(" ");
+}
+
 export function renderLayers(
   targetCtx: CanvasRenderingContext2D,
   layers: LottieLayer[],
@@ -247,14 +374,14 @@ export function renderLayers(
 
     const ownMatrix = getLayerMatrix(matteLayer, layersByInd, docFrame, matrixCache);
     const matrix = multiply(parentMatrix, ownMatrix);
-    const { opacity: ownOpacity } = computeLocalTransform(matteLayer.ks, docFrame);
+    const matteFrame = docFrame - (matteLayer.st ?? 0);
+    const { opacity: ownOpacity } = computeLocalTransform(matteLayer.ks, matteFrame);
     const opacity = parentOpacity * ownOpacity;
 
     const scratch = makeCanvas(opts.canvasWidth, opts.canvasHeight);
     scratch.ctx.save();
     scratch.ctx.globalAlpha = opacity;
-    applyMasks(scratch.ctx, matteLayer, matrix, docFrame, opts.canvasWidth, opts.canvasHeight);
-    renderSingleLayer(scratch.ctx, matteLayer, assetsById, matrix, 1, docFrame, opts);
+    renderMaskedLayer(scratch.ctx, matteLayer, assetsById, matrix, matteFrame, opts);
     scratch.ctx.restore();
     return scratch;
   };
@@ -268,10 +395,16 @@ export function renderLayers(
 
     const ownMatrix = getLayerMatrix(layer, layersByInd, docFrame, matrixCache);
     const matrix = multiply(parentMatrix, ownMatrix);
-    const { opacity: ownOpacity } = computeLocalTransform(layer.ks, docFrame);
+    const layerFrame = docFrame - (layer.st ?? 0);
+    const { opacity: ownOpacity } = computeLocalTransform(layer.ks, layerFrame);
     const opacity = parentOpacity * ownOpacity;
 
-    const matteLayer = layer.tt && idx > 0 ? layers[idx - 1] : null;
+    const matteIndex = layer.tt
+      ? layer.tp != null
+        ? layers.findIndex((candidate) => candidate.ind === layer.tp)
+        : idx - 1
+      : -1;
+    const matteLayer = matteIndex >= 0 ? layers[matteIndex] : null;
     const pendingMatte = matteLayer && matteLayer.td === 1 ? renderMatteSource(matteLayer) : null;
     const needsMatte = !!layer.tt && !!pendingMatte;
 
@@ -293,12 +426,15 @@ export function renderLayers(
       drawCtx.globalAlpha = opacity;
     }
 
-    const hadClip = applyMasks(drawCtx, layer, matrix, docFrame, opts.canvasWidth, opts.canvasHeight);
+    applyLayerEffects(drawCtx, layer);
 
-    renderSingleLayer(drawCtx, layer, assetsById, matrix, 1, docFrame, opts);
+    if (layer.masksProperties?.some((mask) => (mask.mode ?? "a") !== "n")) {
+      renderMaskedLayer(drawCtx, layer, assetsById, matrix, layerFrame, opts);
+    } else {
+      renderSingleLayer(drawCtx, layer, assetsById, matrix, 1, layerFrame, opts);
+    }
 
     drawCtx.restore();
-    void hadClip;
 
     if (needsMatte && scratch && pendingMatte) {
       const tt = layer.tt;
@@ -359,7 +495,7 @@ function renderSingleLayer(
       const stretch = layer.sr ?? 1;
       const innerFrame = layer.tm
         ? getAnimatedValue(layer.tm, docFrame)[0] ?? docFrame
-        : (docFrame - (layer.st ?? 0)) / stretch;
+        : docFrame / stretch;
       renderLayers(ctx, asset.layers, assetsById, matrix, opacity, innerFrame, opts);
       break;
     }
@@ -371,10 +507,7 @@ function renderSingleLayer(
     case 3:
       break;
     case 5:
-      opts.warnOnce(
-        "text-layer",
-        "react-tgs-player: text layers are not rendered by this zero-dependency engine (not used by valid .tgs stickers)."
-      );
+      renderTextLayer(ctx, layer, matrix, docFrame);
       break;
     default:
       break;
