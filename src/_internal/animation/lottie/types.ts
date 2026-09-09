@@ -172,6 +172,15 @@ export interface ShapeTransformItem extends ShapeItemBase, Transform {
   ty: "tr";
 }
 
+export interface ShapeModifierItem extends ShapeItemBase {
+  ty: "rd" | "zz" | "pb" | "op";
+  r?: ScalarProperty;
+  s?: ScalarProperty;
+  m?: ScalarProperty;
+  a?: ScalarProperty;
+  o?: ScalarProperty;
+}
+
 export type ShapeItem =
   | ShapePathItem
   | ShapeRectItem
@@ -185,13 +194,44 @@ export type ShapeItem =
   | ShapeTrimItem
   | ShapeRepeaterItem
   | ShapeMergeItem
-  | ShapeTransformItem;
+  | ShapeTransformItem
+  | ShapeModifierItem;
+
+export interface TextDocumentData {
+  t?: string;
+  f?: string;
+  s?: number;
+  sz?: number;
+  lh?: number;
+  ls?: number;
+  j?: number;
+  a?: number;
+  fc?: number[];
+  sc?: number[];
+  sw?: number;
+  tr?: number;
+}
+
+export interface TextLayerData {
+  d?: { k?: Array<{ s?: TextDocumentData; t?: number }> };
+  p?: { m?: number; f?: string; l?: number; j?: number; a?: number; r?: number; b?: number };
+  a?: Array<{ a?: AnimatedProperty; s?: AnimatedProperty; t?: AnimatedProperty; r?: AnimatedProperty; o?: AnimatedProperty; p?: AnimatedProperty }>;
+}
+
+export interface LottieEffect {
+  ty?: number;
+  nm?: string;
+  en?: number;
+  ef?: Array<{ ty?: number; v?: AnimatedProperty }>;
+}
 
 export interface MaskProperty {
   inv: boolean;
   mode: "a" | "s" | "i" | "l" | "d" | "n";
   pt: ShapeProperty;
   o: ScalarProperty;
+  x?: ScalarProperty;
+  f?: number;
 }
 
 export interface LottieLayer {
@@ -214,10 +254,14 @@ export interface LottieLayer {
   masksProperties?: MaskProperty[];
   tt?: number; 
   td?: number; 
+  tp?: number;
   bm?: number; 
   hd?: boolean;
   ao?: number; 
   tm?: AnimatedProperty; 
+  t?: TextLayerData;
+  ef?: LottieEffect[];
+  hasMask?: boolean;
 }
 
 export interface LottieAsset {
