@@ -2,11 +2,15 @@ import { getAnimatedValue, getAnimatedPosition, getAnimatedShape } from "./inter
 import {
   type BezierPath,
   ellipseToBezierPath,
+  offsetPath,
+  puckerBloatPath,
   rectToBezierPath,
   shapeValueToBezierPath,
+  roundCorners,
   starToBezierPath,
   tracePathOnContext,
   trimPaths,
+  zigzagPath,
 } from "./path";
 import { applyStrokeStyle, buildGradient, colorToCss } from "./paint";
 import { identity, multiply, rotate, scale, skew, translate, type Mat2D } from "./matrix";
@@ -22,6 +26,7 @@ import type {
   ShapeRepeaterItem,
   ShapeStarItem,
   ShapeStrokeItem,
+  ShapeModifierItem,
   ShapeTransformItem,
   ShapeTrimItem,
   Transform,
@@ -210,7 +215,9 @@ export function renderShapeItems(
   rc: ShapeRenderContext,
   items: ShapeItem[],
   parentMatrix: Mat2D,
-  parentOpacity: number
+  parentOpacity: number,
+  inheritedTrim?: { start: number; end: number; offset: number; mode: 1 | 2 },
+  inheritedRoundRadius = 0
 ): void {
   const trItem = items.find((i) => i.ty === "tr") as ShapeTransformItem | undefined;
   const { matrix: groupMatrix, opacity: groupOpacity } = computeLocalTransform(
@@ -219,6 +226,20 @@ export function renderShapeItems(
   );
   const localMatrix = multiply(parentMatrix, groupMatrix);
   const localOpacity = parentOpacity * groupOpacity;
+  const trailingTrimItem = items.find((item) => item.ty === "tm") as ShapeTrimItem | undefined;
+  const trailingTrim = trailingTrimItem
+    ? {
+        start: getAnimatedValue(trailingTrimItem.s, rc.frame)[0] ?? 0,
+        end: getAnimatedValue(trailingTrimItem.e, rc.frame)[0] ?? 100,
+        offset: getAnimatedValue(trailingTrimItem.o, rc.frame)[0] ?? 0,
+        mode: (trailingTrimItem.m ?? 1) as 1 | 2,
+      }
+    : inheritedTrim;
+  const roundItem = items.find((item) => item.ty === "rd") as ShapeModifierItem | undefined;
+  const roundRadius = roundItem
+    ? getAnimatedValue(roundItem.r, rc.frame)[0] ?? 0
+    : inheritedRoundRadius;
+  const modifiers = items.filter((item) => ["zz", "pb", "op"].includes(item.ty)) as ShapeModifierItem[];
 
   let currentPaths: BezierPath[] = [];
   let mergeMode: number | null = null;
@@ -235,7 +256,7 @@ export function renderShapeItems(
 
       case "gr": {
         const group = item as ShapeGroupItem;
-        drawOps.push(() => renderShapeItems(rc, group.it, localMatrix, localOpacity));
+        drawOps.push(() => renderShapeItems(rc, group.it, localMatrix, localOpacity, trailingTrim, roundRadius));
         break;
       }
 
@@ -244,7 +265,26 @@ export function renderShapeItems(
       case "el":
       case "sr": {
         const path = buildShapePath(item, rc.frame);
-        if (path) currentPaths = [...currentPaths, path];
+        if (path) {
+          let rounded = roundRadius > 0 ? roundCorners(path, roundRadius) : path;
+          for (const modifier of modifiers) {
+            if (modifier.ty === "zz") {
+              rounded = zigzagPath(
+                rounded,
+                getAnimatedValue(modifier.s ?? modifier.a, rc.frame)[0] ?? 0,
+                getAnimatedValue(modifier.r ?? modifier.s, rc.frame)[0] ?? 2
+              );
+            } else if (modifier.ty === "pb") {
+              rounded = puckerBloatPath(rounded, getAnimatedValue(modifier.a ?? modifier.r, rc.frame)[0] ?? 0);
+            } else if (modifier.ty === "op") {
+              rounded = offsetPath(rounded, getAnimatedValue(modifier.a ?? modifier.r, rc.frame)[0] ?? 0);
+            }
+          }
+          const paths = inheritedTrim
+            ? trimPaths([rounded], inheritedTrim.start, inheritedTrim.end, inheritedTrim.offset, inheritedTrim.mode)
+            : [rounded];
+          currentPaths = [...currentPaths, ...paths];
+        }
         break;
       }
 
@@ -284,6 +324,7 @@ export function renderShapeItems(
             compound = translate(compound, repPos[0] ?? 0, repPos[1] ?? 0);
             compound = rotate(compound, ((repRotation ?? 0) * Math.PI) / 180);
             compound = scale(compound, (repScale[0] ?? 100) / 100, (repScale[1] ?? 100) / 100);
+            compound = translate(compound, -(repAnchor[0] ?? 0), -(repAnchor[1] ?? 0));
           }
           for (const p of basePaths) {
             repeated.push({
