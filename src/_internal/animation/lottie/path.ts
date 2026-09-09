@@ -88,6 +88,47 @@ export function ellipseToBezierPath(
   };
 }
 
+export function roundCorners(path: BezierPath, radius: number): BezierPath {
+  if (!path.closed || path.vertices.length < 3 || radius <= 0) return path;
+  const vertices = path.vertices;
+  const result: BezierVertex[] = [];
+  for (let index = 0; index < vertices.length; index++) {
+    const previous = vertices[(index + vertices.length - 1) % vertices.length].v;
+    const current = vertices[index].v;
+    const next = vertices[(index + 1) % vertices.length].v;
+    const inDx = previous[0] - current[0];
+    const inDy = previous[1] - current[1];
+    const outDx = next[0] - current[0];
+    const outDy = next[1] - current[1];
+    const inLength = Math.hypot(inDx, inDy);
+    const outLength = Math.hypot(outDx, outDy);
+    if (inLength < 1e-4 || outLength < 1e-4) {
+      result.push(vertices[index]);
+      continue;
+    }
+    const distance = Math.min(radius, inLength * 0.5, outLength * 0.5);
+    const entry: [number, number] = [
+      current[0] + (inDx / inLength) * distance,
+      current[1] + (inDy / inLength) * distance,
+    ];
+    const exit: [number, number] = [
+      current[0] + (outDx / outLength) * distance,
+      current[1] + (outDy / outLength) * distance,
+    ];
+    const exitHandle: [number, number] = [
+      (current[0] - exit[0]) * (2 / 3),
+      (current[1] - exit[1]) * (2 / 3),
+    ];
+    const entryHandle: [number, number] = [
+      (current[0] - entry[0]) * (2 / 3),
+      (current[1] - entry[1]) * (2 / 3),
+    ];
+    result.push({ v: entry, i: [0, 0], o: entryHandle });
+    result.push({ v: exit, i: exitHandle, o: [0, 0] });
+  }
+  return { ...path, vertices: result };
+}
+
 export function starToBezierPath(
   cx: number,
   cy: number,
@@ -200,6 +241,67 @@ export function flattenPath(
     points.push(...flattenSegment(verts[verts.length - 1], verts[0], samplesPerSegment));
   }
   return { points, closed: path.closed };
+}
+
+function pointsToPath(points: Array<[number, number]>, closed: boolean): BezierPath {
+  return {
+    closed,
+    vertices: points.map((point) => ({ v: point, i: [0, 0], o: [0, 0] })),
+  };
+}
+
+export function zigzagPath(path: BezierPath, amplitude: number, pointsPerSegment: number): BezierPath {
+  if (Math.abs(amplitude) < 1e-4 || path.vertices.length < 2) return path;
+  const { points, closed } = flattenPath(path, 8);
+  const result: Array<[number, number]> = [];
+  const count = closed ? points.length - 1 : points.length;
+  const frequency = Math.max(1, Math.round(pointsPerSegment));
+  for (let index = 0; index < count; index++) {
+    const point = points[index];
+    const previous = points[(index + count - 1) % count];
+    const next = points[(index + 1) % count];
+    const dx = next[0] - previous[0];
+    const dy = next[1] - previous[1];
+    const length = Math.hypot(dx, dy) || 1;
+    const sign = index % frequency < frequency / 2 ? 1 : -1;
+    result.push([point[0] - (dy / length) * amplitude * sign, point[1] + (dx / length) * amplitude * sign]);
+  }
+  return pointsToPath(result, closed);
+}
+
+export function puckerBloatPath(path: BezierPath, amountPct: number): BezierPath {
+  if (Math.abs(amountPct) < 1e-4 || path.vertices.length < 2) return path;
+  const { points, closed } = flattenPath(path, 8);
+  const count = closed ? points.length - 1 : points.length;
+  let cx = 0;
+  let cy = 0;
+  for (let index = 0; index < count; index++) {
+    cx += points[index][0];
+    cy += points[index][1];
+  }
+  cx /= count;
+  cy /= count;
+  const scaleValue = Math.max(0, 1 + amountPct / 100);
+  return pointsToPath(
+    points.slice(0, count).map((point) => [cx + (point[0] - cx) * scaleValue, cy + (point[1] - cy) * scaleValue]),
+    closed
+  );
+}
+
+export function offsetPath(path: BezierPath, amount: number): BezierPath {
+  if (Math.abs(amount) < 1e-4 || path.vertices.length < 2) return path;
+  const { points, closed } = flattenPath(path, 8);
+  const count = closed ? points.length - 1 : points.length;
+  const result: Array<[number, number]> = [];
+  for (let index = 0; index < count; index++) {
+    const previous = points[(index + count - 1) % count];
+    const next = points[(index + 1) % count];
+    const dx = next[0] - previous[0];
+    const dy = next[1] - previous[1];
+    const length = Math.hypot(dx, dy) || 1;
+    result.push([points[index][0] - (dy / length) * amount, points[index][1] + (dx / length) * amount]);
+  }
+  return pointsToPath(result, closed);
 }
 
 function polylineLength(points: Array<[number, number]>): number {
