@@ -23,10 +23,11 @@ export const TgsPlayer = React.forwardRef<TgsPlayerHandle, TgsPlayerProps>(funct
   props,
   ref
 ) {
-  const { strict = true, ...rest } = props;
+  const { strict = true, loop = true, ...rest } = props;
   return (
     <BaseAnimationPlayer
       {...rest}
+      loop={loop}
       ref={ref}
       validate={strict ? checkTgsCompliance : undefined}
     />

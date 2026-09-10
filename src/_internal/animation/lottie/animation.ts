@@ -1,4 +1,9 @@
-import { renderDocumentFrame, type EngineImageCache, type RenderOptions } from "./engine";
+import {
+  buildAssetsMap,
+  renderDocumentFrame,
+  type EngineImageCache,
+  type RenderOptions,
+} from "./engine";
 import type { LottieAnimation } from "./types";
 
 export type PlayerState =
@@ -43,6 +48,8 @@ const imageCache: EngineImageCache = {
 };
 
 const warnedKeys = new Set<string>();
+const FRAME_EPSILON = 0.0001;
+
 function warnOnce(key: string, message: string): void {
   if (warnedKeys.has(key)) return;
   warnedKeys.add(key);
@@ -62,11 +69,17 @@ export class LottieAnimationController {
   private mode: PlayMode = "normal";
   private loopsCompleted = 0;
   private segment: [number, number] | null = null;
+  private destroyed = false;
 
   private rafHandle: number | null = null;
   private lastTs: number | null = null;
 
   private shapeScratch: { canvas: HTMLCanvasElement | OffscreenCanvas; ctx: CanvasRenderingContext2D } | null = null;
+  private assetsById = new Map<string, import("./types").LottieAsset>();
+  private layerIndexCache = new WeakMap<
+    import("./types").LottieLayer[],
+    Map<number, import("./types").LottieLayer>
+  >();
 
   private listeners: Map<keyof PlayerEventMap, Set<Listener<any>>> = new Map();
 
@@ -99,7 +112,12 @@ export class LottieAnimationController {
   }
 
   setDocument(doc: LottieAnimation): void {
+    if (this.destroyed) return;
     this.doc = doc;
+    this.assetsById = buildAssetsMap(doc);
+    this.layerIndexCache = new WeakMap();
+    this.loopsCompleted = 0;
+    this.lastTs = null;
     const [inF, outF] = this.getBounds();
     this.currentFrame = this.direction === -1 ? outF : inF;
     this.state = "stopped";
@@ -108,14 +126,19 @@ export class LottieAnimationController {
   }
 
   setError(errors?: string[]): void {
+    this.stopLoop();
     this.state = "error";
     this.emit("error", { errors });
   }
 
   private getBounds(): [number, number] {
     if (!this.doc) return [0, 0];
-    if (this.segment) return this.segment;
-    return [this.doc.ip, this.doc.op];
+    const start = this.segment?.[0] ?? this.doc.ip;
+    const rawEnd = this.segment?.[1] ?? this.doc.op;
+    // Lottie `op` is exclusive. Rendering it makes every layer inactive because
+    // layer visibility is checked with `frame < layer.op`.
+    const end = Math.max(start, rawEnd - FRAME_EPSILON);
+    return [start, end];
   }
 
   resize(width: number, height: number): void {
@@ -169,6 +192,7 @@ export class LottieAnimationController {
 
   destroy(): void {
     this.stopLoop();
+    this.destroyed = true;
     this.state = "destroyed";
     this.doc = null;
     this.shapeScratch = null;
@@ -180,15 +204,23 @@ export class LottieAnimationController {
   }
 
   setSpeed(speed: number): void {
-    this.speed = speed;
+    this.speed = Number.isFinite(speed) ? Math.max(0, speed) : 1;
   }
 
   setDirection(direction: 1 | -1): void {
     this.direction = direction;
+    if (this.doc && this.state === "stopped") {
+      const [inF, outF] = this.getBounds();
+      this.currentFrame = direction === -1 ? outF : inF;
+      this.renderCurrentFrame();
+    }
   }
 
   setLoop(loop: boolean | number): void {
-    this.loop = loop;
+    this.loop =
+      typeof loop === "number" && Number.isFinite(loop)
+        ? Math.max(0, Math.floor(loop))
+        : loop;
   }
 
   setMode(mode: PlayMode): void {
@@ -214,7 +246,7 @@ export class LottieAnimationController {
     let frame: number;
 
     if (typeof value === "string" && value.trim().endsWith("%")) {
-      const pct = parseFloat(value) / 100;
+      const pct = Math.max(0, Math.min(1, parseFloat(value) / 100));
       frame = inF + (outF - inF) * pct;
     } else {
       frame = Number(value);
@@ -225,8 +257,6 @@ export class LottieAnimationController {
     this.renderCurrentFrame();
     this.emitFrameEvent();
 
-    if (this.state !== "playing") {
-    }
   }
 
   private startLoop(): void {
@@ -258,7 +288,7 @@ export class LottieAnimationController {
     if (!this.doc) return;
     const [inF, outF] = this.getBounds();
     const fps = this.doc.fr || 30;
-    const framesDelta = (dtMs / 1000) * fps * this.speed * this.direction;
+    const framesDelta = Math.max(0, dtMs) / 1000 * fps * this.speed * this.direction;
 
     let next = this.currentFrame + framesDelta;
 
@@ -267,46 +297,50 @@ export class LottieAnimationController {
       this.loop === true ? Infinity : this.loop === false ? 1 : Math.max(1, this.loop);
 
     if (this.mode === "bounce") {
-      if (next >= outF) {
-        if (this.direction === 1 && (this.loop === true || this.loopsCompleted < loopLimit - 0.5)) {
-          this.direction = -1;
-          next = outF - (next - outF);
-          this.loopsCompleted += 0.5;
-          this.emit("loop");
-        } else {
-          next = outF;
-          this.finishPlayback();
+      let remaining = Math.abs(framesDelta);
+      let direction = this.direction;
+      let guard = 0;
+      while (remaining > 0 && guard++ < 128) {
+        const distance = direction === 1 ? outF - next : next - inF;
+        if (remaining <= distance) {
+          next += remaining * direction;
+          remaining = 0;
+          break;
         }
-      } else if (next <= inF) {
-        if (this.direction === -1 && (this.loop === true || this.loopsCompleted < loopLimit - 0.5)) {
-          this.direction = 1;
-          next = inF + (inF - next);
-          this.loopsCompleted += 0.5;
-          this.emit("loop");
-        } else {
-          next = inF;
+
+        remaining -= Math.max(0, distance);
+        next = direction === 1 ? outF : inF;
+        if (this.loop !== true && this.loopsCompleted >= loopLimit - 0.5) {
+          this.direction = direction;
           this.finishPlayback();
+          break;
         }
+        direction = direction === 1 ? -1 : 1;
+        this.direction = direction;
+        this.loopsCompleted += 0.5;
+        this.emit("loop");
       }
-    } else {
-      if (next >= outF && this.direction === 1) {
-        if (this.loop === true || this.loopsCompleted < loopLimit - 1) {
-          next = inF + ((next - outF) % span);
-          this.loopsCompleted += 1;
-          this.emit("loop");
-        } else {
-          next = outF;
-          this.finishPlayback();
+    } else if (framesDelta !== 0) {
+      const movingForward = framesDelta > 0;
+      let remaining = Math.abs(framesDelta);
+      let guard = 0;
+      while (remaining > 0 && guard++ < 128) {
+        const distance = movingForward ? outF - next : next - inF;
+        if (remaining <= distance) {
+          next += remaining * (movingForward ? 1 : -1);
+          remaining = 0;
+          break;
         }
-      } else if (next <= inF && this.direction === -1) {
-        if (this.loop === true || this.loopsCompleted < loopLimit - 1) {
-          next = outF - ((inF - next) % span);
-          this.loopsCompleted += 1;
-          this.emit("loop");
-        } else {
-          next = inF;
+
+        remaining -= Math.max(0, distance);
+        next = movingForward ? outF : inF;
+        if (this.loop !== true && this.loopsCompleted >= loopLimit - 1) {
           this.finishPlayback();
+          break;
         }
+        next = movingForward ? inF : outF;
+        this.loopsCompleted += 1;
+        this.emit("loop");
       }
     }
 
@@ -358,6 +392,9 @@ export class LottieAnimationController {
       canvasWidth: this.canvas.width,
       canvasHeight: this.canvas.height,
       imageCache,
+      assetsById: this.assetsById,
+      layerIndexCache: this.layerIndexCache,
+      sourceUrl: this.doc.__sourceUrl,
       onAssetLoaded: () => this.renderCurrentFrame(),
       warnOnce,
       getShapeScratch: (w, h) => this.getShapeScratch(w, h),

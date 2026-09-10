@@ -9,9 +9,10 @@ import type {
 import { type Mat2D, applyToPoint } from "./matrix";
 
 export function colorToCss(rgb: number[], opacity01: number): string {
-  const r = Math.round((rgb[0] ?? 0) * (rgb[0] <= 1 ? 255 : 1));
-  const g = Math.round((rgb[1] ?? 0) * (rgb[1] <= 1 ? 255 : 1));
-  const b = Math.round((rgb[2] ?? 0) * (rgb[2] <= 1 ? 255 : 1));
+  const scale = Math.max(rgb[0] ?? 0, rgb[1] ?? 0, rgb[2] ?? 0) > 1 ? 1 : 255;
+  const r = Math.round((rgb[0] ?? 0) * scale);
+  const g = Math.round((rgb[1] ?? 0) * scale);
+  const b = Math.round((rgb[2] ?? 0) * scale);
   const a = (rgb[3] !== undefined ? rgb[3] : 1) * opacity01;
   return `rgba(${clamp255(r)}, ${clamp255(g)}, ${clamp255(b)}, ${clampAlpha(a)})`;
 }
@@ -119,7 +120,10 @@ export function applyStrokeStyle(
   m: Mat2D
 ): void {
   const widthArr = getAnimatedValue(item.w, frame);
-  const scaleFactor = Math.hypot(m[0], m[1]);
+  // Paths are transformed manually before they reach Canvas, so line width
+  // must be adjusted separately. The determinant gives a stable scale for
+  // rotations and non-uniform transforms without over-scaling skewed paths.
+  const scaleFactor = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])) || 1;
   ctx.lineWidth = Math.max(0, (widthArr[0] ?? 1) * scaleFactor);
   ctx.lineCap = LINE_CAP[(item.lc ?? 2) - 1] ?? "round";
   ctx.lineJoin = LINE_JOIN[(item.lj ?? 2) - 1] ?? "round";

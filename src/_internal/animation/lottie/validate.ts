@@ -7,8 +7,18 @@ export function checkTgsCompliance(data: LottieAnimation & { tgs?: number }): st
     errors.push("Must be marked as a TGS Lottie variant (tgs: 1)");
   }
 
-  if ((data.op - data.ip) / data.fr > 3.0) {
+  if (!Number.isFinite(data.fr) || data.fr <= 0) {
+    errors.push("Frame rate must be a positive number");
+  } else if ((data.op - data.ip) / data.fr > 3.0) {
     errors.push("Longer than 3 seconds");
+  }
+
+  if (data.fr !== 60) {
+    errors.push("Frame rate must be exactly 60 FPS");
+  }
+
+  if (!Number.isFinite(data.ip) || !Number.isFinite(data.op) || data.op <= data.ip) {
+    errors.push("Invalid animation frame range");
   }
 
   if (data.w !== 512 || data.h !== 512) {
@@ -44,6 +54,9 @@ function checkLayer(layer: LottieLayer): string[] {
   }
   if (layer.sr != null && layer.sr !== 1) {
     errors.push("Composition should not include any Time Stretching");
+  }
+  if (!Number.isFinite(layer.ip) || !Number.isFinite(layer.op) || layer.op <= layer.ip) {
+    errors.push("Layer has an invalid in/out frame range");
   }
   if (layer.tm != null) {
     errors.push("Composition should not include any Time Remapping");

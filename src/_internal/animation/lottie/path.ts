@@ -339,10 +339,15 @@ export function trimPaths(
   const totalLength = lengths.reduce((a, b) => a + b, 0);
   if (totalLength <= 0) return paths;
 
-  let s = (Math.min(startPct, endPct) / 100 + offsetPct / 360) % 1;
-  let e = (Math.max(startPct, endPct) / 100 + offsetPct / 360) % 1;
-  if (s < 0) s += 1;
-  if (e < 0) e += 1;
+  const normalize = (value: number): number => ((value % 1) + 1) % 1;
+  const minPct = Math.min(startPct, endPct);
+  const maxPct = Math.max(startPct, endPct);
+  const rawStart = minPct / 100 + offsetPct / 360;
+  const rawEnd = maxPct / 100 + offsetPct / 360;
+  const s = normalize(rawStart);
+  const isFullRange = maxPct - minPct >= 100 - 1e-6;
+  if (isFullRange) return paths;
+  const e = normalize(rawEnd);
 
   const startDist = s * totalLength;
   const endDist = e * totalLength;
