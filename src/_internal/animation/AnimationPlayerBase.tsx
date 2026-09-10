@@ -166,7 +166,8 @@ export function createAnimationPlayerComponent(displayName: string, defaultAriaL
             if (validate) {
               const errors = validate(doc);
               if (errors.length > 0) {
-                callbacksRef.current.onError?.(errors);
+                controller.setError(errors);
+                return;
               }
             }
 
@@ -177,13 +178,16 @@ export function createAnimationPlayerComponent(displayName: string, defaultAriaL
           .catch((err: Error) => {
             if (cancelled) return;
             controller.setError([err.message]);
-            callbacksRef.current.onError?.([err.message]);
           });
 
         return () => {
           cancelled = true;
         };
       }, [src, validate]);
+
+      React.useEffect(() => {
+        if (autoplay) controllerRef.current?.play();
+      }, [autoplay]);
 
       React.useEffect(() => controllerRef.current?.setSpeed(speed), [speed]);
       React.useEffect(() => controllerRef.current?.setDirection(direction), [direction]);

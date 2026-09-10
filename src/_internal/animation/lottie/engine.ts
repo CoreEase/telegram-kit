@@ -64,6 +64,9 @@ export interface RenderOptions {
   canvasWidth: number;
   canvasHeight: number;
   imageCache: EngineImageCache;
+  assetsById?: Map<string, LottieAsset>;
+  layerIndexCache?: WeakMap<LottieLayer[], Map<number, LottieLayer>>;
+  sourceUrl?: string;
   onAssetLoaded?: () => void;
   warnOnce: (key: string, message: string) => void;
   getShapeScratch?: (
@@ -245,13 +248,30 @@ function applyPoint(m: Mat2D, x: number, y: number): [number, number] {
   return [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
 }
 
-function resolveImageSrc(asset: LottieAsset): string | null {
+function resolveImageSrc(asset: LottieAsset, baseUrl?: string): string | null {
   if (asset.e === 1) {
     if (!asset.p) return null;
     if (asset.p.startsWith("data:")) return asset.p;
     return `data:image/png;base64,${asset.p}`;
   }
-  if (asset.u) return asset.u + (asset.p ?? "");
+  if (asset.u) {
+    const relative = asset.u + (asset.p ?? "");
+    if (baseUrl) {
+      try {
+        return new URL(relative, baseUrl).toString();
+      } catch {
+        // Keep the original path for non-URL sources.
+      }
+    }
+    return relative;
+  }
+  if (asset.p && baseUrl) {
+    try {
+      return new URL(asset.p, baseUrl).toString();
+    } catch {
+      // Keep the original path for non-URL sources.
+    }
+  }
   return asset.p ?? null;
 }
 
@@ -261,14 +281,15 @@ function renderImageLayer(
   matrix: Mat2D,
   opts: RenderOptions
 ): void {
-  const src = resolveImageSrc(asset);
+  const src = resolveImageSrc(asset, opts.sourceUrl);
   if (!src) return;
 
-  let img = opts.imageCache.get(asset.id);
+  const cacheKey = `${asset.id}:${src}`;
+  let img = opts.imageCache.get(cacheKey);
   if (!img) {
     img = new Image();
     img.src = src;
-    opts.imageCache.set(asset.id, img);
+    opts.imageCache.set(cacheKey, img);
     img.addEventListener("load", () => opts.onAssetLoaded?.());
     return;
   }
@@ -354,9 +375,13 @@ export function renderLayers(
   docFrame: number,
   opts: RenderOptions
 ): void {
-  const layersByInd = new Map<number, LottieLayer>();
-  for (const l of layers) {
-    if (l.ind != null) layersByInd.set(l.ind, l);
+  let layersByInd = opts.layerIndexCache?.get(layers);
+  if (!layersByInd) {
+    layersByInd = new Map<number, LottieLayer>();
+    for (const l of layers) {
+      if (l.ind != null) layersByInd.set(l.ind, l);
+    }
+    opts.layerIndexCache?.set(layers, layersByInd);
   }
   const matrixCache = new Map<number, Mat2D>();
 
@@ -481,6 +506,7 @@ function renderSingleLayer(
         canvasHeight: opts.canvasHeight,
         scratchCanvas: scratch.canvas,
         scratchCtx: scratch.ctx,
+        warnOnce: opts.warnOnce,
       };
       renderShapeItems(rc, layer.shapes, matrix, opacity);
       break;
@@ -510,6 +536,10 @@ function renderSingleLayer(
       renderTextLayer(ctx, layer, matrix, docFrame);
       break;
     default:
+      opts.warnOnce(
+        `layer-type:${layer.ty}`,
+        `[@core-ease/telegram-kit] Unsupported Lottie layer type ${layer.ty}; the layer was skipped.`
+      );
       break;
   }
 }
@@ -527,7 +557,7 @@ export function buildAssetsMap(doc: LottieAnimation): Map<string, LottieAsset> {
 }
 
 export function renderDocumentFrame(doc: LottieAnimation, frame: number, opts: RenderOptions): void {
-  const assetsById = buildAssetsMap(doc);
+  const assetsById = opts.assetsById ?? buildAssetsMap(doc);
   opts.ctx.save();
   opts.ctx.clearRect(0, 0, opts.canvasWidth, opts.canvasHeight);
   const scaleX = opts.canvasWidth / doc.w;

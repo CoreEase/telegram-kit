@@ -14,7 +14,7 @@ export function isGzip(data: Uint8Array): boolean {
 }
 
 export function gunzip(data: Uint8Array): Uint8Array {
-  if (!isGzip(data)) {
+  if (!isGzip(data) || data.length < 18) {
     throw new Error("Not a valid gzip stream (bad magic bytes)");
   }
 
@@ -25,6 +25,9 @@ export function gunzip(data: Uint8Array): Uint8Array {
   }
 
   const flags = data[pos++];
+  if ((flags & 0xe0) !== 0) {
+    throw new Error("Invalid gzip header flags");
+  }
   pos += 4; 
   pos += 1; 
   pos += 1;
@@ -48,8 +51,41 @@ export function gunzip(data: Uint8Array): Uint8Array {
     pos += 2;
   }
 
-  const deflateData = data.subarray(pos);
-  return inflateRaw(deflateData);
+  const trailerPos = data.length - 8;
+  if (pos > trailerPos) {
+    throw new Error("Invalid gzip header (truncated stream)");
+  }
+
+  const output = inflateRaw(data.subarray(pos, trailerPos));
+  const expectedCrc =
+    data[trailerPos] |
+    (data[trailerPos + 1] << 8) |
+    (data[trailerPos + 2] << 16) |
+    (data[trailerPos + 3] << 24);
+  const expectedSize =
+    data[trailerPos + 4] |
+    (data[trailerPos + 5] << 8) |
+    (data[trailerPos + 6] << 16) |
+    (data[trailerPos + 7] << 24);
+
+  if (crc32(output) !== (expectedCrc >>> 0)) {
+    throw new Error("Invalid gzip stream (CRC32 mismatch)");
+  }
+  if ((output.length >>> 0) !== (expectedSize >>> 0)) {
+    throw new Error("Invalid gzip stream (size mismatch)");
+  }
+  return output;
+}
+
+function crc32(bytes: Uint8Array): number {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit++) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
 }
 
 export function bytesToUtf8(bytes: Uint8Array): string {

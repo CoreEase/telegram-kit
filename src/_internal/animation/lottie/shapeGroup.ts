@@ -39,6 +39,7 @@ export interface ShapeRenderContext {
   canvasHeight: number;
   scratchCanvas: HTMLCanvasElement | OffscreenCanvas;
   scratchCtx: CanvasRenderingContext2D;
+  warnOnce: (key: string, message: string) => void;
 }
 
 export function computeLocalTransform(
@@ -235,11 +236,7 @@ export function renderShapeItems(
         mode: (trailingTrimItem.m ?? 1) as 1 | 2,
       }
     : inheritedTrim;
-  const roundItem = items.find((item) => item.ty === "rd") as ShapeModifierItem | undefined;
-  const roundRadius = roundItem
-    ? getAnimatedValue(roundItem.r, rc.frame)[0] ?? 0
-    : inheritedRoundRadius;
-  const modifiers = items.filter((item) => ["zz", "pb", "op"].includes(item.ty)) as ShapeModifierItem[];
+  const roundRadius = inheritedRoundRadius;
 
   let currentPaths: BezierPath[] = [];
   let mergeMode: number | null = null;
@@ -266,25 +263,41 @@ export function renderShapeItems(
       case "sr": {
         const path = buildShapePath(item, rc.frame);
         if (path) {
-          let rounded = roundRadius > 0 ? roundCorners(path, roundRadius) : path;
-          for (const modifier of modifiers) {
-            if (modifier.ty === "zz") {
-              rounded = zigzagPath(
-                rounded,
-                getAnimatedValue(modifier.s ?? modifier.a, rc.frame)[0] ?? 0,
-                getAnimatedValue(modifier.r ?? modifier.s, rc.frame)[0] ?? 2
-              );
-            } else if (modifier.ty === "pb") {
-              rounded = puckerBloatPath(rounded, getAnimatedValue(modifier.a ?? modifier.r, rc.frame)[0] ?? 0);
-            } else if (modifier.ty === "op") {
-              rounded = offsetPath(rounded, getAnimatedValue(modifier.a ?? modifier.r, rc.frame)[0] ?? 0);
-            }
-          }
+          const rounded = roundRadius > 0 ? roundCorners(path, roundRadius) : path;
           const paths = inheritedTrim
             ? trimPaths([rounded], inheritedTrim.start, inheritedTrim.end, inheritedTrim.offset, inheritedTrim.mode)
             : [rounded];
           currentPaths = [...currentPaths, ...paths];
         }
+        break;
+      }
+
+      case "rd": {
+        const modifier = item as ShapeModifierItem;
+        const radius = getAnimatedValue(modifier.r, rc.frame)[0] ?? 0;
+        currentPaths = currentPaths.map((path) => roundCorners(path, radius));
+        break;
+      }
+
+      case "zz": {
+        const modifier = item as ShapeModifierItem;
+        const amplitude = getAnimatedValue(modifier.s ?? modifier.a, rc.frame)[0] ?? 0;
+        const frequency = getAnimatedValue(modifier.r ?? modifier.s, rc.frame)[0] ?? 2;
+        currentPaths = currentPaths.map((path) => zigzagPath(path, amplitude, frequency));
+        break;
+      }
+
+      case "pb": {
+        const modifier = item as ShapeModifierItem;
+        const amount = getAnimatedValue(modifier.a ?? modifier.r, rc.frame)[0] ?? 0;
+        currentPaths = currentPaths.map((path) => puckerBloatPath(path, amount));
+        break;
+      }
+
+      case "op": {
+        const modifier = item as ShapeModifierItem;
+        const amount = getAnimatedValue(modifier.a ?? modifier.r, rc.frame)[0] ?? 0;
+        currentPaths = currentPaths.map((path) => offsetPath(path, amount));
         break;
       }
 
@@ -359,6 +372,7 @@ export function renderShapeItems(
           const css = colorToCss(color, opacity * localOpacity);
           paintFill(rc, paths, localMatrix, css, mm, fillRule);
         });
+        currentPaths = [];
         break;
       }
 
@@ -372,6 +386,7 @@ export function renderShapeItems(
           const gradient = buildGradient(rc.ctx, gf, rc.frame, localMatrix, opacity * localOpacity);
           paintFill(rc, paths, localMatrix, gradient, mm, fillRule);
         });
+        currentPaths = [];
         break;
       }
 
@@ -385,6 +400,7 @@ export function renderShapeItems(
           applyStrokeStyle(rc.ctx, st, rc.frame, localMatrix);
           paintStroke(rc, paths, localMatrix, css);
         });
+        currentPaths = [];
         break;
       }
 
@@ -397,10 +413,16 @@ export function renderShapeItems(
           applyStrokeStyle(rc.ctx, gs, rc.frame, localMatrix);
           paintStroke(rc, paths, localMatrix, gradient);
         });
+        currentPaths = [];
         break;
       }
 
       default:
+        const unsupportedType = (item as { ty: string }).ty;
+        rc.warnOnce(
+          `shape-type:${unsupportedType}`,
+          `[@core-ease/telegram-kit] Unsupported Lottie shape type "${unsupportedType}"; the item was skipped.`
+        );
         break;
     }
   }

@@ -287,4 +287,6 @@ export interface LottieAnimation {
   layers: LottieLayer[];
   markers?: Array<{ tm: number; cm: string; dr: number }>;
   tgs?: number;
+  /** Internal metadata used to resolve relative image assets. */
+  __sourceUrl?: string;
 }
