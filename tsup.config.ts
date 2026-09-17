@@ -38,7 +38,7 @@ export default defineConfig([
       const worker = join(dist, 'lottie.worker.js');
       mkdirSync(dist, { recursive: true });
       copyFileSync(wasm, join(dist, 'lottie.wasm'));
-      const wasmDirectories = ['core', 'animation/core', 'lottie/core', 'tgs/core'];
+      const wasmDirectories = ['core', 'animation', 'animation/core', 'animation/lottie', 'animation/tgs', 'animation/vanilla', 'lottie', 'lottie/core', 'tgs', 'tgs/core'];
       const workerDirectories = ['.', 'animation', 'animation/lottie', 'animation/tgs', 'animation/vanilla', 'lottie', 'tgs'];
       for (const directory of wasmDirectories) {
         mkdirSync(join(dist, directory), { recursive: true });
