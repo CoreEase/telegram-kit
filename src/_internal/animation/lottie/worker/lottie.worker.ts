@@ -32,6 +32,20 @@ const cancelRaf: (handle: number) => void =
 		: (handle) => clearTimeout(handle);
 
 const REPORT_INTERVAL_MS = 100;
+const MAX_RENDER_PIXELS = 1_000_000;
+
+function fitRenderSize(width: number, height: number): { width: number; height: number } {
+	const safeWidth = Math.max(1, Math.floor(Number.isFinite(width) ? width : 1));
+	const safeHeight = Math.max(1, Math.floor(Number.isFinite(height) ? height : 1));
+	const pixels = safeWidth * safeHeight;
+	if (pixels <= MAX_RENDER_PIXELS)
+		return { width: safeWidth, height: safeHeight };
+	const scale = Math.sqrt(MAX_RENDER_PIXELS / pixels);
+	return {
+		width: Math.max(1, Math.floor(safeWidth * scale)),
+		height: Math.max(1, Math.floor(safeHeight * scale)),
+	};
+}
 
 class WorkerAnimation {
 	private readonly id: string;
@@ -65,8 +79,7 @@ class WorkerAnimation {
 		this.animationBytes = animationBytes;
 		this.instance = instance;
 		this.canvas = config.canvas;
-		this.width = config.width;
-		this.height = config.height;
+		({ width: this.width, height: this.height } = fitRenderSize(config.width, config.height));
 		this.canvas.width = this.width;
 		this.canvas.height = this.height;
 
@@ -161,9 +174,10 @@ class WorkerAnimation {
 	}
 
 	resize(width: number, height: number): void {
-		if (width === this.width && height === this.height) return;
-		this.width = width;
-		this.height = height;
+		const size = fitRenderSize(width, height);
+		if (size.width === this.width && size.height === this.height) return;
+		this.width = size.width;
+		this.height = size.height;
 		this.canvas.width = width;
 		this.canvas.height = height;
 		this.draw();
