@@ -82,16 +82,27 @@ export class LottieInstance {
 		height: number,
 		quality: RenderQuality = DEFAULT_RENDER_QUALITY,
 	): Uint8ClampedArray<ArrayBuffer> | null {
-		const ptr = this.exports.tlottie_render_with_options(
+		const renderWidth = normalizeDimension(width);
+		const renderHeight = normalizeDimension(height);
+		const renderFrame = normalizeFrame(frame, this.frameCount);
+		let ptr = this.exports.tlottie_render_with_options(
 			this.ptr,
-			frame,
-			width,
-			height,
+			renderFrame,
+			renderWidth,
+			renderHeight,
 			quality.antialias ? 1 : 0,
 			quality.curveTolerance,
 		);
+		if (ptr === 0)
+			ptr = this.exports.tlottie_render(
+				this.ptr,
+				renderFrame,
+				renderWidth,
+				renderHeight,
+				quality.antialias ? 1 : 0,
+			);
 		if (ptr === 0) return null;
-		return readRgba(this.exports, ptr, width, height);
+		return readRgba(this.exports, ptr, renderWidth, renderHeight);
 	}
 
 	renderAlpha8(
@@ -138,6 +149,16 @@ export class LottieInstance {
 			this.ptr = 0;
 		}
 	}
+}
+
+function normalizeDimension(value: number): number {
+	if (!Number.isFinite(value)) return 1;
+	return Math.max(1, Math.min(Math.floor(value), 4096));
+}
+
+function normalizeFrame(frame: number, frameCount: number): number {
+	if (!Number.isFinite(frame)) return 0;
+	return Math.min(Math.max(frame, 0), Math.max(0, frameCount - 1));
 }
 
 interface PackedReplacements {

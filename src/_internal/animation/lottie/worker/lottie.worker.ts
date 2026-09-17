@@ -234,7 +234,10 @@ class WorkerAnimation {
 			this.post({
 				type: "error",
 				id: this.id,
-				error: { reason: "wasm", message: "render failed" },
+				error: {
+					reason: "wasm",
+					message: `render failed at frame ${this.engine.currentFrame} with ${this.width}x${this.height}`,
+				},
 			});
 			return;
 		}
