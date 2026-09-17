@@ -1,25 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import type { WebApp } from '../sdk';
 
 export type {
@@ -39,7 +18,6 @@ export type {
   HomeScreenStatus,
   ColorScheme,
 } from '../sdk';
-
 
 export interface EmojiStatusParams {
   duration?: number;
@@ -105,7 +83,6 @@ export type TgPlatform =
   | 'unknown';
 
 export type RuntimeMode = 'node' | 'edge';
-
 
 export type TgWebApp = WebApp;
 

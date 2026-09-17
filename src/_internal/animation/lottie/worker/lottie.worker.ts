@@ -12,19 +12,6 @@ import type {
 
 const ctx = self as unknown as typeof globalThis & { postMessage: (message: unknown) => void };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 let wasmPromise: Promise<LottieWasmExports> | null = null;
 function getWasm(wasmUrl: string | undefined): Promise<LottieWasmExports> {
 	if (!wasmUrl)
@@ -35,9 +22,6 @@ function getWasm(wasmUrl: string | undefined): Promise<LottieWasmExports> {
 	return wasmPromise;
 }
 
-
-
-
 const raf: (cb: (t: number) => void) => number =
 	typeof ctx.requestAnimationFrame === "function"
 		? ctx.requestAnimationFrame.bind(ctx)
@@ -47,7 +31,7 @@ const cancelRaf: (handle: number) => void =
 		? ctx.cancelAnimationFrame.bind(ctx)
 		: (handle) => clearTimeout(handle);
 
-const REPORT_INTERVAL_MS = 100; 
+const REPORT_INTERVAL_MS = 100;
 
 class WorkerAnimation {
 	private readonly id: string;
@@ -268,7 +252,6 @@ class WorkerAnimation {
 
 const animations = new Map<string, WorkerAnimation>();
 
-
 const pendingObservability = new Map<string, boolean>();
 
 ctx.onmessage = (ev: MessageEvent<MainToWorkerMessage>) => {
@@ -317,7 +300,6 @@ ctx.onmessage = (ev: MessageEvent<MainToWorkerMessage>) => {
 			break;
 	}
 };
-
 
 async function handleWarmup(
 	requestId: string,

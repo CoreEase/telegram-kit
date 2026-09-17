@@ -1,7 +1,4 @@
 
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
 import type { LocationData } from '../types';
@@ -121,7 +118,7 @@ export class LocationManager {
 
   private checkInit(): true {
     if (!this._isInited) {
-      
+
       console.error('[@core-ease/telegram-kit] LocationManager should be inited before using.');
       throwWebAppError(WebAppErrorName.LocationManagerNotInited);
     }
@@ -140,7 +137,7 @@ export class LocationManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isLocationAvailable) {
-      
+
       console.error('[@core-ease/telegram-kit] Location is not available on this device.');
       throwWebAppError(WebAppErrorName.LocationManagerLocationNotAvailable);
     }
@@ -153,17 +150,17 @@ export class LocationManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isLocationAvailable) {
-      
+
       console.error('[@core-ease/telegram-kit] Location is not available on this device.');
       throwWebAppError(WebAppErrorName.LocationManagerLocationNotAvailable);
     }
     if (!this._isAccessRequested) {
-      
+
       console.error('[@core-ease/telegram-kit] Location access was not requested yet.');
       throwWebAppError(WebAppErrorName.LocationManagerLocationAccessNotRequested);
     }
     if (this._isAccessGranted) {
-      
+
       console.warn('[@core-ease/telegram-kit] Location access was granted by the user, no need to go to settings.');
       return this;
     }

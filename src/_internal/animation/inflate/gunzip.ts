@@ -19,7 +19,7 @@ export function gunzip(data: Uint8Array): Uint8Array {
   }
 
   let pos = 2;
-  const cm = data[pos++]; 
+  const cm = data[pos++];
   if (cm !== 8) {
     throw new Error(`Unsupported gzip compression method: ${cm}`);
   }
@@ -28,8 +28,8 @@ export function gunzip(data: Uint8Array): Uint8Array {
   if ((flags & 0xe0) !== 0) {
     throw new Error("Invalid gzip header flags");
   }
-  pos += 4; 
-  pos += 1; 
+  pos += 4;
+  pos += 1;
   pos += 1;
 
   if (flags & FLAG_FEXTRA) {
@@ -39,7 +39,7 @@ export function gunzip(data: Uint8Array): Uint8Array {
 
   if (flags & FLAG_FNAME) {
     while (pos < data.length && data[pos] !== 0) pos++;
-    pos++; 
+    pos++;
   }
 
   if (flags & FLAG_FCOMMENT) {

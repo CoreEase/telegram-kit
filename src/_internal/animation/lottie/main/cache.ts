@@ -1,7 +1,4 @@
 
-
-
-
 const cache = new Map<string, Promise<Uint8Array>>();
 
 export function fetchAnimationBytes(src: string): Promise<Uint8Array> {
@@ -14,7 +11,7 @@ export function fetchAnimationBytes(src: string): Promise<Uint8Array> {
 				return res.arrayBuffer();
 			})
 			.then((buffer) => new Uint8Array(buffer));
-		
+
 		pending.catch(() => cache.delete(src));
 		cache.set(src, pending);
 	}

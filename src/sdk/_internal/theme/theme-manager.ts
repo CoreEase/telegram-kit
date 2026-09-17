@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import { isColorDark, parseColorToHex, sessionStorageGet, sessionStorageSet } from '../core/utils';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
@@ -29,7 +21,6 @@ export class ThemeManager {
   private bottomBarColorValue: string | ColorKey | 'bottom_bar_bg_color' = 'bottom_bar_bg_color';
   private appBottomBarColor: string | null = null;
 
-  
   onBottomBarColorApplied: (() => void) | null = null;
 
   constructor(private readonly kernel: WebAppKernel) {
@@ -40,7 +31,7 @@ export class ThemeManager {
         const parsed = JSON.parse(rawTheme);
         if (parsed) this.setThemeParams(parsed);
       } catch (e) {
-        
+
       }
     }
     if (storedTheme) {
@@ -54,7 +45,7 @@ export class ThemeManager {
         const parsed = JSON.parse(rawColors);
         if (parsed) this.setDefaultColors(parsed);
       } catch (e) {
-        
+
       }
     }
     if (storedColors) {
@@ -71,7 +62,7 @@ export class ThemeManager {
   }
 
   setThemeParams(theme: ThemeParams): void {
-    
+
     if (theme.bg_color == '#1c1c1d' && theme.bg_color == theme.secondary_bg_color) {
       theme.secondary_bg_color = '#2c2c2e';
     }
@@ -111,10 +102,6 @@ export class ThemeManager {
     sessionStorageSet('defaultColors', defColors);
   }
 
-  
-  
-  
-
   getHeaderColor(): string | null | undefined {
     if (this.headerColorKey == 'secondary_bg_color') {
       return this.themeParams.secondary_bg_color;
@@ -142,13 +129,13 @@ export class ThemeManager {
     } else if (this.kernel.versionAtLeast('6.9')) {
       headColor = parseColorToHex(color);
       if (!headColor) {
-        
+
         console.error('[@core-ease/telegram-kit] Header color format is invalid', color);
         throwWebAppError(WebAppErrorName.HeaderColorInvalid);
       }
     }
     if (!this.kernel.versionAtLeast('6.9') && colorKey != 'bg_color' && colorKey != 'secondary_bg_color') {
-      
+
       console.error(
         "[@core-ease/telegram-kit] Header color key should be one of Telegram.WebApp.themeParams.bg_color, Telegram.WebApp.themeParams.secondary_bg_color, 'bg_color', 'secondary_bg_color'",
         color
@@ -172,10 +159,6 @@ export class ThemeManager {
     }
   }
 
-  
-  
-  
-
   getBackgroundColor(): string | undefined {
     if (this.backgroundColorValue == 'secondary_bg_color') {
       return this.themeParams.secondary_bg_color;
@@ -195,7 +178,7 @@ export class ThemeManager {
     } else {
       const parsed = parseColorToHex(color);
       if (!parsed) {
-        
+
         console.error('[@core-ease/telegram-kit] Background color format is invalid', color);
         throwWebAppError(WebAppErrorName.BackgroundColorInvalid);
       }
@@ -212,10 +195,6 @@ export class ThemeManager {
       this.kernel.webView.postEvent('web_app_set_background_color', undefined, { color });
     }
   }
-
-  
-  
-  
 
   getBottomBarColor(): string {
     if (this.bottomBarColorValue == 'bottom_bar_bg_color') {
@@ -238,7 +217,7 @@ export class ThemeManager {
     } else {
       const parsed = parseColorToHex(color);
       if (!parsed) {
-        
+
         console.error('[@core-ease/telegram-kit] Bottom bar color format is invalid', color);
         throwWebAppError(WebAppErrorName.BottomBarColorInvalid);
       }

@@ -5,15 +5,6 @@ export interface WasmAlloc {
 	len: number;
 }
 
-
-
-
-
-
-
-
-
-
 export function writeBytes(
 	exports: LottieWasmExports,
 	bytes: Uint8Array,
@@ -30,7 +21,6 @@ export function freeBytes(exports: LottieWasmExports, alloc: WasmAlloc): void {
 	if (alloc.ptr !== 0) exports.tlottie_free(alloc.ptr, alloc.len);
 }
 
-
 export function readRgba(
 	exports: LottieWasmExports,
 	ptr: number,
@@ -39,7 +29,6 @@ export function readRgba(
 ): Uint8ClampedArray<ArrayBuffer> {
 	return new Uint8ClampedArray(exports.memory.buffer, ptr, width * height * 4);
 }
-
 
 export function readAlpha8(
 	exports: LottieWasmExports,

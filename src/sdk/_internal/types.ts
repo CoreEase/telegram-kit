@@ -1,21 +1,9 @@
 
-
-
-
-
-
-
-
-
-
 export type AnyRecord = Record<string, any>;
-
 
 export type VoidCallback = (...args: any[]) => void;
 
-
 export type EventHandler = (eventType: string, eventData: any) => void;
-
 
 export interface InitParams extends AnyRecord {
   _path?: string;
@@ -29,7 +17,6 @@ export interface InitParams extends AnyRecord {
   tgWebAppBotInline?: string;
   tgWebAppDebug?: string;
 }
-
 
 export interface ThemeParams extends AnyRecord {
   bg_color?: string;
@@ -49,7 +36,6 @@ export interface ThemeParams extends AnyRecord {
   destructive_text_color?: string;
 }
 
-
 export interface DefaultColors {
   bg_color?: string;
   bg_dark_color?: string;
@@ -65,7 +51,6 @@ export interface SafeAreaInset {
   left: number;
   right: number;
 }
-
 
 export interface WebAppInitDataUnsafe extends AnyRecord {
   query_id?: string;
@@ -101,7 +86,6 @@ export interface WebAppChat extends AnyRecord {
   username?: string;
   photo_url?: string;
 }
-
 
 export type BottomButtonPosition = 'left' | 'right' | 'top' | 'bottom';
 
@@ -198,8 +182,6 @@ export interface ShareToStoryParams {
   widget_link?: ShareToStoryWidgetLink;
 }
 
-
 export type ErrCallback<T = any> = (error: string | null, result?: T) => void;
-
 
 export type ItemsCallback = ErrCallback<Record<string, string>>;

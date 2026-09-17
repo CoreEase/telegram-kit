@@ -1,7 +1,4 @@
 
-
-
-
 import { WebAppKernel } from '../core/kernel';
 
 type ClipboardCallback = (data: string | null) => void;

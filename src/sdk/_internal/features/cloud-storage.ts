@@ -1,7 +1,4 @@
 
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import type { ErrCallback, ItemsCallback } from '../types';
 

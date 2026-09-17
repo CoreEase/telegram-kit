@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 export enum WebAppErrorName {
   MethodUnsupported = 'WebAppMethodUnsupported',
   DataInvalid = 'WebAppDataInvalid',

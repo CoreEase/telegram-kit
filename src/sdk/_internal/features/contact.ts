@@ -1,7 +1,4 @@
 
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import { urlParseQueryString } from '../core/utils';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
@@ -47,7 +44,7 @@ export class ContactManager {
                 webViewEvent.responseUnsafe[key] = JSON.parse(val);
               }
             } catch (e) {
-              
+
             }
           }
         }
@@ -63,7 +60,7 @@ export class ContactManager {
   requestWriteAccess(callback?: WriteAccessCallback): void {
     this.kernel.requireVersion('6.9', 'requestWriteAccess');
     if (this.writeAccessRequested) {
-      
+
       console.error('[@core-ease/telegram-kit] Write access is already requested');
       throwWebAppError(WebAppErrorName.WriteAccessRequested);
     }
@@ -74,7 +71,7 @@ export class ContactManager {
   requestContact(callback?: ContactCallback): void {
     this.kernel.requireVersion('6.9', 'requestContact');
     if (this.contactRequested) {
-      
+
       console.error('[@core-ease/telegram-kit] Contact is already requested');
       throwWebAppError(WebAppErrorName.ContactRequested);
     }

@@ -1,14 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import type { BottomButtonPosition } from '../types';
 
@@ -38,7 +28,6 @@ export class DebugBottomBar {
   private container: HTMLElement | null = null;
   private buttons: Partial<Record<ButtonType, RegisteredDebugButton>> = {};
 
-  
   onHeightChanged: (() => void) | null = null;
 
   constructor(private readonly kernel: WebAppKernel, private readonly getBottomBarColor: () => string) {
@@ -81,7 +70,6 @@ export class DebugBottomBar {
     this.container.appendChild(animStyle);
   }
 
-  
   registerButton(type: ButtonType, onPressed: () => void): HTMLElement | null {
     if (!this.enabled || !this.container) return null;
     const el = document.createElement('tg-bottom-button');
@@ -102,7 +90,6 @@ export class DebugBottomBar {
     return el;
   }
 
-  
   updateButtonVisual(type: ButtonType, params: DebugButtonVisualState & { position?: BottomButtonPosition }): void {
     const entry = this.buttons[type];
     if (!entry) return;
@@ -166,7 +153,6 @@ export class DebugBottomBar {
     this.onHeightChanged?.();
   }
 
-  
   refreshColor(): void {
     if (!this.enabled || !this.container) return;
     this.updateBar();

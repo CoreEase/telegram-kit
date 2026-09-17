@@ -1,28 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { TelegramWebView, Utils } from './_internal/core/webview';
 import { WebApp } from './_internal/webapp';
 
@@ -31,9 +7,6 @@ export { TelegramWebView, Utils } from './_internal/core/webview';
 export { WebAppKernel } from './_internal/core/kernel';
 export { WebAppError, WebAppErrorName } from './_internal/core/errors';
 export { WebApp } from './_internal/webapp';
-
-
-
 
 export { ThemeManager } from './_internal/theme/theme-manager';
 export { ViewportManager } from './_internal/theme/viewport-manager';
@@ -65,17 +38,6 @@ export const SDK_NAME = '@core-ease/telegram-kit';
 
 let bootstrapped: { webView: TelegramWebView; webApp: WebApp } | null = null;
 
-
-
-
-
-
-
-
-
-
-
-
 export function bootstrapTelegramWebApp(): { webView: TelegramWebView; webApp: WebApp } {
   if (bootstrapped) {
     return bootstrapped;
@@ -100,7 +62,6 @@ export function bootstrapTelegramWebApp(): { webView: TelegramWebView; webApp: W
   bootstrapped = { webView, webApp };
   return bootstrapped;
 }
-
 
 export function isBootstrapped(): boolean {
   return bootstrapped !== null;

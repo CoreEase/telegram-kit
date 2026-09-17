@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 .lottie-player {
 	position: relative;
 	overflow: hidden;
@@ -42,9 +35,6 @@
 		transition: opacity 0.15s ease-out;
 		pointer-events: none;
 
-		
-		
-		
 		&::after {
 			content: "";
 			position: absolute;
@@ -60,9 +50,6 @@
 		&.lottie-hidden {
 			opacity: 0;
 
-			
-			
-			
 			&::after {
 				animation-play-state: paused;
 			}

@@ -1,7 +1,4 @@
 
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
 import { ALLOWED_TELEGRAM_HOSTS } from '../../_internal/core/utils';
@@ -36,13 +33,13 @@ export class InvoiceManager {
     const match = a.pathname.match(/^\/(\$|invoice\/)([A-Za-z0-9\-_=]+)$/);
     const slug = match?.[2];
     if ((a.protocol != 'http:' && a.protocol != 'https:') || !ALLOWED_TELEGRAM_HOSTS.includes(a.hostname) || !match || !slug) {
-      
+
       console.error('[@core-ease/telegram-kit] Invoice url is invalid', url);
       throwWebAppError(WebAppErrorName.InvoiceUrlInvalid);
     }
     this.kernel.requireVersion('6.1', 'openInvoice');
     if (this.openInvoices[slug as string]) {
-      
+
       console.error('[@core-ease/telegram-kit] Invoice is already opened');
       throwWebAppError(WebAppErrorName.InvoiceOpened);
     }

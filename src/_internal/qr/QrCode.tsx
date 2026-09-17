@@ -122,16 +122,16 @@ function getLogoClipPath(
   borderRadius?: number
 ): string | undefined {
   if (shape === 'none') return undefined;
-  
+
   if (shape === 'circle') {
     return `circle(${radius}px at ${center}px ${center}px)`;
   }
-  
+
   if (shape === 'rounded') {
     const r = borderRadius ?? radius * 0.25;
     return `inset(0px round ${r}px)`;
   }
-  
+
   return undefined;
 }
 

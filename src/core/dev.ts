@@ -1,53 +1,25 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { Utils, isBootstrapped, bootstrapTelegramWebApp } from '../sdk';
 import { markDevModeActive } from './fallback';
 import type { TgUser, TgThemeParams } from '../types/webapp';
 
 export interface DevModeOptions {
-  
+
   user?: Partial<TgUser>;
-  
+
   colorScheme?: 'light' | 'dark';
-  
+
   platform?: string;
-  
+
   version?: string;
-  
+
   startParam?: string;
-  
+
   showIndicator?: boolean;
 }
 
 export interface InstallDevModeOptions extends DevModeOptions {
-  
+
   force?: boolean;
 }
 
@@ -96,7 +68,6 @@ const DARK_THEME: TgThemeParams = {
   destructive_text_color: '#ec3942',
 };
 
-
 function getAppTheme(): TgThemeParams {
   if (typeof document === 'undefined') return DARK_THEME;
 
@@ -130,7 +101,6 @@ function resolveTheme(colorScheme?: 'light' | 'dark'): TgThemeParams {
   return getAppTheme();
 }
 
-
 function buildFakeTgWebAppData(options: DevModeOptions): string {
   const user: TgUser = { ...DEFAULT_USER, ...options.user };
   const fields: Record<string, string> = {
@@ -144,7 +114,6 @@ function buildFakeTgWebAppData(options: DevModeOptions): string {
     .join('&');
 }
 
-
 function looksLikeRealTelegramLaunch(): boolean {
   try {
     return typeof location !== 'undefined' && location.hash.indexOf('tgWebAppData') !== -1;
@@ -153,27 +122,13 @@ function looksLikeRealTelegramLaunch(): boolean {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export function installDevMode(options: InstallDevModeOptions = {}): boolean {
   if (typeof window === 'undefined') return false;
 
   if (looksLikeRealTelegramLaunch() && !options.force) return false;
 
   if (isBootstrapped()) {
-    
+
     console.warn(
       '[@core-ease/telegram-kit] installDevMode() was called after the SDK already bootstrapped - call it before ' +
         'any other @core-ease/telegram-kit import touches getWebApp() (hooks, <TelegramProvider>, core functions).'
@@ -189,13 +144,10 @@ export function installDevMode(options: InstallDevModeOptions = {}): boolean {
   });
   markDevModeActive();
 
-  
-  
   bootstrapTelegramWebApp();
 
   if (options.showIndicator !== false) attachDevIndicator();
 
-  
   console.info(
     '%c[@core-ease/telegram-kit] Dev mode active',
     'background:#2678b6;color:#fff;padding:2px 6px;border-radius:3px;font-weight:bold'
@@ -233,15 +185,6 @@ function attachDevIndicator(): void {
 
   document.body.appendChild(el);
 }
-
-
-
-
-
-
-
-
-
 
 export function isDevMode(): boolean {
   if (typeof window === 'undefined') return false;

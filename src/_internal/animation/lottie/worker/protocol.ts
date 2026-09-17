@@ -12,9 +12,9 @@ import type {
 
 export interface WorkerInitConfig {
 	canvas: OffscreenCanvas;
-	
+
 	animationData: Uint8Array;
-	
+
 	wasmUrl?: string;
 	width: number;
 	height: number;
@@ -25,9 +25,9 @@ export interface WorkerInitConfig {
 	fitzModifier?: FitzModifier;
 	layerColorReplacements?: LayerColorReplacementInput[];
 	quality?: Partial<RenderQuality>;
-	
+
 	forceRender?: boolean;
-	
+
 	reportFrames?: boolean;
 }
 

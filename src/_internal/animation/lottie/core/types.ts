@@ -9,16 +9,15 @@ export const FitzModifier = {
 } as const;
 export type FitzModifier = (typeof FitzModifier)[keyof typeof FitzModifier];
 
-
 export interface LayerColorReplacementInput {
 	layerNamePrefix: string;
-	
+
 	color: number;
 }
 
 export interface RenderQuality {
 	antialias: boolean;
-	
+
 	curveTolerance: number;
 }
 
@@ -56,7 +55,6 @@ export interface PlayerFrameSnapshot {
 
 export type PlayDirection = 1 | -1;
 
-
 export type LoopConfig = boolean | number;
 
 export interface PlayerEngineConfig {
@@ -68,7 +66,6 @@ export interface PlayerEngineConfig {
 	autoplay?: boolean;
 	initialFrame?: number;
 }
-
 
 export interface LottieSource {
 	src?: string;
@@ -86,7 +83,6 @@ export interface LottieColorConfig {
 	fitzModifier?: FitzModifier;
 	layerColorReplacements?: LayerColorReplacementInput[];
 }
-
 
 export type LottieErrorReason = "fetch" | "decompress" | "parse" | "wasm";
 

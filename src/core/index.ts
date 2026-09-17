@@ -1,28 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { bootstrapTelegramWebApp, type WebApp } from '../sdk';
 import type {
   TgUser,
@@ -49,12 +25,7 @@ import {
 
 export { safeInvoke } from './fallback';
 
-
-
-
-
 let cachedWebApp: WebApp | null = null;
-
 
 export function getWebApp(): WebApp | null {
   if (typeof window === 'undefined') return null;
@@ -63,11 +34,6 @@ export function getWebApp(): WebApp | null {
   }
   return cachedWebApp;
 }
-
-
-
-
-
 
 export function isInTelegram(): boolean {
   const wa = getWebApp();
@@ -78,22 +44,12 @@ export function isVersionAtLeast(version: string): boolean {
   return getWebApp()?.isVersionAtLeast(version) ?? false;
 }
 
-
-
-
-
-
-
 function nativeReady(version?: string): boolean {
   if (!isInTelegram()) return false;
   if (isDevModeActive()) return false;
   if (version && !isVersionAtLeast(version)) return false;
   return true;
 }
-
-
-
-
 
 export function getRawUserData(): TgUser | null {
   return getWebApp()?.initDataUnsafe?.user ?? null;
@@ -170,12 +126,6 @@ export function getUserInfoWithAvatar() {
   };
 }
 
-
-
-
-
-
-
 export function openExternalLink(url: string, tryInstantView = false): void {
   const wa = getWebApp();
   if (!wa) {
@@ -193,7 +143,6 @@ export function openTelegramLink(url: string): void {
   }
   wa.openTelegramLink(url);
 }
-
 
 export function openInvoice(url: string): Promise<'paid' | 'cancelled' | 'failed' | 'pending'> {
   return callNativeOrFallback({
@@ -216,12 +165,6 @@ export function switchInlineQuery(
 export function hideKeyboard(): void {
   safeInvoke(() => getWebApp()?.hideKeyboard());
 }
-
-
-
-
-
-
 
 export function getTheme() {
   const wa = getWebApp();
@@ -249,7 +192,6 @@ export function close(): void {
   safeInvoke(() => getWebApp()?.close());
 }
 
-
 export const fullscreen = {
   enter: (): Promise<boolean> => {
     if (nativeReady('8.0')) {
@@ -266,7 +208,6 @@ export const fullscreen = {
     return fullscreenFallback(false);
   },
 };
-
 
 export const orientation = {
   lock: (): Promise<boolean> => {
@@ -313,7 +254,6 @@ export function setBottomBarColor(color: string): void {
   safeInvoke(() => getWebApp()?.setBottomBarColor(color));
 }
 
-
 export function addToHomeScreen(): void {
   if (!nativeReady('8.0')) return;
   safeInvoke(() => getWebApp()!.addToHomeScreen());
@@ -327,10 +267,6 @@ export function checkHomeScreenStatus(): Promise<'unsupported' | 'unknown' | 'ad
   });
 }
 
-
-
-
-
 export const haptic = {
   light: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.impactOccurred('light') : vibrateFallback('light')),
   medium: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.impactOccurred('medium') : vibrateFallback('medium')),
@@ -342,11 +278,6 @@ export const haptic = {
   error: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.notificationOccurred('error') : vibrateFallback('error')),
   selection: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.selectionChanged() : vibrateFallback('selection')),
 };
-
-
-
-
-
 
 const cloudStorageFallback = createLocalStorageFallback('cloud');
 const deviceStorageFallback = createLocalStorageFallback('device');
@@ -466,10 +397,6 @@ export const secureStorage = {
     }),
 };
 
-
-
-
-
 export const dialog = {
   alert: (message: string): Promise<void> =>
     callNativeOrFallback({
@@ -493,8 +420,7 @@ export const dialog = {
       native: () => new Promise((resolve) => getWebApp()!.showPopup(params, (buttonId) => resolve(buttonId ?? null))),
       fallback: () => {
         if (typeof window === 'undefined') return null;
-        
-        
+
         const okButton = params.buttons?.find((b) => b.type === 'ok' || b.type === 'default');
         const okButtonId = okButton?.id != null ? String(okButton.id) : null;
         if (params.buttons && params.buttons.length > 1) {
@@ -509,10 +435,6 @@ export const dialog = {
   prompt: (message: string, defaultValue = ''): Promise<string | null> =>
     Promise.resolve(typeof window === 'undefined' ? null : window.prompt(message, defaultValue)),
 };
-
-
-
-
 
 export function readClipboard(): Promise<string | null> {
   return callNativeOrFallback({
@@ -534,7 +456,7 @@ export function scanQr(text?: string): Promise<string | null> {
           return true;
         });
       }),
-    fallback: () => Promise.resolve(null), 
+    fallback: () => Promise.resolve(null),
   });
 }
 
@@ -558,12 +480,6 @@ export function downloadFile(params: DownloadFileParams): Promise<boolean> {
     fallback: () => downloadFileFallback(params.url, params.file_name),
   });
 }
-
-
-
-
-
-
 
 export function setEmojiStatus(customEmojiId: string, params?: EmojiStatusParams): Promise<boolean> {
   return callNativeOrFallback({
@@ -597,11 +513,6 @@ export function requestContact(): Promise<boolean> {
   });
 }
 
-
-
-
-
-
 export function requestChat(reqId: string): Promise<boolean> {
   return callNativeOrFallback({
     ready: nativeReady('9.6'),
@@ -609,7 +520,6 @@ export function requestChat(reqId: string): Promise<boolean> {
     fallback: () => false,
   });
 }
-
 
 export function invokeCustomMethod(method: string, params: object = {}): Promise<unknown> {
   return callNativeOrFallback({
@@ -620,12 +530,6 @@ export function invokeCustomMethod(method: string, params: object = {}): Promise
     },
   });
 }
-
-
-
-
-
-
 
 export const biometric = {
   init: (): Promise<void> =>
@@ -664,10 +568,6 @@ export const biometric = {
     safeInvoke(() => getWebApp()!.BiometricManager.openSettings());
   },
 };
-
-
-
-
 
 export const location = {
   init: (): Promise<void> =>

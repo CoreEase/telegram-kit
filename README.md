@@ -54,7 +54,6 @@ None of this affects how you import the package — see the sections below for t
 
 Wrap your app once:
 
-
 ```tsx
 import { TelegramProvider, useTelegram } from '@core-ease/telegram-kit';
 

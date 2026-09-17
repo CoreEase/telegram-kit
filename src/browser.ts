@@ -1,6 +1,4 @@
 
-
-
 export * as sdk from './sdk';
 export { bootstrapTelegramWebApp } from './sdk';
 

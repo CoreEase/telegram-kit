@@ -437,10 +437,10 @@ export function useAccelerometer(options?: { refreshRate?: number; autoStart?: b
 
   useTelegramEvent('accelerometerChanged', () => {
     const acc = getWebApp()?.Accelerometer;
-    if (acc) setData({ 
-      x: acc.x ?? 0, 
-      y: acc.y ?? 0, 
-      z: acc.z ?? 0 
+    if (acc) setData({
+      x: acc.x ?? 0,
+      y: acc.y ?? 0,
+      z: acc.z ?? 0
     });
   });
   useTelegramEvent('accelerometerStarted', () => setIsStarted(true));
@@ -467,10 +467,10 @@ export function useGyroscope(options?: { refreshRate?: number; autoStart?: boole
 
   useTelegramEvent('gyroscopeChanged', () => {
     const g = getWebApp()?.Gyroscope;
-    if (g) setData({ 
-      x: g.x ?? 0, 
-      y: g.y ?? 0, 
-      z: g.z ?? 0 
+    if (g) setData({
+      x: g.x ?? 0,
+      y: g.y ?? 0,
+      z: g.z ?? 0
     });
   });
   useTelegramEvent('gyroscopeStarted', () => setIsStarted(true));
@@ -663,11 +663,6 @@ export function useSwitchInlineQuery() {
     coreSwitchInlineQuery(query, chooseChatTypes);
   }, []);
 }
-
-
-
-
-
 
 export function useRequestChat() {
   return useCallback((reqId: string): Promise<boolean> => coreRequestChat(reqId), []);

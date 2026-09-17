@@ -36,31 +36,31 @@ export class InlineKeyboardBuilder {
   webApp(text: string, url: string): this {
     return this.add({ text, web_app: { url } });
   }
-  
+
   login(text: string, loginUrl: string | LoginUrl): this {
     return this.add({ text, login_url: typeof loginUrl === 'string' ? { url: loginUrl } : loginUrl });
   }
-  
+
   switchInline(text: string, query = ''): this {
     return this.add({ text, switch_inline_query: query });
   }
-  
+
   switchInlineCurrentChat(text: string, query = ''): this {
     return this.add({ text, switch_inline_query_current_chat: query });
   }
-  
+
   switchInlineChosenChat(text: string, query?: SwitchInlineQueryChosenChat): this {
     return this.add({ text, switch_inline_query_chosen_chat: query ?? {} });
   }
-  
+
   copyText(text: string, copyText: string | CopyTextButton): this {
     return this.add({ text, copy_text: typeof copyText === 'string' ? { text: copyText } : copyText });
   }
-  
+
   pay(text = 'Pay'): this {
     return this.add({ text, pay: true });
   }
-  
+
   callbackGame(text: string): this {
     return this.add({ text, callback_game: {} });
   }
@@ -112,15 +112,15 @@ export class ReplyKeyboardBuilder {
   text(label: string): this {
     return this.add({ text: label });
   }
-  
+
   requestContact(label: string): this {
     return this.add({ text: label, request_contact: true });
   }
-  
+
   requestLocation(label: string): this {
     return this.add({ text: label, request_location: true });
   }
-  
+
   requestPoll(label: string, type?: KeyboardButtonPollType['type']): this {
     return this.add({ text: label, request_poll: { type } });
   }

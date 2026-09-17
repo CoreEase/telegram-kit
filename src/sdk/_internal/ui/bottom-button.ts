@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import { parseColorToHex, strTrim } from '../core/utils';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
@@ -97,10 +90,6 @@ export class BottomButton {
     }
   };
 
-  
-  
-  
-
   get iconCustomEmojiId(): string | false {
     return this.iconCustomEmojiIdValue;
   }
@@ -161,10 +150,6 @@ export class BottomButton {
     if (!this.isMain) this.setParams({ position: val });
   }
 
-  
-  
-  
-
   private buttonParams(): ButtonParamsWire {
     if (!this.isVisibleValue) {
       return { is_visible: false };
@@ -205,7 +190,7 @@ export class BottomButton {
         emojiId = '';
       }
       if (emojiId !== '' && !/^[0-9]{10,20}$/.test(emojiId)) {
-        
+
         console.error('[@core-ease/telegram-kit] Bottom button icon custom emoji is invalid', params.icon_custom_emoji_id);
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
@@ -214,12 +199,12 @@ export class BottomButton {
     if (typeof params.text !== 'undefined') {
       const text = strTrim(params.text);
       if (!text.length && !this.iconCustomEmojiIdValue) {
-        
+
         console.error('[@core-ease/telegram-kit] Bottom button text is required', params.text);
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
       if (text.length > 64) {
-        
+
         console.error('[@core-ease/telegram-kit] Bottom button text is too long', text);
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
@@ -231,7 +216,7 @@ export class BottomButton {
       } else {
         const color = parseColorToHex(params.color);
         if (!color) {
-          
+
           console.error('[@core-ease/telegram-kit] Bottom button color format is invalid', params.color);
           throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
         }
@@ -244,7 +229,7 @@ export class BottomButton {
       } else {
         const textColor = parseColorToHex(params.text_color);
         if (!textColor) {
-          
+
           console.error('[@core-ease/telegram-kit] Bottom button text color format is invalid', params.text_color);
           throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
         }
@@ -253,7 +238,7 @@ export class BottomButton {
     }
     if (typeof params.is_visible !== 'undefined') {
       if (params.is_visible && !this.textValue.length) {
-        
+
         console.error('[@core-ease/telegram-kit] Bottom button text is required');
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
@@ -269,7 +254,7 @@ export class BottomButton {
         params.position != 'top' &&
         params.position != 'bottom'
       ) {
-        
+
         console.error('[@core-ease/telegram-kit] Bottom button posiition is invalid', params.position);
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }

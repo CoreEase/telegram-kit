@@ -1,9 +1,4 @@
 
-
-
-
-
-
 import { WebAppKernel } from '../core/kernel';
 
 export function invokeGetRequestedContact(
@@ -18,7 +13,7 @@ export function invokeGetRequestedContact(
   const reqInvoke = (): void => {
     kernel.invokeCustomMethod('getRequestedContact', {}, (_err: any, res: any) => {
       if (typeof res === 'string' && res.substr(0, 1) == '"' && res.substr(-1) == '"') {
-        
+
         res = JSON.parse(res);
       }
       if (res && res.length) {

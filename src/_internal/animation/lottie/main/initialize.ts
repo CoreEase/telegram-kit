@@ -6,9 +6,9 @@ import type {
 import { DEFAULT_WASM_URL } from "./wasm-url";
 
 export interface InitializeLottieOptions {
-	
+
 	workerCount?: number;
-	
+
 	pool?: LottieWorkerPool;
 	wasmUrl?: string | URL;
 }
@@ -20,21 +20,6 @@ function generateRequestId(): string {
 	idCounter += 1;
 	return `lottie-warmup-${Date.now()}-${idCounter}`;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export function initializeLottie(
 	options: InitializeLottieOptions = {},

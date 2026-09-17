@@ -1,12 +1,5 @@
 
-
-
-
-
-
-
 const DEFAULT_POOL_SIZE = 1;
-
 
 export class LottieWorkerPool {
 	private workers: Worker[] = [];
@@ -40,7 +33,6 @@ export class LottieWorkerPool {
 		return this.workers[this.nextIndex];
 	}
 
-	
 	getAllWorkers(): Worker[] {
 		while (this.workers.length < this.size) this.getWorker();
 		return [...this.workers];

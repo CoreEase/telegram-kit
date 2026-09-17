@@ -42,7 +42,7 @@ class ByteSink {
 
 class BitReader {
   private readonly data: Uint8Array;
-  private pos = 0; 
+  private pos = 0;
   private bitBuf = 0;
   private bitCount = 0;
 
@@ -180,7 +180,7 @@ function inflateBlock(
     }
 
     if (sym === 256) {
-      return; 
+      return;
     }
 
     const lengthIndex = sym - 257;

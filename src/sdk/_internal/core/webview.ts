@@ -1,17 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 import {
   sessionStorageGet,
   sessionStorageSet,
@@ -48,7 +35,7 @@ export class TelegramWebView {
     try {
       locationHash = location.hash.toString();
     } catch (e) {
-      
+
     }
 
     const parsedParams = urlParseHashParams(locationHash);
@@ -76,15 +63,14 @@ export class TelegramWebView {
             '*'
           );
         } catch (e) {
-          
+
         }
       }
     } catch (e) {
-      
+
     }
     this.isIframe = isIframe;
 
-    
     window.TelegramGameProxy_receiveEvent = this.receiveEvent;
     window.TelegramGameProxy = { receiveEvent: this.receiveEvent };
   }
@@ -108,7 +94,7 @@ export class TelegramWebView {
       try {
         window.parent.postMessage(JSON.stringify({ eventType: 'iframe_will_reload' }), '*');
       } catch (e) {
-        
+
       }
       location.reload();
     } else {
@@ -116,7 +102,6 @@ export class TelegramWebView {
     }
   };
 
-  
   postEvent(eventType: string, callback?: PostEventCallback, eventData: unknown = ''): void {
     const cb: PostEventCallback = callback || (() => {});
 
@@ -128,7 +113,7 @@ export class TelegramWebView {
       cb();
     } else if (this.isIframe) {
       try {
-        
+
         const trustedTarget = '*';
         window.parent.postMessage(JSON.stringify({ eventType, eventData }), trustedTarget);
         cb();
@@ -140,7 +125,6 @@ export class TelegramWebView {
     }
   }
 
-  
   receiveEvent = (eventType: string, eventData: any): void => {
     this.callEventCallbacks(eventType, (callback) => callback(eventType, eventData));
   };
@@ -154,7 +138,7 @@ export class TelegramWebView {
       try {
         func(handlers[i]);
       } catch (e) {
-        
+
       }
     }
   }
@@ -180,10 +164,6 @@ export class TelegramWebView {
     handlers.splice(index, 1);
   }
 }
-
-
-
-
 
 export function openProtoUrl(url: string): boolean {
   if (!url.match(/^(web\+)?tgb?:\/\/./)) {
@@ -215,7 +195,6 @@ export function openProtoUrl(url: string): boolean {
   }
   return true;
 }
-
 
 export const Utils = {
   urlSafeDecode,

@@ -1,13 +1,4 @@
 
-
-
-
-
-
-
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import { sessionStorageGet, sessionStorageSet } from '../core/utils';
 import type { SafeAreaInset } from '../types';
@@ -43,10 +34,6 @@ export class ViewportManager {
 
     this.onWindowResize = this.onWindowResize.bind(this);
   }
-
-  
-  
-  
 
   get isExpanded(): boolean {
     return this._isExpanded;
@@ -86,11 +73,6 @@ export class ViewportManager {
     return this._isVerticalSwipesEnabled;
   }
 
-  
-  
-  
-
-  
   setViewportHeight(data?: { height: number; is_expanded?: boolean; is_state_stable?: boolean }): void {
     let emitEvent = false;
     if (typeof data !== 'undefined') {
@@ -136,10 +118,6 @@ export class ViewportManager {
     }
   }
 
-  
-  
-  
-
   setSafeAreaInset(data?: Partial<SafeAreaInset>): void {
     if (typeof data !== 'undefined') {
       if (typeof data.top !== 'undefined') this._safeAreaInset.top = data.top;
@@ -176,10 +154,6 @@ export class ViewportManager {
     if (eventData) this.setContentSafeAreaInset(eventData);
   };
 
-  
-  
-  
-
   setClosingConfirmation(needConfirmation: boolean): void {
     if (!this.kernel.warnIfUnsupported('6.2', 'Closing confirmation')) {
       return;
@@ -199,10 +173,6 @@ export class ViewportManager {
       allow_vertical_swipe: this._isVerticalSwipesEnabled,
     });
   }
-
-  
-  
-  
 
   private setFullscreen(isFullscreen: boolean): void {
     this._isFullscreen = !!isFullscreen;
@@ -230,10 +200,6 @@ export class ViewportManager {
     this.kernel.requireVersion('8.0', 'exitFullscreen');
     this.kernel.webView.postEvent('web_app_exit_fullscreen');
   }
-
-  
-  
-  
 
   private setOrientationLock(isLocked: boolean): void {
     this._isOrientationLocked = !!isLocked;

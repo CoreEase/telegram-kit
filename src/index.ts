@@ -13,13 +13,5 @@ export * from './utils/format';
 export * from './utils/links';
 export * from './utils/keyboards';
 
-
-
-
-
-
-
-
-
 export * as sdk from './sdk';
 export { bootstrapTelegramWebApp } from './sdk';

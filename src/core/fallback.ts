@@ -1,35 +1,15 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
 import type { LocationData } from '../types/webapp';
 
 const DEV_MODE_STORAGE_KEY = '@core-ease/telegram-kit:dev-mode-active';
-
 
 export function markDevModeActive(): void {
   try {
     if (typeof window !== 'undefined') window.sessionStorage.setItem(DEV_MODE_STORAGE_KEY, '1');
   } catch {
-    
+
   }
 }
-
-
-
-
-
-
-
 
 export function isDevModeActive(): boolean {
   try {
@@ -50,15 +30,6 @@ export interface FallbackKeyValueStore {
   getKeys(): Promise<string[]>;
   clear(): Promise<boolean>;
 }
-
-
-
-
-
-
-
-
-
 
 export function createLocalStorageFallback(namespace: string): FallbackKeyValueStore {
   const prefix = `${STORAGE_PREFIX}${namespace}:`;
@@ -91,7 +62,7 @@ export function createLocalStorageFallback(namespace: string): FallbackKeyValueS
           const value = window.localStorage.getItem(prefix + key);
           if (value !== null) result[key] = value;
         } catch {
-          
+
         }
       }
       return result;
@@ -152,18 +123,15 @@ const HAPTIC_PATTERNS = {
   selection: 5,
 } as const;
 
-
 export function vibrateFallback(kind: keyof typeof HAPTIC_PATTERNS): void {
   try {
     if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
       navigator.vibrate(HAPTIC_PATTERNS[kind] as number | number[]);
     }
   } catch {
-    
-    
+
   }
 }
-
 
 export function downloadFileFallback(url: string, fileName: string): boolean {
   try {
@@ -181,7 +149,6 @@ export function downloadFileFallback(url: string, fileName: string): boolean {
     return false;
   }
 }
-
 
 export function getLocationFallback(): Promise<LocationData | null> {
   return new Promise((resolve) => {
@@ -209,7 +176,6 @@ export function getLocationFallback(): Promise<LocationData | null> {
   });
 }
 
-
 export async function readClipboardFallback(): Promise<string | null> {
   try {
     if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
@@ -217,18 +183,16 @@ export async function readClipboardFallback(): Promise<string | null> {
       return text ?? null;
     }
   } catch {
-    
+
   }
   return null;
 }
-
 
 export function scanQrFallback(promptText?: string): string | null {
   if (typeof window === 'undefined' || typeof window.prompt !== 'function') return null;
   const value = window.prompt(promptText || 'Enter the QR code value:');
   return value && value.length ? value : null;
 }
-
 
 export async function shareTextFallback(text: string, url?: string): Promise<boolean> {
   try {
@@ -237,7 +201,7 @@ export async function shareTextFallback(text: string, url?: string): Promise<boo
       return true;
     }
   } catch {
-    
+
   }
   try {
     if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
@@ -245,17 +209,10 @@ export async function shareTextFallback(text: string, url?: string): Promise<boo
       return true;
     }
   } catch {
-    
+
   }
   return false;
 }
-
-
-
-
-
-
-
 
 export function withTimeoutFallback<T>(factory: () => Promise<T>, fallback: T, timeoutMs = 4000): Promise<T> {
   return new Promise((resolve) => {
@@ -294,23 +251,6 @@ export function withTimeoutFallback<T>(factory: () => Promise<T>, fallback: T, t
   });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export function callNativeOrFallback<T>(options: {
   ready: boolean;
   native: () => Promise<T>;
@@ -346,7 +286,6 @@ export function callNativeOrFallback<T>(options: {
   });
 }
 
-
 export async function orientationLockFallback(locked: boolean): Promise<boolean> {
   try {
     const orientation = typeof screen !== 'undefined' ? (screen as any).orientation : undefined;
@@ -358,12 +297,10 @@ export async function orientationLockFallback(locked: boolean): Promise<boolean>
     }
     return true;
   } catch {
-    
-    
+
     return false;
   }
 }
-
 
 export async function fullscreenFallback(enter: boolean, el?: HTMLElement): Promise<boolean> {
   try {
@@ -380,14 +317,10 @@ export async function fullscreenFallback(enter: boolean, el?: HTMLElement): Prom
   }
 }
 
-
 export function safeInvoke(fn: () => void): void {
   try {
     fn();
   } catch {
-    
-    
-    
-    
+
   }
 }

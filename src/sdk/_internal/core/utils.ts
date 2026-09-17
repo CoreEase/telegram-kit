@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 export const ALLOWED_TELEGRAM_HOSTS = [
   't.me',
   'telegram.me',
@@ -60,29 +54,22 @@ export function urlParseHashParams(locationHash: string): Record<string, any> {
   return params;
 }
 
-
-
-
-
-
-
 export function urlAppendHashParams(url: string, addHash: string): string {
   const ind = url.indexOf('#');
   if (ind < 0) {
-    
+
     return url + '#' + addHash;
   }
   const curHash = url.substr(ind + 1);
   if (curHash.indexOf('=') >= 0 || curHash.indexOf('?') >= 0) {
-    
-    
+
     return url + '&' + addHash;
   }
-  
+
   if (curHash.length > 0) {
     return url + '?' + addHash;
   }
-  
+
   return url + addHash;
 }
 
@@ -91,7 +78,7 @@ export function sessionStorageSet(key: string, value: unknown): boolean {
     window.sessionStorage.setItem(SESSION_STORAGE_PREFIX + key, JSON.stringify(value));
     return true;
   } catch (e) {
-    
+
   }
   return false;
 }
@@ -101,7 +88,7 @@ export function sessionStorageGet<T = any>(key: string): T | null {
     const raw = window.sessionStorage.getItem(SESSION_STORAGE_PREFIX + key);
     return JSON.parse(raw as string) as T;
   } catch (e) {
-    
+
   }
   return null;
 }
@@ -110,13 +97,12 @@ export function strTrim(str: unknown): string {
   return String(str).replace(/^\s+|\s+$/g, '');
 }
 
-
 export function byteLength(str: string): number {
   if (typeof window !== 'undefined' && window.Blob) {
     try {
       return new Blob([str]).size;
     } catch (e) {
-      
+
     }
   }
   let s = str.length;
@@ -128,7 +114,6 @@ export function byteLength(str: string): number {
   }
   return s;
 }
-
 
 export function versionCompare(v1: unknown, v2: unknown): -1 | 0 | 1 {
   const a1 = (typeof v1 === 'string' ? v1 : '').replace(/^\s+|\s+$/g, '').split('.');
@@ -143,7 +128,6 @@ export function versionCompare(v1: unknown, v2: unknown): -1 | 0 | 1 {
   }
   return 0;
 }
-
 
 export function parseColorToHex(color: unknown): string | false {
   const str = String(color);
@@ -164,7 +148,6 @@ export function parseColorToHex(color: unknown): string | false {
   return false;
 }
 
-
 export function isColorDark(rgb: string): boolean {
   let hex = rgb.replace(/[\s#]/g, '');
   if (hex.length == 3) {
@@ -176,7 +159,6 @@ export function isColorDark(rgb: string): boolean {
   const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
   return hsp < 120;
 }
-
 
 export function generateRandomId(len: number, taken: (id: string) => boolean): string {
   let tries = 100;

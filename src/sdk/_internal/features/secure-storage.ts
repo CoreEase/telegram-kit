@@ -1,7 +1,4 @@
 
-
-
-
 import { WebAppKernel } from '../core/kernel';
 
 type SecureStorageCallback = (error: string | null, result?: any, canRestore?: boolean) => void;

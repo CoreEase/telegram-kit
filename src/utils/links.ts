@@ -92,10 +92,10 @@ export interface BuildShareLinkOptions {
 
 export function buildShareLink(options: BuildShareLinkOptions = {}): string {
   const query = new URLSearchParams();
-  
+
   if (options.url) query.set('url', options.url);
   if (options.text) query.set('text', options.text);
-  
+
   const queryString = query.toString();
   return queryString ? `https://telegram.me/share/url?${queryString}` : 'https://telegram.me/share/url';
 }

@@ -1,8 +1,4 @@
 
-
-
-
-
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
 import type { OpenLinkOptions, OpenTelegramLinkOptions } from '../types';
@@ -15,7 +11,7 @@ export class LinkManager {
     const a = document.createElement('A') as HTMLAnchorElement;
     a.href = url;
     if (a.protocol != 'http:' && a.protocol != 'https:') {
-      
+
       console.error('[@core-ease/telegram-kit] Url protocol is not supported', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
@@ -38,12 +34,12 @@ export class LinkManager {
     const a = document.createElement('A') as HTMLAnchorElement;
     a.href = url;
     if (a.protocol != 'http:' && a.protocol != 'https:') {
-      
+
       console.error('[@core-ease/telegram-kit] Url protocol is not supported', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
     if (!ALLOWED_TELEGRAM_HOSTS.includes(a.hostname)) {
-      
+
       console.error('[@core-ease/telegram-kit] Url host is not supported', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
@@ -58,11 +54,6 @@ export class LinkManager {
       location.href = 'https://telegram.me' + pathFull;
     }
   }
-
-  
-
-
-
 
   handleDocumentClick = (e: MouseEvent): void => {
     if (e.metaKey || e.ctrlKey) return;

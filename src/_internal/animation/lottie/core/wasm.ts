@@ -1,9 +1,4 @@
 
-
-
-
-
-
 export interface LottieWasmExports {
 	memory: WebAssembly.Memory;
 	tlottie_alloc(len: number): number;
@@ -70,10 +65,6 @@ export interface LottieWasmExports {
 	): number;
 }
 
-
-
-
-
 let modulePromise: Promise<LottieWasmExports> | null = null;
 
 export function loadWasmModule(
@@ -86,9 +77,7 @@ export function loadWasmModule(
 }
 
 async function instantiate(wasmUrl: string | URL): Promise<LottieWasmExports> {
-	
-	
-	
+
 	if (typeof WebAssembly.instantiateStreaming === "function") {
 		try {
 			const { instance } = await WebAssembly.instantiateStreaming(
@@ -97,9 +86,7 @@ async function instantiate(wasmUrl: string | URL): Promise<LottieWasmExports> {
 			);
 			return instance.exports as unknown as LottieWasmExports;
 		} catch {
-			
-			
-			
+
 		}
 	}
 	const bytes = await (

@@ -1,18 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { TelegramWebView } from './webview';
 import { byteLength, generateRandomId, strTrim, versionCompare } from './utils';
 import { WebAppErrorName, throwWebAppError } from './errors';
@@ -28,12 +14,10 @@ export class WebAppKernel {
   readonly webView: TelegramWebView;
   readonly initParams: InitParams;
 
-  
   private _version = '6.0';
 
   private callbacks: Record<string, PendingCallback> = {};
 
-  
   bottomBarHeightPx = 0;
 
   constructor(webView: TelegramWebView) {
@@ -56,19 +40,17 @@ export class WebAppKernel {
     return versionCompare(this._version, ver) >= 0;
   }
 
-  
   requireVersion(ver: string, methodName: string): void {
     if (!this.versionAtLeast(ver)) {
-      
+
       console.error(`[@core-ease/telegram-kit] Method ${methodName} is not supported in version ${this._version}`);
       throwWebAppError(WebAppErrorName.MethodUnsupported);
     }
   }
 
-  
   warnIfUnsupported(ver: string, featureName: string): boolean {
     if (!this.versionAtLeast(ver)) {
-      
+
       console.warn(`[@core-ease/telegram-kit] ${featureName} is not supported in version ${this._version}`);
       return false;
     }
@@ -90,7 +72,6 @@ export class WebAppKernel {
     return byteLength(str);
   }
 
-  
   receiveWebViewEvent(eventType: string, ...args: any[]): void {
     this.webView.callEventCallbacks('webview:' + eventType, (callback) => {
       (callback as unknown as WebAppCallback).apply(null, args);
@@ -105,7 +86,6 @@ export class WebAppKernel {
     this.webView.offEvent('webview:' + eventType, callback);
   }
 
-  
   registerCallback(callback?: WebAppCallback, len = 16): string {
     const id = generateRandomId(len, (candidate) => !!this.callbacks[candidate]);
     this.callbacks[id] = { callback };
@@ -124,7 +104,6 @@ export class WebAppKernel {
     return !!this.callbacks[reqId];
   }
 
-  
   invokeCustomMethod(method: string, params: AnyRecordLike | undefined, callback?: WebAppCallback): void {
     this.requireVersion('6.9', 'invokeCustomMethod');
     const reqId = this.registerCallback(callback);

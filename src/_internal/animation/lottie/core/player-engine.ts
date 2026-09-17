@@ -9,15 +9,7 @@ import type {
 
 type Listener = (frames: PlayerFrameSnapshot) => void;
 
-
-
-
 const MAX_TICK_DELTA_MS = 100;
-
-
-
-
-
 
 export class PlayerEngine {
 	state: PlayerState = "ready";
@@ -113,22 +105,15 @@ export class PlayerEngine {
 		this.direction = direction;
 	}
 
-	
 	setFrameCount(frameCount: number): void {
 		this.frameCount = frameCount;
 		this.frame = clampFrame(this.frame, frameCount);
 	}
 
-	
-
-
-
-
 	tick(nowMs: number): boolean {
 		if (this.state !== "playing") return false;
 		if (!this.lastTickAt) {
-			
-			
+
 			this.lastTickAt = nowMs;
 			return true;
 		}

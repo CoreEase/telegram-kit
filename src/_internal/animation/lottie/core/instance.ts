@@ -13,19 +13,12 @@ import {
 } from "./types";
 import type { LottieWasmExports } from "./wasm";
 
-
-
 const REPLACEMENT_STRUCT_SIZE = 12;
 
 export interface CreateInstanceOptions {
 	fitzModifier?: FitzModifier;
 	layerColorReplacements?: LayerColorReplacementInput[];
 }
-
-
-
-
-
 
 export class LottieInstance {
 	private ptr: number;
@@ -119,7 +112,6 @@ export class LottieInstance {
 		return readAlpha8(this.exports, ptr, width, height);
 	}
 
-	
 	renderAlpha8Color(
 		frame: number,
 		width: number,
@@ -172,16 +164,11 @@ function packReplacements(
 			exports,
 			encoder.encode(replacements[i].layerNamePrefix),
 		);
-		
-		
-		
+
 		const ptr = prefixAlloc?.ptr ?? 0;
 		const len = prefixAlloc?.len ?? 0;
 		if (prefixAlloc) prefixAllocs.push(prefixAlloc);
 
-		
-		
-		
 		const view = new DataView(exports.memory.buffer, arrayPtr, structBytes);
 		view.setUint32(i * REPLACEMENT_STRUCT_SIZE, ptr, true);
 		view.setUint32(i * REPLACEMENT_STRUCT_SIZE + 4, len, true);

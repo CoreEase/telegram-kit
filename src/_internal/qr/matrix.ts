@@ -205,7 +205,7 @@ export function computeMaskPenalty(modules: boolean[][]): number {
 
 function computeFormatBits(level: ErrorCorrectionLevel, maskId: number): number {
   const data = (FORMAT_EC_BITS[level] << 3) | maskId;
-  const GENERATOR = 0b10100110111; 
+  const GENERATOR = 0b10100110111;
   let remainder = data << 10;
   for (let i = 14; i >= 10; i--) {
     if ((remainder & (1 << i)) !== 0) remainder ^= GENERATOR << (i - 10);
@@ -214,7 +214,7 @@ function computeFormatBits(level: ErrorCorrectionLevel, maskId: number): number 
 }
 
 function computeVersionBits(version: number): number {
-  const GENERATOR = 0b1111100100101; 
+  const GENERATOR = 0b1111100100101;
   let remainder = version << 12;
   for (let i = 17; i >= 12; i--) {
     if ((remainder & (1 << i)) !== 0) remainder ^= GENERATOR << (i - 12);

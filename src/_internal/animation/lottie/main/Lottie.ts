@@ -27,13 +27,13 @@ export interface LottieConfig
 	canvas: HTMLCanvasElement;
 	wasmUrl?: string | URL;
 	quality?: Partial<RenderQuality>;
-	
+
 	workerCount?: number;
-	
+
 	pool?: LottieWorkerPool;
-	
+
 	forceRender?: boolean;
-	
+
 	reportFrames?: boolean;
 }
 
@@ -45,7 +45,6 @@ export interface LottieEventPayload {
 }
 
 export type LottieListener = (payload: LottieEventPayload) => void;
-
 
 export function configureLottie(options: { workerCount?: number }): void {
 	if (options.workerCount !== undefined)
@@ -71,7 +70,6 @@ function generateId(): string {
 	idCounter += 1;
 	return `lottie-${Date.now()}-${idCounter}`;
 }
-
 
 export class Lottie {
 	readonly id = generateId();
@@ -100,9 +98,6 @@ export class Lottie {
 				? new LottieWorkerPool(config.workerCount)
 				: defaultWorkerPool);
 
-		
-		
-		
 		requestAnimationFrame(() => {
 			if (!this.destroyed) this.start();
 		});
@@ -154,7 +149,6 @@ export class Lottie {
 		});
 	}
 
-	
 	setFitzModifier(fitzModifier: FitzModifier): void {
 		this.send({
 			type: "recolor",
@@ -164,7 +158,6 @@ export class Lottie {
 		});
 	}
 
-	
 	setLayerColors(layerColorReplacements: LayerColorReplacementInput[]): void {
 		this.send({
 			type: "recolor",
@@ -174,7 +167,6 @@ export class Lottie {
 		});
 	}
 
-	
 	setObservable(observable: boolean): void {
 		this.send({ type: "observability", id: this.id, observable });
 	}
@@ -233,11 +225,6 @@ export class Lottie {
 		}
 		if (this.destroyed || !this.worker) return;
 
-		
-		
-		
-		
-		
 		const payload = bytes.slice();
 		const message: MainToWorkerMessage = {
 			type: "init",
@@ -298,9 +285,7 @@ export class Lottie {
 		ev: MessageEvent<WorkerToMainMessage>,
 	): void => {
 		const msg = ev.data;
-		
-		
-		
+
 		if (msg.type === "warmed" || msg.type === "warmup-error") return;
 		if (msg.id !== this.id) return;
 		switch (msg.type) {

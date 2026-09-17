@@ -1,17 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { TelegramWebView, Utils } from './core/webview';
 import { WebAppKernel } from './core/kernel';
 import { byteLength, urlParseQueryString } from './core/utils';
@@ -103,7 +90,6 @@ export class WebApp {
     this.kernel = kernel;
     const initParams = webView.initParams;
 
-    
     if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
       this.webAppInitData = initParams.tgWebAppData;
       const parsed = urlParseQueryString(this.webAppInitData) as WebAppInitDataUnsafe;
@@ -114,7 +100,7 @@ export class WebApp {
             (parsed as any)[key] = JSON.parse(val);
           }
         } catch (e) {
-          
+
         }
       }
       this.webAppInitDataUnsafe = parsed;
@@ -124,12 +110,10 @@ export class WebApp {
       this.webAppPlatform = initParams.tgWebAppPlatform;
     }
 
-    
     this.theme = new ThemeManager(kernel);
     this.viewport = new ViewportManager(kernel);
     this.debugBar = new DebugBottomBar(kernel, () => this.theme.getBottomBarColor());
 
-    
     this.BackButton = new BackButton(kernel);
     this.MainButton = new BottomButton('main', kernel, this.theme, this.debugBar);
     this.SecondaryButton = new BottomButton('secondary', kernel, this.theme, this.debugBar);
@@ -137,7 +121,6 @@ export class WebApp {
     this.popups = new PopupManager(kernel);
     this.scanQr = new ScanQrManager(kernel);
 
-    
     this.HapticFeedback = new HapticFeedback(kernel);
     this.CloudStorage = new CloudStorage(kernel);
     this.DeviceStorage = new DeviceStorage(kernel);
@@ -153,13 +136,10 @@ export class WebApp {
     this.emojiStatus = new EmojiStatusManager(kernel);
     this.links = new LinkManager(kernel);
 
-    
     this.Accelerometer = new Accelerometer(kernel);
     this.DeviceOrientation = new DeviceOrientation(kernel);
     this.Gyroscope = new Gyroscope(kernel);
 
-    
-    
     this.debugBar.onHeightChanged = () => this.viewport.setViewportHeight();
     this.theme.onBottomBarColorApplied = () => {
       this.debugBar.refreshColor();
@@ -180,7 +160,6 @@ export class WebApp {
       document.addEventListener('click', this.links.handleDocumentClick);
     }
 
-    
     this.theme.updateHeaderColor();
     this.theme.updateBackgroundColor();
     this.theme.updateBottomBarColor();
@@ -216,10 +195,6 @@ export class WebApp {
       this.kernel.receiveWebViewEvent('deactivated');
     }
   };
-
-  
-  
-  
 
   get initData(): string {
     return this.webAppInitData;
@@ -303,10 +278,6 @@ export class WebApp {
     this.theme.setBottomBarColor(val);
   }
 
-  
-  
-  
-
   isVersionAtLeast(ver: string): boolean {
     return this.kernel.versionAtLeast(ver);
   }
@@ -361,12 +332,12 @@ export class WebApp {
 
   sendData(data: string): void {
     if (!data || !data.length) {
-      
+
       console.error('[@core-ease/telegram-kit] Data is required', data);
       throwWebAppError(WebAppErrorName.DataInvalid);
     }
     if (byteLength(data) > 4096) {
-      
+
       console.error('[@core-ease/telegram-kit] Data is too long', data);
       throwWebAppError(WebAppErrorName.DataInvalid);
     }
