@@ -1,4 +1,3 @@
-
 import { decodeAnimationBytes } from "../core/gzip";
 import { LottieInstance } from "../core/instance";
 import { PlayerEngine } from "../core/player-engine";
@@ -32,7 +31,7 @@ const cancelRaf: (handle: number) => void =
 		: (handle) => clearTimeout(handle);
 
 const REPORT_INTERVAL_MS = 100;
-const MAX_RENDER_PIXELS = 1_000_000;
+	const MAX_RENDER_PIXELS = 800_000;
 
 function fitRenderSize(width: number, height: number): { width: number; height: number } {
 	const safeWidth = Math.max(1, Math.floor(Number.isFinite(width) ? width : 1));
