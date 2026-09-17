@@ -178,8 +178,8 @@ class WorkerAnimation {
 		if (size.width === this.width && size.height === this.height) return;
 		this.width = size.width;
 		this.height = size.height;
-		this.canvas.width = width;
-		this.canvas.height = height;
+		this.canvas.width = size.width;
+		this.canvas.height = size.height;
 		this.draw();
 	}
 
