@@ -1,36 +1,36 @@
-/**
- * Browser-native fallbacks for `@core-ease/telegram-kit`.
- *
- * Every wrapper in `core/index.ts` calls into the real bundled SDK first.
- * When that isn't possible - the Mini App is opened in a plain browser tab,
- * or the installed Telegram client is older than a feature needs - these
- * helpers provide the closest standard Web API equivalent instead of
- * rejecting the call or spamming the console with "not supported"
- * warnings. Where no meaningful browser equivalent exists (biometrics,
- * emoji status, Telegram-account actions, ...) the wrapper still resolves
- * predictably (`false`/`null`/`[]`) instead of throwing.
- */
+
+
+
+
+
+
+
+
+
+
+
+
 
 import type { LocationData } from '../types/webapp';
 
 const DEV_MODE_STORAGE_KEY = '@core-ease/telegram-kit:dev-mode-active';
 
-/** Marks the current session as dev-mode-simulated Telegram. Used by `core/dev.ts`. */
+
 export function markDevModeActive(): void {
   try {
     if (typeof window !== 'undefined') window.sessionStorage.setItem(DEV_MODE_STORAGE_KEY, '1');
   } catch {
-    // ignore
+    
   }
 }
 
-/**
- * `true` if `installDevMode()` seeded fake init data this session. When
- * true, `core/index.ts` treats response-required native calls as
- * unreachable *immediately* (skipping the timeout race) so dev mode feels
- * fast, while fire-and-forget calls (buttons, theme, ...) still flow
- * through the real SDK harmlessly.
- */
+
+
+
+
+
+
+
 export function isDevModeActive(): boolean {
   try {
     return typeof window !== 'undefined' && window.sessionStorage.getItem(DEV_MODE_STORAGE_KEY) === '1';
@@ -51,15 +51,15 @@ export interface FallbackKeyValueStore {
   clear(): Promise<boolean>;
 }
 
-/**
- * A `localStorage`-backed implementation of the Cloud/Device/Secure storage
- * contract, namespaced so the three don't collide with each other or with
- * the host app's own `localStorage` keys.
- *
- * Note: this is a *functional* fallback, not a *secure* one - there is no
- * standard browser API that provides Telegram's server-side encrypted
- * SecureStorage outside of the Telegram client itself.
- */
+
+
+
+
+
+
+
+
+
 export function createLocalStorageFallback(namespace: string): FallbackKeyValueStore {
   const prefix = `${STORAGE_PREFIX}${namespace}:`;
   const hasLocalStorage = () => typeof window !== 'undefined' && !!window.localStorage;
@@ -91,7 +91,7 @@ export function createLocalStorageFallback(namespace: string): FallbackKeyValueS
           const value = window.localStorage.getItem(prefix + key);
           if (value !== null) result[key] = value;
         } catch {
-          // skip unreadable key
+          
         }
       }
       return result;
@@ -152,19 +152,19 @@ const HAPTIC_PATTERNS = {
   selection: 5,
 } as const;
 
-/** Best-effort `navigator.vibrate` stand-in for `HapticFeedback`. */
+
 export function vibrateFallback(kind: keyof typeof HAPTIC_PATTERNS): void {
   try {
     if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
       navigator.vibrate(HAPTIC_PATTERNS[kind] as number | number[]);
     }
   } catch {
-    // vibration API not available/allowed - silently ignore, this is a
-    // best-effort nicety, not a required feature.
+    
+    
   }
 }
 
-/** Triggers a classic `<a download>` browser file download. */
+
 export function downloadFileFallback(url: string, fileName: string): boolean {
   try {
     if (typeof document === 'undefined') return false;
@@ -182,7 +182,7 @@ export function downloadFileFallback(url: string, fileName: string): boolean {
   }
 }
 
-/** `navigator.geolocation`-backed stand-in for `LocationManager.getLocation`. */
+
 export function getLocationFallback(): Promise<LocationData | null> {
   return new Promise((resolve) => {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
@@ -209,7 +209,7 @@ export function getLocationFallback(): Promise<LocationData | null> {
   });
 }
 
-/** `navigator.clipboard.readText()` stand-in for `readTextFromClipboard`. */
+
 export async function readClipboardFallback(): Promise<string | null> {
   try {
     if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
@@ -217,19 +217,19 @@ export async function readClipboardFallback(): Promise<string | null> {
       return text ?? null;
     }
   } catch {
-    // permission denied / not available - fall through
+    
   }
   return null;
 }
 
-/** `window.prompt()` stand-in for the native camera QR scanner. */
+
 export function scanQrFallback(promptText?: string): string | null {
   if (typeof window === 'undefined' || typeof window.prompt !== 'function') return null;
   const value = window.prompt(promptText || 'Enter the QR code value:');
   return value && value.length ? value : null;
 }
 
-/** Web Share API (falling back to clipboard copy) stand-in for `shareMessage`/`shareToStory`. */
+
 export async function shareTextFallback(text: string, url?: string): Promise<boolean> {
   try {
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
@@ -237,7 +237,7 @@ export async function shareTextFallback(text: string, url?: string): Promise<boo
       return true;
     }
   } catch {
-    // user cancelled the native share sheet, or it's unavailable - try clipboard next
+    
   }
   try {
     if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
@@ -245,18 +245,18 @@ export async function shareTextFallback(text: string, url?: string): Promise<boo
       return true;
     }
   } catch {
-    // ignore
+    
   }
   return false;
 }
 
-/**
- * Races a native, callback-driven Telegram call against a timeout so a
- * feature gated by an unmet Bot API version (which the real client would
- * silently no-op on) can never hang a caller's `await` forever. Resolves
- * to `fallback` if the real call doesn't settle in time, or if it throws
- * synchronously (e.g. a hard version-gate error).
- */
+
+
+
+
+
+
+
 export function withTimeoutFallback<T>(factory: () => Promise<T>, fallback: T, timeoutMs = 4000): Promise<T> {
   return new Promise((resolve) => {
     let settled = false;
@@ -294,23 +294,23 @@ export function withTimeoutFallback<T>(factory: () => Promise<T>, fallback: T, t
   });
 }
 
-/**
- * The one function every `core/index.ts` wrapper is built on:
- *
- * - If `ready` is false (not in Telegram, or the client is older than the
- *   feature needs), calls `fallback()` directly - no attempt to reach a
- *   bridge that isn't there.
- * - If `ready` is true, calls `native()` but races it against `timeoutMs`.
- *   This covers `installDevMode()`'s seeded fake init data too: it makes
- *   `ready` true (so the app *looks* like it's running in Telegram), but
- *   there is still no real native client to answer, so without this race
- *   the call would hang forever. Timing out (or the native call throwing/
- *   rejecting) falls through to `fallback()` as well.
- *
- * This means every wrapped feature *always* settles, and always settles
- * with a real, usable value - never a thrown "not supported" error and
- * never a permanently-pending promise.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export function callNativeOrFallback<T>(options: {
   ready: boolean;
   native: () => Promise<T>;
@@ -346,7 +346,7 @@ export function callNativeOrFallback<T>(options: {
   });
 }
 
-/** `screen.orientation.lock/unlock()` stand-in for `WebApp.lockOrientation/unlockOrientation`. */
+
 export async function orientationLockFallback(locked: boolean): Promise<boolean> {
   try {
     const orientation = typeof screen !== 'undefined' ? (screen as any).orientation : undefined;
@@ -358,13 +358,13 @@ export async function orientationLockFallback(locked: boolean): Promise<boolean>
     }
     return true;
   } catch {
-    // Locking requires fullscreen / user gesture in most browsers - fine to
-    // silently no-op when it isn't allowed.
+    
+    
     return false;
   }
 }
 
-/** Best-effort Fullscreen API stand-in for `WebApp.requestFullscreen/exitFullscreen`. */
+
 export async function fullscreenFallback(enter: boolean, el?: HTMLElement): Promise<boolean> {
   try {
     if (typeof document === 'undefined') return false;
@@ -380,14 +380,14 @@ export async function fullscreenFallback(enter: boolean, el?: HTMLElement): Prom
   }
 }
 
-/** Swallows synchronous throws from fire-and-forget SDK calls (e.g. hard version gates). */
+
 export function safeInvoke(fn: () => void): void {
   try {
     fn();
   } catch {
-    // A hard-gated SDK method (wrong Bot API version, invalid input, ...)
-    // threw synchronously. This helper is used for fire-and-forget calls
-    // that have no meaningful browser fallback, so degrading to a no-op is
-    // the right behavior instead of crashing the caller.
+    
+    
+    
+    
   }
 }

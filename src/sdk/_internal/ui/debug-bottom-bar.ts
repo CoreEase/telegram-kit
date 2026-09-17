@@ -1,13 +1,13 @@
-/**
- * Debug bottom bar - the little on-page mock of Telegram's native Main /
- * Secondary button bar, shown only when `tgWebAppDebug` is present in the
- * init hash params (i.e. when testing a Mini App directly in a desktop
- * browser instead of inside the real Telegram client).
- *
- * Isolated into its own module so it can be tree-shaken/omitted entirely in
- * builds that never run in debug mode, and so `BottomButton` doesn't need
- * to know anything about DOM styling.
- */
+
+
+
+
+
+
+
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import type { BottomButtonPosition } from '../types';
@@ -38,7 +38,7 @@ export class DebugBottomBar {
   private container: HTMLElement | null = null;
   private buttons: Partial<Record<ButtonType, RegisteredDebugButton>> = {};
 
-  /** Invoked whenever the reserved bottom-bar height changes. */
+  
   onHeightChanged: (() => void) | null = null;
 
   constructor(private readonly kernel: WebAppKernel, private readonly getBottomBarColor: () => string) {
@@ -81,7 +81,7 @@ export class DebugBottomBar {
     this.container.appendChild(animStyle);
   }
 
-  /** Creates & registers a debug clone of a Main/Secondary button; returns its element. */
+  
   registerButton(type: ButtonType, onPressed: () => void): HTMLElement | null {
     if (!this.enabled || !this.container) return null;
     const el = document.createElement('tg-bottom-button');
@@ -102,7 +102,7 @@ export class DebugBottomBar {
     return el;
   }
 
-  /** Applies visual state coming from `BottomButton.buttonParams()`. */
+  
   updateButtonVisual(type: ButtonType, params: DebugButtonVisualState & { position?: BottomButtonPosition }): void {
     const entry = this.buttons[type];
     if (!entry) return;
@@ -166,7 +166,7 @@ export class DebugBottomBar {
     this.onHeightChanged?.();
   }
 
-  /** Called after the bottom-bar color changes so the debug bar repaints too. */
+  
   refreshColor(): void {
     if (!this.enabled || !this.container) return;
     this.updateBar();

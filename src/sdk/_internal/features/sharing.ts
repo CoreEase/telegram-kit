@@ -1,7 +1,7 @@
-/**
- * Sharing-related surface: `shareToStory`, `shareMessage`, `requestChat`,
- * `switchInlineQuery`.
- */
+
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { strTrim } from '../core/utils';
@@ -58,7 +58,7 @@ export class SharingManager {
     const a = document.createElement('A') as HTMLAnchorElement;
     a.href = mediaUrl;
     if (a.protocol != 'http:' && a.protocol != 'https:') {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Media url protocol is not supported', mediaUrl);
       throwWebAppError(WebAppErrorName.MediaUrlInvalid);
     }
@@ -67,7 +67,7 @@ export class SharingManager {
     if (typeof params.text !== 'undefined') {
       const text = strTrim(params.text);
       if (text.length > 2048) {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Text is too long', text);
         throwWebAppError(WebAppErrorName.ShareToStoryParamInvalid);
       }
@@ -78,7 +78,7 @@ export class SharingManager {
       const widgetLinkParam = params.widget_link || ({} as NonNullable<typeof params.widget_link>);
       a.href = widgetLinkParam.url;
       if (a.protocol != 'http:' && a.protocol != 'https:') {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Link protocol is not supported', widgetLinkParam.url);
         throwWebAppError(WebAppErrorName.ShareToStoryParamInvalid);
       }
@@ -86,7 +86,7 @@ export class SharingManager {
       if (typeof widgetLinkParam.name !== 'undefined') {
         const linkName = strTrim(widgetLinkParam.name);
         if (linkName.length > 48) {
-          // eslint-disable-next-line no-console
+          
           console.error('[@core-ease/telegram-kit] Link name is too long', linkName);
           throwWebAppError(WebAppErrorName.ShareToStoryParamInvalid);
         }
@@ -101,7 +101,7 @@ export class SharingManager {
   shareMessage(msgId: string, callback?: SentCallback): void {
     this.kernel.requireVersion('8.0', 'shareMessage');
     if (this.shareMessageOpened) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Share message is already opened');
       throwWebAppError(WebAppErrorName.ShareMessageOpened);
     }
@@ -112,7 +112,7 @@ export class SharingManager {
   requestChat(reqId: string, callback?: SentCallback): void {
     this.kernel.requireVersion('9.6', 'requestChat');
     if (this.requestChatOpened) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Request chat is already opened');
       throwWebAppError(WebAppErrorName.RequestChatOpened);
     }
@@ -123,7 +123,7 @@ export class SharingManager {
   switchInlineQuery(query: string, chooseChatTypes: string[] | undefined, initParams: InitParams): void {
     this.kernel.requireVersion('6.6', 'switchInlineQuery');
     if (!initParams.tgWebAppBotInline) {
-      // eslint-disable-next-line no-console
+      
       console.error(
         '[@core-ease/telegram-kit] Inline mode is disabled for this bot. Read more about inline mode: https://core.telegram.org/bots/inline'
       );
@@ -131,21 +131,21 @@ export class SharingManager {
     }
     const q = query || '';
     if (q.length > 256) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Inline query is too long', q);
       throwWebAppError(WebAppErrorName.InlineQueryInvalid);
     }
     const chatTypes: string[] = [];
     if (chooseChatTypes) {
       if (!Array.isArray(chooseChatTypes)) {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Choose chat types should be an array', chooseChatTypes);
         throwWebAppError(WebAppErrorName.InlineChooseChatTypesInvalid);
       }
       const goodTypes: Record<string, number> = { users: 1, bots: 1, groups: 1, channels: 1 };
       for (const chatType of chooseChatTypes) {
         if (!goodTypes[chatType]) {
-          // eslint-disable-next-line no-console
+          
           console.error('[@core-ease/telegram-kit] Choose chat type is invalid', chatType);
           throwWebAppError(WebAppErrorName.InlineChooseChatTypeInvalid);
         }

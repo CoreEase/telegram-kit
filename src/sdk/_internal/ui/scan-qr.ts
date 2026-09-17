@@ -1,13 +1,13 @@
-/**
- * `WebApp.showScanQrPopup` / `closeScanQrPopup`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { strTrim } from '../core/utils';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
 import type { ScanQrPopupParams } from '../types';
 
-/** Return `true` from the callback to close the popup automatically. */
+
 type ScanQrCallback = (data: string | null) => boolean | void;
 
 interface PendingScanQr {
@@ -44,7 +44,7 @@ export class ScanQrManager {
   showScanQrPopup(params: ScanQrPopupParams, callback?: ScanQrCallback): void {
     this.kernel.requireVersion('6.4', 'showScanQrPopup');
     if (this.pending) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Popup is already opened');
       throwWebAppError(WebAppErrorName.ScanQrPopupOpened);
     }
@@ -52,7 +52,7 @@ export class ScanQrManager {
     if (typeof params.text !== 'undefined') {
       const text = strTrim(params.text);
       if (text.length > 64) {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Scan QR popup text is too long', text);
         throwWebAppError(WebAppErrorName.ScanQrPopupParamInvalid);
       }

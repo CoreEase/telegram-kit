@@ -1,17 +1,17 @@
-/**
- * WebApp-level kernel.
- *
- * The original script keeps a pile of closures (`versionAtLeast`,
- * `receiveWebViewEvent`, `webAppCallbacks`, `generateCallbackId`,
- * `setCssProperty`, `invokeCustomMethod`, ...) that every feature
- * (buttons, storages, sensors, popups...) reaches into.
- *
- * To keep the TypeScript port modular while preserving that exact runtime
- * behavior, those closures are grouped into one small `WebAppKernel` class
- * that gets constructed once and injected into every feature module. This
- * is the *only* piece of shared mutable plumbing; everything else lives in
- * its own dedicated module.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import { TelegramWebView } from './webview';
 import { byteLength, generateRandomId, strTrim, versionCompare } from './utils';
@@ -28,12 +28,12 @@ export class WebAppKernel {
   readonly webView: TelegramWebView;
   readonly initParams: InitParams;
 
-  /** Mutable current protocol version reported by the client, e.g. '8.0'. */
+  
   private _version = '6.0';
 
   private callbacks: Record<string, PendingCallback> = {};
 
-  /** Height (px) reserved by the in-browser debug bottom bar, if active. */
+  
   bottomBarHeightPx = 0;
 
   constructor(webView: TelegramWebView) {
@@ -56,19 +56,19 @@ export class WebAppKernel {
     return versionCompare(this._version, ver) >= 0;
   }
 
-  /** Logs + throws `WebAppMethodUnsupported` for a method gated by version. */
+  
   requireVersion(ver: string, methodName: string): void {
     if (!this.versionAtLeast(ver)) {
-      // eslint-disable-next-line no-console
+      
       console.error(`[@core-ease/telegram-kit] Method ${methodName} is not supported in version ${this._version}`);
       throwWebAppError(WebAppErrorName.MethodUnsupported);
     }
   }
 
-  /** Same as {@link requireVersion} but warns instead of throwing (soft-gated features). */
+  
   warnIfUnsupported(ver: string, featureName: string): boolean {
     if (!this.versionAtLeast(ver)) {
-      // eslint-disable-next-line no-console
+      
       console.warn(`[@core-ease/telegram-kit] ${featureName} is not supported in version ${this._version}`);
       return false;
     }
@@ -90,7 +90,7 @@ export class WebAppKernel {
     return byteLength(str);
   }
 
-  /** Dispatches an internal `webview:<eventType>` event to WebApp-level subscribers. */
+  
   receiveWebViewEvent(eventType: string, ...args: any[]): void {
     this.webView.callEventCallbacks('webview:' + eventType, (callback) => {
       (callback as unknown as WebAppCallback).apply(null, args);
@@ -105,7 +105,7 @@ export class WebAppKernel {
     this.webView.offEvent('webview:' + eventType, callback);
   }
 
-  /** Allocates a fresh request id and registers its pending callback. */
+  
   registerCallback(callback?: WebAppCallback, len = 16): string {
     const id = generateRandomId(len, (candidate) => !!this.callbacks[candidate]);
     this.callbacks[id] = { callback };
@@ -124,7 +124,7 @@ export class WebAppKernel {
     return !!this.callbacks[reqId];
   }
 
-  /** Generic `web_app_invoke_custom_method` used by CloudStorage, contact lookup, etc. */
+  
   invokeCustomMethod(method: string, params: AnyRecordLike | undefined, callback?: WebAppCallback): void {
     this.requireVersion('6.9', 'invokeCustomMethod');
     const reqId = this.registerCallback(callback);

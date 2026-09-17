@@ -1,6 +1,6 @@
-/**
- * `WebApp.downloadFile`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
@@ -27,7 +27,7 @@ export class DownloadFileManager {
   downloadFile(params: DownloadFileParams, callback?: DownloadCallback): void {
     this.kernel.requireVersion('8.0', 'downloadFile');
     if (this.requested) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Popup is already opened');
       throwWebAppError(WebAppErrorName.DownloadFilePopupOpened);
     }
@@ -35,20 +35,20 @@ export class DownloadFileManager {
     const dlParams: { url?: string; file_name?: string } = {};
 
     if (!params || !params.url || !params.url.length) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Url is required');
       throwWebAppError(WebAppErrorName.DownloadFileParamInvalid);
     }
     a.href = params.url;
     if (a.protocol != 'https:') {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Url protocol is not supported', params.url);
       throwWebAppError(WebAppErrorName.DownloadFileParamInvalid);
     }
     dlParams.url = a.href;
 
     if (!params || !params.file_name || !params.file_name.length) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] File name is required');
       throwWebAppError(WebAppErrorName.DownloadFileParamInvalid);
     }

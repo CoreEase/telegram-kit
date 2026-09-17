@@ -1,6 +1,6 @@
-/**
- * `Telegram.WebApp.SecureStorage`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 

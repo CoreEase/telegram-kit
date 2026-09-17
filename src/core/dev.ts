@@ -1,53 +1,53 @@
-/**
- * `@core-ease/telegram-kit/dev`
- *
- * Dev mode used to work by building a large plain-object mock that
- * re-implemented (and had to keep in sync with) the entire `TgWebApp`
- * surface by hand. That duplication is gone: `installDevMode()` now seeds
- * fake `tgWebAppData` / `tgWebAppThemeParams` / `tgWebAppVersion` /
- * `tgWebAppPlatform` into the exact session-storage slot the bundled SDK
- * reads on bootstrap (`sdk/_internal/core/webview.ts`), so the *real*
- * `WebApp` class boots up thinking it's talking to a (very quiet) native
- * client - no parallel implementation to maintain.
- *
- * Because there's no real native client behind it, response-required
- * calls (storage, biometrics, location, popups, clipboard, ...) would
- * naturally time out. `core/index.ts` already knows this: it marks the
- * session as dev-mode-active (see `isDevModeActive()` in `./fallback`) so
- * those calls skip straight to their fast browser-native fallback
- * (`localStorage`, `window.confirm`, `navigator.geolocation`, ...)
- * instead of waiting out a timeout. Fire-and-forget calls (buttons, theme
- * colors, haptics, ...) flow through the real SDK either way and simply
- * no-op harmlessly.
- *
- * **Call `installDevMode()` first thing** in your app's entry point,
- * before any other `@core-ease/telegram-kit` import touches
- * `getWebApp()` (hooks, `<TelegramProvider>`, `core/index.ts` functions,
- * ...) - the SDK bootstraps once and caches the result, so seeding after
- * that point has no effect.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import { Utils, isBootstrapped, bootstrapTelegramWebApp } from '../sdk';
 import { markDevModeActive } from './fallback';
 import type { TgUser, TgThemeParams } from '../types/webapp';
 
 export interface DevModeOptions {
-  /** Defaults to a generic "Dev User". */
+  
   user?: Partial<TgUser>;
-  /** Forces light/dark theme. Defaults to reading the host page's CSS variables (see `getAppTheme()`), falling back to dark. */
+  
   colorScheme?: 'light' | 'dark';
-  /** Simulated `Telegram.WebApp.platform`. Defaults to `'tdesktop'`. */
+  
   platform?: string;
-  /** Simulated Bot API version. Defaults to `'8.0'`. */
+  
   version?: string;
-  /** Simulated `start_param` (deep-link payload). */
+  
   startParam?: string;
-  /** Shows a small "dev mode" badge in the corner of the page. Defaults to `true`. */
+  
   showIndicator?: boolean;
 }
 
 export interface InstallDevModeOptions extends DevModeOptions {
-  /** Seed fake data even if this looks like it's already running inside real Telegram. */
+  
   force?: boolean;
 }
 
@@ -96,7 +96,7 @@ const DARK_THEME: TgThemeParams = {
   destructive_text_color: '#ec3942',
 };
 
-/** Reads the host page's own CSS variables for a theme that matches your app's current look, falling back to `DARK_THEME`. */
+
 function getAppTheme(): TgThemeParams {
   if (typeof document === 'undefined') return DARK_THEME;
 
@@ -130,7 +130,7 @@ function resolveTheme(colorScheme?: 'light' | 'dark'): TgThemeParams {
   return getAppTheme();
 }
 
-/** Builds the exact `tgWebAppData` query-string shape a real Telegram client would send. */
+
 function buildFakeTgWebAppData(options: DevModeOptions): string {
   const user: TgUser = { ...DEFAULT_USER, ...options.user };
   const fields: Record<string, string> = {
@@ -144,7 +144,7 @@ function buildFakeTgWebAppData(options: DevModeOptions): string {
     .join('&');
 }
 
-/** Cheap heuristic (no bootstrap needed) for "does this look like a real Telegram launch". */
+
 function looksLikeRealTelegramLaunch(): boolean {
   try {
     return typeof location !== 'undefined' && location.hash.indexOf('tgWebAppData') !== -1;
@@ -153,27 +153,27 @@ function looksLikeRealTelegramLaunch(): boolean {
   }
 }
 
-/**
- * Seeds fake Telegram init data (a fake user, theme, platform, and Bot API
- * version) so the bundled SDK bootstraps exactly as it would inside real
- * Telegram - just talking to a client that never answers. Every
- * `@core-ease/telegram-kit` feature keeps working through its browser
- * fallback (see `core/fallback.ts`).
- *
- * Call this **before** anything else touches `getWebApp()` (any hook, the
- * `<TelegramProvider>`, or any `core/index.ts` function) - the SDK
- * bootstraps once and caches the result.
- *
- * Returns `false` (and does nothing) if it looks like the app is already
- * running inside real Telegram, unless `options.force` is set.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export function installDevMode(options: InstallDevModeOptions = {}): boolean {
   if (typeof window === 'undefined') return false;
 
   if (looksLikeRealTelegramLaunch() && !options.force) return false;
 
   if (isBootstrapped()) {
-    // eslint-disable-next-line no-console
+    
     console.warn(
       '[@core-ease/telegram-kit] installDevMode() was called after the SDK already bootstrapped - call it before ' +
         'any other @core-ease/telegram-kit import touches getWebApp() (hooks, <TelegramProvider>, core functions).'
@@ -189,13 +189,13 @@ export function installDevMode(options: InstallDevModeOptions = {}): boolean {
   });
   markDevModeActive();
 
-  // Bootstraps right away (idempotent) so window.Telegram.WebApp and
-  // getWebApp() are usable immediately after this call returns.
+  
+  
   bootstrapTelegramWebApp();
 
   if (options.showIndicator !== false) attachDevIndicator();
 
-  // eslint-disable-next-line no-console
+  
   console.info(
     '%c[@core-ease/telegram-kit] Dev mode active',
     'background:#2678b6;color:#fff;padding:2px 6px;border-radius:3px;font-weight:bold'
@@ -234,15 +234,15 @@ function attachDevIndicator(): void {
   document.body.appendChild(el);
 }
 
-/**
- * Environment heuristic (NOT the same as "dev mode is active" - see
- * `isDevModeActive()` in `./fallback` for that) you can use to decide
- * *whether* to call `installDevMode()` at all, e.g.:
- *
- * ```ts
- * if (isDevMode()) installDevMode();
- * ```
- */
+
+
+
+
+
+
+
+
+
 export function isDevMode(): boolean {
   if (typeof window === 'undefined') return false;
   return (

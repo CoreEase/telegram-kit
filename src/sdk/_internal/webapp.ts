@@ -1,16 +1,16 @@
-/**
- * `Telegram.WebApp` - the public-facing composition root.
- *
- * This class owns no protocol logic itself; it wires the kernel + every
- * feature module together (dependency injection) and re-exposes their
- * public surface under the exact same property/method names as the
- * original monolithic script, so existing integrations keep working
- * unchanged (just typed, and testable module-by-module now).
- *
- * Adding a new feature later means: write a small class in `features/`,
- * `sensors/`, `ui/` or `theme/` that takes a `WebAppKernel`, then
- * instantiate + expose it here. No other module needs to change.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import { TelegramWebView, Utils } from './core/webview';
 import { WebAppKernel } from './core/kernel';
@@ -103,7 +103,7 @@ export class WebApp {
     this.kernel = kernel;
     const initParams = webView.initParams;
 
-    // -- initData / initDataUnsafe -------------------------------------
+    
     if (initParams.tgWebAppData && initParams.tgWebAppData.length) {
       this.webAppInitData = initParams.tgWebAppData;
       const parsed = urlParseQueryString(this.webAppInitData) as WebAppInitDataUnsafe;
@@ -114,7 +114,7 @@ export class WebApp {
             (parsed as any)[key] = JSON.parse(val);
           }
         } catch (e) {
-          // leave raw string on parse failure
+          
         }
       }
       this.webAppInitDataUnsafe = parsed;
@@ -124,12 +124,12 @@ export class WebApp {
       this.webAppPlatform = initParams.tgWebAppPlatform;
     }
 
-    // -- Theme / viewport ------------------------------------------------
+    
     this.theme = new ThemeManager(kernel);
     this.viewport = new ViewportManager(kernel);
     this.debugBar = new DebugBottomBar(kernel, () => this.theme.getBottomBarColor());
 
-    // -- UI --------------------------------------------------------------
+    
     this.BackButton = new BackButton(kernel);
     this.MainButton = new BottomButton('main', kernel, this.theme, this.debugBar);
     this.SecondaryButton = new BottomButton('secondary', kernel, this.theme, this.debugBar);
@@ -137,7 +137,7 @@ export class WebApp {
     this.popups = new PopupManager(kernel);
     this.scanQr = new ScanQrManager(kernel);
 
-    // -- Features ----------------------------------------------------------
+    
     this.HapticFeedback = new HapticFeedback(kernel);
     this.CloudStorage = new CloudStorage(kernel);
     this.DeviceStorage = new DeviceStorage(kernel);
@@ -153,13 +153,13 @@ export class WebApp {
     this.emojiStatus = new EmojiStatusManager(kernel);
     this.links = new LinkManager(kernel);
 
-    // -- Sensors -----------------------------------------------------------
+    
     this.Accelerometer = new Accelerometer(kernel);
     this.DeviceOrientation = new DeviceOrientation(kernel);
     this.Gyroscope = new Gyroscope(kernel);
 
-    // -- Cross-module wiring (mirrors the interleaved calls in the
-    //    original single closure) -----------------------------------------
+    
+    
     this.debugBar.onHeightChanged = () => this.viewport.setViewportHeight();
     this.theme.onBottomBarColorApplied = () => {
       this.debugBar.refreshColor();
@@ -180,7 +180,7 @@ export class WebApp {
       document.addEventListener('click', this.links.handleDocumentClick);
     }
 
-    // -- Initial sync with native client -----------------------------------
+    
     this.theme.updateHeaderColor();
     this.theme.updateBackgroundColor();
     this.theme.updateBottomBarColor();
@@ -217,9 +217,9 @@ export class WebApp {
     }
   };
 
-  // -----------------------------------------------------------------------
-  // Public read-only properties
-  // -----------------------------------------------------------------------
+  
+  
+  
 
   get initData(): string {
     return this.webAppInitData;
@@ -303,9 +303,9 @@ export class WebApp {
     this.theme.setBottomBarColor(val);
   }
 
-  // -----------------------------------------------------------------------
-  // Methods
-  // -----------------------------------------------------------------------
+  
+  
+  
 
   isVersionAtLeast(ver: string): boolean {
     return this.kernel.versionAtLeast(ver);
@@ -361,12 +361,12 @@ export class WebApp {
 
   sendData(data: string): void {
     if (!data || !data.length) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Data is required', data);
       throwWebAppError(WebAppErrorName.DataInvalid);
     }
     if (byteLength(data) > 4096) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Data is too long', data);
       throwWebAppError(WebAppErrorName.DataInvalid);
     }

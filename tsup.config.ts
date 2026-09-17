@@ -1,6 +1,7 @@
 import { defineConfig } from 'tsup';
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { copyFileSync } from 'fs';
 
 function prependUseClient(files: string[]): void {
   for (const file of files) {
@@ -20,6 +21,8 @@ export default defineConfig([
       'animation/index': 'src/ui/animation.ts',
       'animation/lottie/index': 'src/ui/lottie.tsx',
       'animation/tgs/index': 'src/ui/tgs.tsx',
+      'animation/vanilla/index': 'src/ui/lottie-vanilla.ts',
+      'lottie.worker': 'src/_internal/animation/lottie/worker/lottie.worker.ts',
       'tgs/index': 'src/ui/tgs.tsx',
       'lottie/index': 'src/ui/lottie.tsx',
     },
@@ -31,6 +34,7 @@ export default defineConfig([
     target: 'es2017',
     async onSuccess() {
       const dist = 'dist';
+      copyFileSync(resolve('src/_internal/animation/lottie/core/lottie.wasm'), join(dist, 'lottie.wasm'));
       const entryFiles = [
         join(dist, 'index.js'),
         join(dist, 'index.mjs'),
@@ -42,6 +46,8 @@ export default defineConfig([
         join(dist, 'animation', 'lottie', 'index.mjs'),
         join(dist, 'animation', 'tgs', 'index.js'),
         join(dist, 'animation', 'tgs', 'index.mjs'),
+        join(dist, 'animation', 'vanilla', 'index.js'),
+        join(dist, 'animation', 'vanilla', 'index.mjs'),
         join(dist, 'tgs', 'index.js'),
         join(dist, 'tgs', 'index.mjs'),
         join(dist, 'lottie', 'index.js'),

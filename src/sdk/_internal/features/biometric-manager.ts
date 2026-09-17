@@ -1,6 +1,6 @@
-/**
- * `Telegram.WebApp.BiometricManager`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { strTrim } from '../core/utils';
@@ -128,7 +128,7 @@ export class BiometricManager {
 
   private checkInit(): true {
     if (!this._isInited) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] BiometricManager should be inited before using.');
       throwWebAppError(WebAppErrorName.BiometricManagerNotInited);
     }
@@ -147,12 +147,12 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isBiometricAvailable) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (this.accessRequestState) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Access is already requested');
       throwWebAppError(WebAppErrorName.BiometricManagerAccessRequested);
     }
@@ -160,7 +160,7 @@ export class BiometricManager {
     if (typeof params.reason !== 'undefined') {
       const reason = strTrim(params.reason);
       if (reason.length > 128) {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Biometric reason is too long', reason);
         throwWebAppError(WebAppErrorName.BiometricRequestAccessParamInvalid);
       }
@@ -175,17 +175,17 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isBiometricAvailable) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (!this.isAccessGranted) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Biometric access was not granted by the user.');
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricAccessNotGranted);
     }
     if (this.authRequestState) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Authentication request is already in progress.');
       throwWebAppError(WebAppErrorName.BiometricManagerAuthenticationRequested);
     }
@@ -193,7 +193,7 @@ export class BiometricManager {
     if (typeof params.reason !== 'undefined') {
       const reason = strTrim(params.reason);
       if (reason.length > 128) {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Biometric reason is too long', reason);
         throwWebAppError(WebAppErrorName.BiometricRequestAccessParamInvalid);
       }
@@ -208,23 +208,23 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     token = token || '';
     if (token.length > 1024) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Token is too long', token);
       throwWebAppError(WebAppErrorName.BiometricManagerTokenInvalid);
     }
     this.checkInit();
     if (!this._isBiometricAvailable) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (!this.isAccessGranted) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Biometric access was not granted by the user.');
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricAccessNotGranted);
     }
     if (this.tokenRequestState) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Token request is already in progress.');
       throwWebAppError(WebAppErrorName.BiometricManagerTokenUpdateRequested);
     }
@@ -237,17 +237,17 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isBiometricAvailable) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (!this._isAccessRequested) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Biometric access was not requested yet.');
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsAccessNotRequested);
     }
     if (this._isAccessGranted) {
-      // eslint-disable-next-line no-console
+      
       console.warn('[@core-ease/telegram-kit] Biometric access was granted by the user, no need to go to settings.');
       return this;
     }

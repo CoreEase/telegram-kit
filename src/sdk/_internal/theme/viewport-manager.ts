@@ -1,12 +1,12 @@
-/**
- * Viewport & window-chrome manager.
- *
- * Covers everything related to the app's visible area and window behavior:
- * viewport height/expansion, safe-area insets, fullscreen state,
- * orientation lock, the closing confirmation dialog and vertical swipe
- * toggling. All of it was interleaved with theme code in the original
- * single closure; split out here since it is a clearly separate concern.
- */
+
+
+
+
+
+
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { sessionStorageGet, sessionStorageSet } from '../core/utils';
@@ -44,9 +44,9 @@ export class ViewportManager {
     this.onWindowResize = this.onWindowResize.bind(this);
   }
 
-  // ---------------------------------------------------------------------
-  // Getters mirroring the public WebApp properties
-  // ---------------------------------------------------------------------
+  
+  
+  
 
   get isExpanded(): boolean {
     return this._isExpanded;
@@ -86,11 +86,11 @@ export class ViewportManager {
     return this._isVerticalSwipesEnabled;
   }
 
-  // ---------------------------------------------------------------------
-  // Viewport height
-  // ---------------------------------------------------------------------
+  
+  
+  
 
-  /** Re-applies the current viewport CSS vars; call after bottom-bar height changes too. */
+  
   setViewportHeight(data?: { height: number; is_expanded?: boolean; is_state_stable?: boolean }): void {
     let emitEvent = false;
     if (typeof data !== 'undefined') {
@@ -136,9 +136,9 @@ export class ViewportManager {
     }
   }
 
-  // ---------------------------------------------------------------------
-  // Safe area insets
-  // ---------------------------------------------------------------------
+  
+  
+  
 
   setSafeAreaInset(data?: Partial<SafeAreaInset>): void {
     if (typeof data !== 'undefined') {
@@ -176,9 +176,9 @@ export class ViewportManager {
     if (eventData) this.setContentSafeAreaInset(eventData);
   };
 
-  // ---------------------------------------------------------------------
-  // Closing confirmation / vertical swipes
-  // ---------------------------------------------------------------------
+  
+  
+  
 
   setClosingConfirmation(needConfirmation: boolean): void {
     if (!this.kernel.warnIfUnsupported('6.2', 'Closing confirmation')) {
@@ -200,9 +200,9 @@ export class ViewportManager {
     });
   }
 
-  // ---------------------------------------------------------------------
-  // Fullscreen
-  // ---------------------------------------------------------------------
+  
+  
+  
 
   private setFullscreen(isFullscreen: boolean): void {
     this._isFullscreen = !!isFullscreen;
@@ -231,9 +231,9 @@ export class ViewportManager {
     this.kernel.webView.postEvent('web_app_exit_fullscreen');
   }
 
-  // ---------------------------------------------------------------------
-  // Orientation lock
-  // ---------------------------------------------------------------------
+  
+  
+  
 
   private setOrientationLock(isLocked: boolean): void {
     this._isOrientationLocked = !!isLocked;

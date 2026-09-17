@@ -1,6 +1,6 @@
-/**
- * `WebApp.setEmojiStatus` / `WebApp.requestEmojiStatusAccess`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
@@ -49,7 +49,7 @@ export class EmojiStatusManager {
       statusParams.duration = params.duration;
     }
     if (this.setRequested) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Emoji status is already requested');
       throwWebAppError(WebAppErrorName.EmojiStatusRequested);
     }
@@ -60,7 +60,7 @@ export class EmojiStatusManager {
   requestEmojiStatusAccess(callback?: AccessCallback): void {
     this.kernel.requireVersion('8.0', 'requestEmojiStatusAccess');
     if (this.accessRequested) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Emoji status permission is already requested');
       throwWebAppError(WebAppErrorName.EmojiStatusAccessRequested);
     }

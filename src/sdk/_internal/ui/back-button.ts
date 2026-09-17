@@ -1,6 +1,6 @@
-/**
- * `Telegram.WebApp.BackButton` - port of the `BackButton` IIFE.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import type { VoidCallback } from '../types';

@@ -1,6 +1,6 @@
-// `window.Telegram.{WebView,Utils,WebApp}` is set up the first time any
-// telegram-kit function is used (see `./sdk/index.ts` / `./core/index.ts`) -
-// this bundle no longer needs, and does not load, telegram.org's CDN script.
+
+
+
 export * as sdk from './sdk';
 export { bootstrapTelegramWebApp } from './sdk';
 

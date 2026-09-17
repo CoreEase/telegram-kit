@@ -1,6 +1,6 @@
-/**
- * `WebApp.readTextFromClipboard`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 

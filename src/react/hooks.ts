@@ -664,11 +664,11 @@ export function useSwitchInlineQuery() {
   }, []);
 }
 
-/**
- * Opens Telegram's native chat-request dialog for a chat request you
- * already created server-side, identified by `reqId`. Requires Bot API
- * 9.6+.
- */
+
+
+
+
+
 export function useRequestChat() {
   return useCallback((reqId: string): Promise<boolean> => coreRequestChat(reqId), []);
 }

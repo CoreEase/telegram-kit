@@ -1,11 +1,11 @@
-/**
- * Shared implementation for the three near-identical motion sensors
- * (`Accelerometer`, `Gyroscope`, `DeviceOrientation`). All three follow the
- * exact same start/stop/changed/failed event protocol in the original SDK,
- * differing only in event names and payload shape - so we factor that
- * protocol out once here and let each sensor supply its own config +
- * payload mapping.
- */
+
+
+
+
+
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 
@@ -81,7 +81,7 @@ export abstract class MotionSensorBase<TValues extends Record<string, any>> {
     this.kernel.receiveWebViewEvent(this.names.webViewFailed, { error: eventData.error });
   };
 
-  /** Subclasses map the raw `*_changed` event payload onto their typed value shape. */
+  
   protected abstract mapChangedPayload(eventData: any): TValues;
 
   protected checkVersion(): boolean {
@@ -92,7 +92,7 @@ export abstract class MotionSensorBase<TValues extends Record<string, any>> {
     const params: { refresh_rate?: number } = {};
     const rate = parseInt(String(refreshRate ?? 1000));
     if (isNaN(rate) || rate < 20 || rate > 1000) {
-      // eslint-disable-next-line no-console
+      
       console.warn(`[@core-ease/telegram-kit] ${this.names.displayName} refresh_rate is invalid`, rate);
     } else {
       params.refresh_rate = rate;

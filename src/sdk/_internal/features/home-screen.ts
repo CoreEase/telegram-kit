@@ -1,6 +1,6 @@
-/**
- * `WebApp.addToHomeScreen` / `WebApp.checkHomeScreenStatus`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import type { HomeScreenStatus } from '../types';

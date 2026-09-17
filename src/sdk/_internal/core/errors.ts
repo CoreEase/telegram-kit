@@ -1,9 +1,9 @@
-/**
- * The original SDK throws plain `Error('SomeName')` objects. We keep the
- * exact same string names (so existing error-handling code that matches on
- * `error.message` keeps working) but expose them as a typed enum plus a
- * small helper so call sites read better than magic strings.
- */
+
+
+
+
+
+
 
 export enum WebAppErrorName {
   MethodUnsupported = 'WebAppMethodUnsupported',

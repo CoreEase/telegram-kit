@@ -1,16 +1,16 @@
-/**
- * WebView bridge / transport layer.
- *
- * This is a faithful port of the first `(function () { ... })()` block in
- * the original telegram-web-app.js: it is responsible for talking to the
- * native Telegram client (Android/iOS WebView proxy, Windows `external`
- * bridge, or a browser `postMessage` iframe bridge) and for the generic
- * pub/sub event bus that every higher-level feature (WebApp, buttons,
- * storages, sensors, ...) is built on top of.
- *
- * Nothing Telegram.WebApp-specific lives here on purpose: this module only
- * knows how to send/receive named events and parse the initial hash params.
- */
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 import {
   sessionStorageGet,
@@ -48,7 +48,7 @@ export class TelegramWebView {
     try {
       locationHash = location.hash.toString();
     } catch (e) {
-      // ignore - `location` may be unavailable in some embedding contexts
+      
     }
 
     const parsedParams = urlParseHashParams(locationHash);
@@ -76,15 +76,15 @@ export class TelegramWebView {
             '*'
           );
         } catch (e) {
-          // ignore
+          
         }
       }
     } catch (e) {
-      // ignore
+      
     }
     this.isIframe = isIframe;
 
-    // Windows Phone app / legacy game-proxy backward compatibility.
+    
     window.TelegramGameProxy_receiveEvent = this.receiveEvent;
     window.TelegramGameProxy = { receiveEvent: this.receiveEvent };
   }
@@ -108,7 +108,7 @@ export class TelegramWebView {
       try {
         window.parent.postMessage(JSON.stringify({ eventType: 'iframe_will_reload' }), '*');
       } catch (e) {
-        // ignore
+        
       }
       location.reload();
     } else {
@@ -116,7 +116,7 @@ export class TelegramWebView {
     }
   };
 
-  /** Sends a named event + payload to the native Telegram client. */
+  
   postEvent(eventType: string, callback?: PostEventCallback, eventData: unknown = ''): void {
     const cb: PostEventCallback = callback || (() => {});
 
@@ -128,7 +128,7 @@ export class TelegramWebView {
       cb();
     } else if (this.isIframe) {
       try {
-        // For now we don't restrict target, for testing purposes.
+        
         const trustedTarget = '*';
         window.parent.postMessage(JSON.stringify({ eventType, eventData }), trustedTarget);
         cb();
@@ -140,7 +140,7 @@ export class TelegramWebView {
     }
   }
 
-  /** Dispatches an incoming event to every subscriber of `eventType`. */
+  
   receiveEvent = (eventType: string, eventData: any): void => {
     this.callEventCallbacks(eventType, (callback) => callback(eventType, eventData));
   };
@@ -154,7 +154,7 @@ export class TelegramWebView {
       try {
         func(handlers[i]);
       } catch (e) {
-        // Swallow subscriber errors, matching original try/catch-per-callback behavior.
+        
       }
     }
   }
@@ -181,10 +181,10 @@ export class TelegramWebView {
   }
 }
 
-/**
- * Opens a `tg://` / `web+tg://` proto URL, following the same iOS-iframe
- * workaround as the original `openProtoUrl` helper.
- */
+
+
+
+
 export function openProtoUrl(url: string): boolean {
   if (!url.match(/^(web\+)?tgb?:\/\/./)) {
     return false;
@@ -216,7 +216,7 @@ export function openProtoUrl(url: string): boolean {
   return true;
 }
 
-/** Re-exported so consumers of `window.Telegram.Utils` keep the same surface. */
+
 export const Utils = {
   urlSafeDecode,
   urlParseQueryString,

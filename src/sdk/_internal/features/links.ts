@@ -1,7 +1,7 @@
-/**
- * `WebApp.openLink` / `WebApp.openTelegramLink` + the iframe `<a href="t.me/...">`
- * click interception (`linkHandler` in the original script).
- */
+
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
@@ -15,7 +15,7 @@ export class LinkManager {
     const a = document.createElement('A') as HTMLAnchorElement;
     a.href = url;
     if (a.protocol != 'http:' && a.protocol != 'https:') {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Url protocol is not supported', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
@@ -38,12 +38,12 @@ export class LinkManager {
     const a = document.createElement('A') as HTMLAnchorElement;
     a.href = url;
     if (a.protocol != 'http:' && a.protocol != 'https:') {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Url protocol is not supported', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
     if (!ALLOWED_TELEGRAM_HOSTS.includes(a.hostname)) {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Url host is not supported', url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
@@ -59,11 +59,11 @@ export class LinkManager {
     }
   }
 
-  /**
-   * Intercepts clicks on in-page `t.me` links while running inside an
-   * iframe (web.telegram.org) and routes them through `openTelegramLink`
-   * instead of letting the browser navigate directly.
-   */
+  
+
+
+
+
   handleDocumentClick = (e: MouseEvent): void => {
     if (e.metaKey || e.ctrlKey) return;
     let el = e.target as HTMLElement | null;

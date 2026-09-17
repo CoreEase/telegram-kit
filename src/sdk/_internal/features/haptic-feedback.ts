@@ -1,6 +1,6 @@
-/**
- * `Telegram.WebApp.HapticFeedback`.
- */
+
+
+
 
 import { WebAppKernel } from '../core/kernel';
 import { WebAppErrorName, throwWebAppError } from '../core/errors';
@@ -26,20 +26,20 @@ export class HapticFeedback {
         params.impact_style != 'rigid' &&
         params.impact_style != 'soft'
       ) {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Haptic impact style is invalid', params.impact_style);
         throwWebAppError(WebAppErrorName.HapticImpactStyleInvalid);
       }
     } else if (params.type == 'notification') {
       if (params.notification_type != 'error' && params.notification_type != 'success' && params.notification_type != 'warning') {
-        // eslint-disable-next-line no-console
+        
         console.error('[@core-ease/telegram-kit] Haptic notification type is invalid', params.notification_type);
         throwWebAppError(WebAppErrorName.HapticNotificationTypeInvalid);
       }
     } else if (params.type == 'selection_change') {
-      // no params needed
+      
     } else {
-      // eslint-disable-next-line no-console
+      
       console.error('[@core-ease/telegram-kit] Haptic feedback type is invalid', (params as any).type);
       throwWebAppError(WebAppErrorName.HapticFeedbackTypeInvalid);
     }
