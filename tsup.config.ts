@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
 import { join, resolve } from 'path';
-import { copyFileSync } from 'fs';
+import { copyFileSync, mkdirSync } from 'fs';
 
 function prependUseClient(files: string[]): void {
   for (const file of files) {
@@ -31,10 +31,23 @@ export default defineConfig([
     external: ['react', 'react-dom', 'node:crypto', 'crypto'],
     clean: true,
     treeshake: true,
-    target: 'es2017',
+    target: 'es2020',
     async onSuccess() {
       const dist = 'dist';
-      copyFileSync(resolve('src/_internal/animation/lottie/core/lottie.wasm'), join(dist, 'lottie.wasm'));
+      const wasm = resolve('src/_internal/animation/lottie/core/lottie.wasm');
+      const worker = join(dist, 'lottie.worker.js');
+      mkdirSync(dist, { recursive: true });
+      copyFileSync(wasm, join(dist, 'lottie.wasm'));
+      const wasmDirectories = ['core', 'animation/core', 'lottie/core', 'tgs/core'];
+      const workerDirectories = ['.', 'animation', 'animation/lottie', 'animation/tgs', 'animation/vanilla', 'lottie', 'tgs'];
+      for (const directory of wasmDirectories) {
+        mkdirSync(join(dist, directory), { recursive: true });
+        copyFileSync(wasm, join(dist, directory, 'lottie.wasm'));
+      }
+      for (const directory of workerDirectories) {
+        mkdirSync(join(dist, directory), { recursive: true });
+        copyFileSync(worker, join(dist, directory, 'lottie.worker.js'));
+      }
       const entryFiles = [
         join(dist, 'index.js'),
         join(dist, 'index.mjs'),
@@ -77,7 +90,7 @@ export default defineConfig([
     external: ['react', 'react-dom', 'node:crypto', 'crypto'],
     clean: false,
     treeshake: true,
-    target: 'es2017',
+    target: 'es2020',
   },
   {
     entry: { browser: 'src/browser.ts' },
@@ -87,7 +100,7 @@ export default defineConfig([
     dts: false,
     clean: false,
     treeshake: true,
-    target: 'es2017',
+    target: 'es2020',
     minify: true,
   },
 ]);

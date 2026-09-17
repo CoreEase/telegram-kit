@@ -14,8 +14,14 @@ export {
   encodeQRCode,
   qrCodeToSVG,
 } from './ui/qr';
-export type { QrEncodeOptions, QrEncodeResult, QrSvgOptions, ErrorCorrectionLevel } from './ui/qr';
+export type {
+  QrEncodeOptions,
+  QrEncodeResult,
+  QrSvgOptions,
+  ErrorCorrectionLevel,
+} from './ui/qr';
 
 export * from './utils/format';
 export * from './utils/links';
 export * from './utils/keyboards';
+export * from './ui/lottie-vanilla';
