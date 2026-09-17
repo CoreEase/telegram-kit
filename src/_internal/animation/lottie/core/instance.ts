@@ -113,9 +113,9 @@ export class LottieInstance {
 	): Uint8Array<ArrayBuffer> | null {
 		const ptr = this.exports.tlottie_render_alpha8_with_options(
 			this.ptr,
-			frame,
-			width,
-			height,
+			normalizeFrame(frame, this.frameCount),
+			normalizeDimension(width),
+			normalizeDimension(height),
 			quality.antialias ? 1 : 0,
 			quality.curveTolerance,
 		);
@@ -132,9 +132,9 @@ export class LottieInstance {
 	): Uint8ClampedArray<ArrayBuffer> | null {
 		const ptr = this.exports.tlottie_render_alpha8_color_with_options(
 			this.ptr,
-			frame,
-			width,
-			height,
+			normalizeFrame(frame, this.frameCount),
+			normalizeDimension(width),
+			normalizeDimension(height),
 			quality.antialias ? 1 : 0,
 			color >>> 0,
 			quality.curveTolerance,
@@ -158,7 +158,7 @@ function normalizeDimension(value: number): number {
 
 function normalizeFrame(frame: number, frameCount: number): number {
 	if (!Number.isFinite(frame)) return 0;
-	return Math.min(Math.max(frame, 0), Math.max(0, frameCount - 1));
+	return Math.floor(Math.min(Math.max(frame, 0), Math.max(0, frameCount - 1)));
 }
 
 interface PackedReplacements {
