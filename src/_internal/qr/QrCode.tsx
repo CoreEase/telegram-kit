@@ -361,6 +361,9 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
 
     const center = size / 2;
     const backdropColor = logoBackgroundColor ?? 'transparent';
+    const imageHalf = effectiveLogoImageSize / 2;
+    const imageX = center - imageHalf;
+    const imageY = center - imageHalf;
 
     let backdrop: React.ReactElement | null = null;
     if (backdropColor !== 'transparent') {
@@ -369,7 +372,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
           <circle
             cx={center}
             cy={center}
-            r={logoClearRadiusPx}
+            r={imageHalf}
             fill={backdropColor}
           />
         );
@@ -377,15 +380,15 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
         const radii =
           logoShape === 'rounded'
             ? {
-                tl: logoClearRadiusPx * 0.25,
-                tr: logoClearRadiusPx * 0.25,
-                br: logoClearRadiusPx * 0.25,
-                bl: logoClearRadiusPx * 0.25,
+                tl: imageHalf * 0.25,
+                tr: imageHalf * 0.25,
+                br: imageHalf * 0.25,
+                bl: imageHalf * 0.25,
               }
             : { tl: 0, tr: 0, br: 0, bl: 0 };
         backdrop = (
           <path
-            d={roundedRectPath(center, center, logoClearRadiusPx, radii)}
+            d={roundedRectPath(center, center, imageHalf, radii)}
             fill={backdropColor}
           />
         );
@@ -398,21 +401,21 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     if (logoShape === 'circle') {
       const id = `qr-logo-circle-${clipIdSuffix}`;
       clipDef = (
-        <clipPath id={id}>
-          <circle cx={center} cy={center} r={logoClearRadiusPx} />
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <circle cx={center} cy={center} r={imageHalf} />
         </clipPath>
       );
       clipUrl = `url(#${id})`;
     } else if (logoShape === 'rounded') {
       const id = `qr-logo-rounded-${clipIdSuffix}`;
-      const r = logoClearRadiusPx * 0.25;
+      const r = imageHalf * 0.25;
       clipDef = (
-        <clipPath id={id}>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
           <rect
-            x={center - logoClearRadiusPx}
-            y={center - logoClearRadiusPx}
-            width={logoClearRadiusPx * 2}
-            height={logoClearRadiusPx * 2}
+            x={imageX}
+            y={imageY}
+            width={effectiveLogoImageSize}
+            height={effectiveLogoImageSize}
             rx={r}
             ry={r}
           />
@@ -422,12 +425,12 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     } else if (logoShape === 'square') {
       const id = `qr-logo-square-${clipIdSuffix}`;
       clipDef = (
-        <clipPath id={id}>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
           <rect
-            x={center - logoClearRadiusPx}
-            y={center - logoClearRadiusPx}
-            width={logoClearRadiusPx * 2}
-            height={logoClearRadiusPx * 2}
+            x={imageX}
+            y={imageY}
+            width={effectiveLogoImageSize}
+            height={effectiveLogoImageSize}
           />
         </clipPath>
       );
@@ -440,8 +443,8 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
         {backdrop}
         <image
           href={logo}
-          x={center - effectiveLogoImageSize / 2}
-          y={center - effectiveLogoImageSize / 2}
+          x={imageX}
+          y={imageY}
           width={effectiveLogoImageSize}
           height={effectiveLogoImageSize}
           preserveAspectRatio="xMidYMid meet"
