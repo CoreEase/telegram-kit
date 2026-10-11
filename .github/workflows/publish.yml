@@ -9,7 +9,7 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
+      id-token: write  
 
     steps:
       - name: Checkout code
@@ -21,9 +21,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          
+          registry-url: 'https://registry.npmjs.org' 
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Typecheck
         run: npm run typecheck
@@ -32,4 +33,4 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-      - run: npm publish --access public --registry=https://registry.npmjs.org
+        run: npm publish --access public
