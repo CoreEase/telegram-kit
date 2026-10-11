@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write
-      id-token: write 
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -31,9 +31,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Check dist output
-        run: ls -R dist
 
       - name: Publish to npm
         run: npm publish --access public
