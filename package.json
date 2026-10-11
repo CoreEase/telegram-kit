@@ -101,7 +101,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepare": "npm run build"
   },
   "keywords": [
     "telegram",
