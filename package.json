@@ -57,6 +57,11 @@
       "import": "./dist/animation/tgs/index.mjs",
       "require": "./dist/animation/tgs/index.js"
     },
+    "./gram-diamond": {
+      "types": "./dist/gram-diamond/index.d.ts",
+      "import": "./dist/gram-diamond/index.mjs",
+      "require": "./dist/gram-diamond/index.js"
+    },
     "./tgs": {
       "types": "./dist/tgs/index.d.ts",
       "import": "./dist/tgs/index.mjs",
@@ -120,6 +125,9 @@
     "bot-telegram",
     "telegram-kit",
     "animation",
+    "gram-diamond",
+    "webgl",
+    "webgl2",
     "qrcode",
     "qr-code",
     "qr-code-generator",

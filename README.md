@@ -14,7 +14,7 @@ Telegram Mini Apps and Bot API projects usually end up gluing together the same 
 npm install @core-ease/telegram-kit
 ```
 
-React is an optional peer dependency — you only need it if you use the hooks, the provider, or the sticker/QR components. Everything else (bot client, QR encoding, formatting, links, server-side validation) works in plain Node or the browser with no React involved.
+React is an optional peer dependency — you only need it if you use the hooks, the provider, or the sticker/QR/GramDiamond components. Everything else (bot client, QR encoding, formatting, links, server-side validation) works in plain Node or the browser with no React involved.
 
 ## Package structure
 
@@ -37,14 +37,14 @@ src/
   react/     Hooks and the TelegramProvider for React-based Mini Apps -
              every hook delegates to core/ rather than re-implementing
              its own copy of the same logic
-  ui/        QR code generation/rendering and the Lottie/TGS sticker players
+  ui/        QR code, Gram Diamond WebGL component, and Lottie/TGS players
   utils/     MarkdownV2/HTML formatting, deep links, inline & reply keyboards
   bot/       The Bot API client, update dispatcher, and long-polling helper
   types/     Shared TypeScript types for the WebApp and the Bot API - the
              WebApp types are thin re-exports of the real ../sdk types
              instead of a hand-maintained parallel copy
-  _internal/ Implementation details (QR encoding math, the Lottie rendering
-             engine, gzip inflate, HMAC verification, etc.) — not part of the
+  _internal/ Implementation details (QR encoding math, Gram Diamond and Lottie
+             rendering engines, gzip inflate, HMAC verification, etc.) — not part of the
              public API and can change without notice
 ```
 
@@ -190,6 +190,26 @@ import { TgsPlayer } from '@core-ease/telegram-kit/tgs';
 ```
 
 `TgsPlayer` validates that the file is actually a Telegram-compliant animated sticker (set `strict={false}` to skip that check). If you're rendering a plain Lottie JSON animation instead of a `.tgs` file, use `LottiePlayer` from `@core-ease/telegram-kit/lottie` — same props, no TGS validation. Both are also reachable from `@core-ease/telegram-kit/animation`.
+
+## Gram Diamond
+
+`GramDiamond` is a React/WebGL2 crystal component. It is available from the dedicated subpath and from the animation bundle:
+
+```tsx
+"use client";
+import { GramDiamond } from '@core-ease/telegram-kit/gram-diamond';
+
+<GramDiamond
+  variant="interactive"
+  appearance="blue"
+  width={220}
+  height={220}
+  animationMode="continuous"
+  animateOnAppear
+/>
+```
+
+The component also supports `white` and `cool` appearances, the `premium` variant, drag/tap interaction, and imperative controls through `GramDiamondHandle`. It requires WebGL2 in the browser. The shader uses constant-index branches for anchor data to avoid a mobile WebGL linker incompatibility without changing rendered geometry or animation values. `GramDiamond` is also exported by `@core-ease/telegram-kit/animation`.
 
 ## Formatting messages (MarkdownV2 / HTML)
 
