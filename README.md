@@ -222,11 +222,6 @@ import { PremiumStar } from "@core-ease/telegram-kit/premium-star";
 <PremiumStar variant="business" width={200} height={200} />  // coin (Business)
 ```
 
-Same mesh for `stars` / `premium` (only the gradient + particle tint differ); `business` uses the coin scene.
-Drag to spin, tap to tilt; `colors`, `particleColor`, `look`, `idleAnimations` are optional.
-Data is regenerated from Telegram-iOS with `tools/export_scn.py` and `tools/pack_ts.py`. Run `npm run format` to format the project.
-
-
 ## Formatting messages (MarkdownV2 / HTML)
 
 Hand-escaping MarkdownV2 is a common source of bugs (it has more reserved characters than people expect). This builds the string for you instead:
