@@ -1,8 +1,7 @@
-
-import { TelegramWebView } from './webview';
-import { byteLength, generateRandomId, strTrim, versionCompare } from './utils';
-import { WebAppErrorName, throwWebAppError } from './errors';
-import type { EventHandler, InitParams } from '../types';
+import { TelegramWebView } from "./webview";
+import { byteLength, generateRandomId, strTrim, versionCompare } from "./utils";
+import { WebAppErrorName, throwWebAppError } from "./errors";
+import type { EventHandler, InitParams } from "../types";
 
 export type WebAppCallback = (...args: any[]) => void;
 
@@ -14,7 +13,7 @@ export class WebAppKernel {
   readonly webView: TelegramWebView;
   readonly initParams: InitParams;
 
-  private _version = '6.0';
+  private _version = "6.0";
 
   private callbacks: Record<string, PendingCallback> = {};
 
@@ -42,16 +41,18 @@ export class WebAppKernel {
 
   requireVersion(ver: string, methodName: string): void {
     if (!this.versionAtLeast(ver)) {
-
-      console.error(`[@core-ease/telegram-kit] Method ${methodName} is not supported in version ${this._version}`);
+      console.error(
+        `[@core-ease/telegram-kit] Method ${methodName} is not supported in version ${this._version}`,
+      );
       throwWebAppError(WebAppErrorName.MethodUnsupported);
     }
   }
 
   warnIfUnsupported(ver: string, featureName: string): boolean {
     if (!this.versionAtLeast(ver)) {
-
-      console.warn(`[@core-ease/telegram-kit] ${featureName} is not supported in version ${this._version}`);
+      console.warn(
+        `[@core-ease/telegram-kit] ${featureName} is not supported in version ${this._version}`,
+      );
       return false;
     }
     return true;
@@ -60,7 +61,7 @@ export class WebAppKernel {
   setCssProperty(name: string, value: string): void {
     const root = document.documentElement;
     if (root && root.style && root.style.setProperty) {
-      root.style.setProperty('--tg-' + name, value);
+      root.style.setProperty("--tg-" + name, value);
     }
   }
 
@@ -73,17 +74,17 @@ export class WebAppKernel {
   }
 
   receiveWebViewEvent(eventType: string, ...args: any[]): void {
-    this.webView.callEventCallbacks('webview:' + eventType, (callback) => {
+    this.webView.callEventCallbacks("webview:" + eventType, (callback) => {
       (callback as unknown as WebAppCallback).apply(null, args);
     });
   }
 
   onWebViewEvent(eventType: string, callback: EventHandler): void {
-    this.webView.onEvent('webview:' + eventType, callback);
+    this.webView.onEvent("webview:" + eventType, callback);
   }
 
   offWebViewEvent(eventType: string, callback: EventHandler): void {
-    this.webView.offEvent('webview:' + eventType, callback);
+    this.webView.offEvent("webview:" + eventType, callback);
   }
 
   registerCallback(callback?: WebAppCallback, len = 16): string {
@@ -104,10 +105,14 @@ export class WebAppKernel {
     return !!this.callbacks[reqId];
   }
 
-  invokeCustomMethod(method: string, params: AnyRecordLike | undefined, callback?: WebAppCallback): void {
-    this.requireVersion('6.9', 'invokeCustomMethod');
+  invokeCustomMethod(
+    method: string,
+    params: AnyRecordLike | undefined,
+    callback?: WebAppCallback,
+  ): void {
+    this.requireVersion("6.9", "invokeCustomMethod");
     const reqId = this.registerCallback(callback);
-    this.webView.postEvent('web_app_invoke_custom_method', undefined, {
+    this.webView.postEvent("web_app_invoke_custom_method", undefined, {
       req_id: reqId,
       method,
       params: params || {},
@@ -119,10 +124,10 @@ export class WebAppKernel {
       const entry = this.takeCallback(eventData.req_id);
       let res: any = null;
       let err: any = null;
-      if (typeof eventData.result !== 'undefined') {
+      if (typeof eventData.result !== "undefined") {
         res = eventData.result;
       }
-      if (typeof eventData.error !== 'undefined') {
+      if (typeof eventData.error !== "undefined") {
         err = eventData.error;
       }
       entry?.callback?.(err, res);

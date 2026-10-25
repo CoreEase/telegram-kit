@@ -68,10 +68,10 @@ export function gunzip(data: Uint8Array): Uint8Array {
     (data[trailerPos + 6] << 16) |
     (data[trailerPos + 7] << 24);
 
-  if (crc32(output) !== (expectedCrc >>> 0)) {
+  if (crc32(output) !== expectedCrc >>> 0) {
     throw new Error("Invalid gzip stream (CRC32 mismatch)");
   }
-  if ((output.length >>> 0) !== (expectedSize >>> 0)) {
+  if (output.length >>> 0 !== expectedSize >>> 0) {
     throw new Error("Invalid gzip stream (size mismatch)");
   }
   return output;
@@ -105,18 +105,13 @@ export function bytesToUtf8(bytes: Uint8Array): string {
     } else if (b0 >= 0xe0 && b0 < 0xf0) {
       const b1 = bytes[i++];
       const b2 = bytes[i++];
-      out += String.fromCharCode(
-        ((b0 & 0x0f) << 12) | ((b1 & 0x3f) << 6) | (b2 & 0x3f)
-      );
+      out += String.fromCharCode(((b0 & 0x0f) << 12) | ((b1 & 0x3f) << 6) | (b2 & 0x3f));
     } else {
       const b1 = bytes[i++];
       const b2 = bytes[i++];
       const b3 = bytes[i++];
       const codePoint =
-        ((b0 & 0x07) << 18) |
-        ((b1 & 0x3f) << 12) |
-        ((b2 & 0x3f) << 6) |
-        (b3 & 0x3f);
+        ((b0 & 0x07) << 18) | ((b1 & 0x3f) << 12) | ((b2 & 0x3f) << 6) | (b3 & 0x3f);
       out += String.fromCodePoint(codePoint);
     }
   }

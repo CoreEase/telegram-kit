@@ -1,6 +1,6 @@
-import { WebAppKernel } from '../core/kernel';
-import { MotionSensorBase } from './motion-sensor-base';
-import type { MotionSensorStartParams } from '../types';
+import { WebAppKernel } from "../core/kernel";
+import { MotionSensorBase } from "./motion-sensor-base";
+import type { MotionSensorStartParams } from "../types";
 
 interface AccelerometerValues {
   x: number | null;
@@ -13,20 +13,20 @@ export class Accelerometer extends MotionSensorBase<AccelerometerValues> {
     super(
       kernel,
       {
-        started: 'accelerometer_started',
-        stopped: 'accelerometer_stopped',
-        changed: 'accelerometer_changed',
-        failed: 'accelerometer_failed',
-        webViewStarted: 'accelerometerStarted',
-        webViewStopped: 'accelerometerStopped',
-        webViewChanged: 'accelerometerChanged',
-        webViewFailed: 'accelerometerFailed',
-        startCommand: 'web_app_start_accelerometer',
-        stopCommand: 'web_app_stop_accelerometer',
-        minVersion: '8.0',
-        displayName: 'Accelerometer',
+        started: "accelerometer_started",
+        stopped: "accelerometer_stopped",
+        changed: "accelerometer_changed",
+        failed: "accelerometer_failed",
+        webViewStarted: "accelerometerStarted",
+        webViewStopped: "accelerometerStopped",
+        webViewChanged: "accelerometerChanged",
+        webViewFailed: "accelerometerFailed",
+        startCommand: "web_app_start_accelerometer",
+        stopCommand: "web_app_stop_accelerometer",
+        minVersion: "8.0",
+        displayName: "Accelerometer",
       },
-      { x: null, y: null, z: null }
+      { x: null, y: null, z: null },
     );
   }
 

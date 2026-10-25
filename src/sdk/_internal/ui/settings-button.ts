@@ -1,17 +1,16 @@
-
-import { WebAppKernel } from '../core/kernel';
-import type { VoidCallback } from '../types';
+import { WebAppKernel } from "../core/kernel";
+import type { VoidCallback } from "../types";
 
 export class SettingsButton {
   private _isVisible = false;
   private curButtonState: string | null = null;
 
   constructor(private readonly kernel: WebAppKernel) {
-    kernel.webView.onEvent('settings_button_pressed', this.handleSettingsButtonPressed);
+    kernel.webView.onEvent("settings_button_pressed", this.handleSettingsButtonPressed);
   }
 
   private handleSettingsButtonPressed = (): void => {
-    this.kernel.receiveWebViewEvent('settingsButtonClicked');
+    this.kernel.receiveWebViewEvent("settingsButtonClicked");
   };
 
   get isVisible(): boolean {
@@ -23,7 +22,7 @@ export class SettingsButton {
   }
 
   private checkVersion(): boolean {
-    return this.kernel.warnIfUnsupported('6.10', 'SettingsButton');
+    return this.kernel.warnIfUnsupported("6.10", "SettingsButton");
   }
 
   private buttonParams() {
@@ -37,14 +36,14 @@ export class SettingsButton {
       return;
     }
     this.curButtonState = state;
-    this.kernel.webView.postEvent('web_app_setup_settings_button', undefined, params);
+    this.kernel.webView.postEvent("web_app_setup_settings_button", undefined, params);
   }
 
   setParams(params: { is_visible?: boolean }): this {
     if (!this.checkVersion()) {
       return this;
     }
-    if (typeof params.is_visible !== 'undefined') {
+    if (typeof params.is_visible !== "undefined") {
       this._isVisible = !!params.is_visible;
     }
     this.updateButton();
@@ -53,14 +52,14 @@ export class SettingsButton {
 
   onClick(callback: VoidCallback): this {
     if (this.checkVersion()) {
-      this.kernel.onWebViewEvent('settingsButtonClicked', callback);
+      this.kernel.onWebViewEvent("settingsButtonClicked", callback);
     }
     return this;
   }
 
   offClick(callback: VoidCallback): this {
     if (this.checkVersion()) {
-      this.kernel.offWebViewEvent('settingsButtonClicked', callback);
+      this.kernel.offWebViewEvent("settingsButtonClicked", callback);
     }
     return this;
   }

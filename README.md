@@ -18,7 +18,7 @@ React is an optional peer dependency — you only need it if you use the hooks, 
 
 ## Package structure
 
-The source is organized by what the code *does*, not by which npm subpath exports it:
+The source is organized by what the code _does_, not by which npm subpath exports it:
 
 ```
 src/
@@ -55,7 +55,7 @@ None of this affects how you import the package — see the sections below for t
 Wrap your app once:
 
 ```tsx
-import { TelegramProvider, useTelegram } from '@core-ease/telegram-kit';
+import { TelegramProvider, useTelegram } from "@core-ease/telegram-kit";
 
 function App() {
   return (
@@ -70,7 +70,11 @@ function Home() {
 
   if (!inTelegram) return <p>Open this from a Telegram chat.</p>;
 
-  return <p>Hey {user?.first_name}, you're on {colorScheme} mode.</p>;
+  return (
+    <p>
+      Hey {user?.first_name}, you're on {colorScheme} mode.
+    </p>
+  );
 }
 ```
 
@@ -85,17 +89,17 @@ import {
   useHapticFeedback,
   useShowConfirm,
   useCloudStorage,
-} from '@core-ease/telegram-kit';
+} from "@core-ease/telegram-kit";
 
 function CheckoutButton() {
   const haptic = useHapticFeedback();
   const confirm = useShowConfirm();
 
   useTelegramMainButton({
-    text: 'Confirm order',
+    text: "Confirm order",
     onClick: async () => {
-      if (await confirm('Place this order?')) {
-        haptic.notification('success');
+      if (await confirm("Place this order?")) {
+        haptic.notification("success");
       }
     },
   });
@@ -111,12 +115,12 @@ There are around 40 hooks in total — main/back/settings buttons, cloud/device/
 Everything the hooks are built on is also available directly, for vanilla JS, Vue, or anywhere else:
 
 ```ts
-import { getWebApp, isInTelegram, haptic, cloudStorage, dialog } from '@core-ease/telegram-kit';
+import { getWebApp, isInTelegram, haptic, cloudStorage, dialog } from "@core-ease/telegram-kit";
 
 if (isInTelegram()) {
-  await dialog.showConfirm('Continue?');
-  await cloudStorage.setItem('draft', JSON.stringify(formState));
-  haptic.impact('medium');
+  await dialog.showConfirm("Continue?");
+  await cloudStorage.setItem("draft", JSON.stringify(formState));
+  haptic.impact("medium");
 }
 ```
 
@@ -125,18 +129,15 @@ This module also has `openTelegramLink`, `openInvoice`, `shareToStory`, `request
 ## Bot API (server-side)
 
 ```ts
-import { TelegramBot, Dispatcher, TelegramPoller } from '@core-ease/telegram-kit/bot';
+import { TelegramBot, Dispatcher, TelegramPoller } from "@core-ease/telegram-kit/bot";
 
 const bot = new TelegramBot({ token: process.env.BOT_TOKEN! });
 
 const dispatcher = new Dispatcher()
-  .onCommand('start', (msg) => bot.sendMessage({ chat_id: msg.chat.id, text: 'Welcome!' }))
+  .onCommand("start", (msg) => bot.sendMessage({ chat_id: msg.chat.id, text: "Welcome!" }))
   .onMessage((msg) => bot.sendMessage({ chat_id: msg.chat.id, text: `You said: ${msg.text}` }));
 
-const poller = new TelegramPoller(
-  (params) => bot.getUpdates(params),
-  dispatcher.toHandler()
-);
+const poller = new TelegramPoller((params) => bot.getUpdates(params), dispatcher.toHandler());
 
 poller.start();
 ```
@@ -148,7 +149,7 @@ poller.start();
 Never trust `initData` on the client — always verify it server-side before treating it as an authenticated user:
 
 ```ts
-import { validateInitData } from '@core-ease/telegram-kit/server';
+import { validateInitData } from "@core-ease/telegram-kit/server";
 
 const result = await validateInitData(initDataFromClient, process.env.BOT_TOKEN!, {
   maxAgeSeconds: 3600,
@@ -156,7 +157,7 @@ const result = await validateInitData(initDataFromClient, process.env.BOT_TOKEN!
 
 if (!result.valid) {
   // result.reason: 'invalid_hash' | 'expired' | 'missing_hash' | 'malformed'
-  throw new Error('Invalid Telegram session');
+  throw new Error("Invalid Telegram session");
 }
 
 // result.user, result.startParam, result.authDate are ready to use
@@ -169,14 +170,14 @@ There's also a synchronous `validateInitDataSync` if you're not in an async cont
 A zero-dependency ISO/IEC 18004 encoder plus a styled React component:
 
 ```tsx
-import { QRCode, encodeQRCode, qrCodeToSVG } from '@core-ease/telegram-kit/qr';
+import { QRCode, encodeQRCode, qrCodeToSVG } from "@core-ease/telegram-kit/qr";
 
 // as a component
-<QRCode value="https://t.me/your_bot" size={256} dotColor="#111" logo="/logo.png" />
+<QRCode value="https://t.me/your_bot" size={256} dotColor="#111" logo="/logo.png" />;
 
 // or just get raw SVG / matrix data, no React needed
-const svg = qrCodeToSVG('https://t.me/your_bot', { size: 512, color: '#000' });
-const { modules } = encodeQRCode('https://t.me/your_bot', { errorCorrectionLevel: 'M' });
+const svg = qrCodeToSVG("https://t.me/your_bot", { size: 512, color: "#000" });
+const { modules } = encodeQRCode("https://t.me/your_bot", { errorCorrectionLevel: "M" });
 ```
 
 `QRCode` supports custom dot/corner shapes, a logo with automatic size clamping so it never breaks scannability, rounded corners, and a `downloadQRCode(svgRef.current, { format: 'png' | 'svg' })` helper for exporting it.
@@ -184,9 +185,9 @@ const { modules } = encodeQRCode('https://t.me/your_bot', { errorCorrectionLevel
 ## Animated stickers (TGS / Lottie)
 
 ```tsx
-import { TgsPlayer } from '@core-ease/telegram-kit/tgs';
+import { TgsPlayer } from "@core-ease/telegram-kit/tgs";
 
-<TgsPlayer src="/stickers/wave.tgs" autoplay loop style={{ width: 128, height: 128 }} />
+<TgsPlayer src="/stickers/wave.tgs" autoplay loop style={{ width: 128, height: 128 }} />;
 ```
 
 `TgsPlayer` validates that the file is actually a Telegram-compliant animated sticker (set `strict={false}` to skip that check). If you're rendering a plain Lottie JSON animation instead of a `.tgs` file, use `LottiePlayer` from `@core-ease/telegram-kit/lottie` — same props, no TGS validation. Both are also reachable from `@core-ease/telegram-kit/animation`.
@@ -197,7 +198,7 @@ import { TgsPlayer } from '@core-ease/telegram-kit/tgs';
 
 ```tsx
 "use client";
-import { GramDiamond } from '@core-ease/telegram-kit/gram-diamond';
+import { GramDiamond } from "@core-ease/telegram-kit/gram-diamond";
 
 <GramDiamond
   variant="interactive"
@@ -206,7 +207,7 @@ import { GramDiamond } from '@core-ease/telegram-kit/gram-diamond';
   height={220}
   animationMode="continuous"
   animateOnAppear
-/>
+/>;
 ```
 
 The component also supports `white` and `cool` appearances, the `premium` variant, drag/tap interaction, and imperative controls through `GramDiamondHandle`. It requires WebGL2 in the browser. The shader uses constant-index branches for anchor data to avoid a mobile WebGL linker incompatibility without changing rendered geometry or animation values. `GramDiamond` is also exported by `@core-ease/telegram-kit/animation`.
@@ -216,10 +217,16 @@ The component also supports `white` and `cool` appearances, the `premium` varian
 Hand-escaping MarkdownV2 is a common source of bugs (it has more reserved characters than people expect). This builds the string for you instead:
 
 ```ts
-import { md, html } from '@core-ease/telegram-kit/format';
+import { md, html } from "@core-ease/telegram-kit/format";
 
-const text = md.text('Hello ', md.bold(user.first_name), '! Your order ', md.code(orderId), ' is ready.');
-await bot.sendMessage({ chat_id, text: text.toString(), parse_mode: 'MarkdownV2' });
+const text = md.text(
+  "Hello ",
+  md.bold(user.first_name),
+  "! Your order ",
+  md.code(orderId),
+  " is ready.",
+);
+await bot.sendMessage({ chat_id, text: text.toString(), parse_mode: "MarkdownV2" });
 ```
 
 Both `md` and `html` support `bold`, `italic`, `underline`, `strikethrough`, `spoiler`, `code`, `pre`, `link`, `mentionUser`, and `customEmoji`; `html` additionally has `blockquote` and `expandableBlockquote`. Everything you pass in is escaped automatically unless it's already a formatted fragment, so nesting `md.bold(md.italic('x'))` works as expected. `TELEGRAM_TEXT_LIMITS` and `truncateText` are there for staying under Telegram's length limits (surrogate-pair-safe).
@@ -227,15 +234,19 @@ Both `md` and `html` support `bold`, `italic`, `underline`, `strikethrough`, `sp
 ## Deep links
 
 ```ts
-import { buildStartLink, buildStartAppLink, parseTelegramLink } from '@core-ease/telegram-kit/links';
+import {
+  buildStartLink,
+  buildStartAppLink,
+  parseTelegramLink,
+} from "@core-ease/telegram-kit/links";
 
-buildStartLink({ botUsername: 'your_bot', data: 'ref_42' });
+buildStartLink({ botUsername: "your_bot", data: "ref_42" });
 // -> https://t.me/your_bot?start=cmVmXzQy
 
-buildStartAppLink({ botUsername: 'your_bot', appName: 'shop', startParam: 'sku_123' });
+buildStartAppLink({ botUsername: "your_bot", appName: "shop", startParam: "sku_123" });
 // -> https://t.me/your_bot/shop?startapp=sku_123
 
-parseTelegramLink('https://t.me/your_bot/shop?startapp=sku_123');
+parseTelegramLink("https://t.me/your_bot/shop?startapp=sku_123");
 // -> { type: 'mini-app', username: 'your_bot', appName: 'shop', startParam: 'sku_123' }
 ```
 
@@ -244,15 +255,16 @@ parseTelegramLink('https://t.me/your_bot/shop?startapp=sku_123');
 ## Keyboards
 
 ```ts
-import { InlineKeyboardBuilder, ReplyKeyboardBuilder } from '@core-ease/telegram-kit/keyboards';
+import { InlineKeyboardBuilder, ReplyKeyboardBuilder } from "@core-ease/telegram-kit/keyboards";
 
 const keyboard = new InlineKeyboardBuilder()
-  .text('Yes', 'confirm:yes').text('No', 'confirm:no')
+  .text("Yes", "confirm:yes")
+  .text("No", "confirm:no")
   .row()
-  .url('Docs', 'https://example.com')
+  .url("Docs", "https://example.com")
   .build();
 
-await bot.sendMessage({ chat_id, text: 'Confirm?', reply_markup: keyboard });
+await bot.sendMessage({ chat_id, text: "Confirm?", reply_markup: keyboard });
 ```
 
 `InlineKeyboardBuilder.columns(buttons, perRow)` is a shortcut for grid layouts. `removeKeyboard()` and `forceReply()` cover the remaining reply-markup types.
@@ -262,15 +274,15 @@ await bot.sendMessage({ chat_id, text: 'Confirm?', reply_markup: keyboard });
 `WebApp` doesn't exist outside a Telegram client, which makes local development painful. Even without calling `installDevMode()`, every `@core-ease/telegram-kit` function already degrades to a real browser-native equivalent (see `core/fallback.ts`) - so hooks and core functions work in a regular browser tab out of the box. `installDevMode()` goes one step further and seeds a fake user/theme/session, so `getWebApp().initDataUnsafe.user`, the theme, and `isInTelegram()` all behave like a real launch too:
 
 ```ts
-import { installDevMode } from '@core-ease/telegram-kit/dev';
+import { installDevMode } from "@core-ease/telegram-kit/dev";
 
 // Call this before anything else touches getWebApp() - hooks, <TelegramProvider>,
 // or any core/index.ts function. It seeds a fake user/theme/session through the
 // exact same code path a real Telegram launch uses, so every feature (storage,
 // haptics, dialogs, location, ...) keeps working through its browser-native
 // fallback instead of hanging or warning.
-if (process.env.NODE_ENV === 'development') {
-  installDevMode({ user: { id: 1, first_name: 'Dev' } });
+if (process.env.NODE_ENV === "development") {
+  installDevMode({ user: { id: 1, first_name: "Dev" } });
 }
 ```
 
@@ -292,7 +304,7 @@ This build includes core, QR, formatting, links, keyboards, dev mode, and the bu
 
 ## The bundled Mini Apps SDK
 
-`@core-ease/telegram-kit` used to be a thin *type* wrapper around Telegram's own `https://telegram.org/js/telegram-web-app.js`, which you had to load yourself via a `<script>` tag. That script is now vendored in full, as a faithful line-for-line behavioral TypeScript port, under `@core-ease/telegram-kit/sdk` (source: `src/sdk/`, public entry `src/sdk/index.ts`, implementation under `src/sdk/_internal/`).
+`@core-ease/telegram-kit` used to be a thin _type_ wrapper around Telegram's own `https://telegram.org/js/telegram-web-app.js`, which you had to load yourself via a `<script>` tag. That script is now vendored in full, as a faithful line-for-line behavioral TypeScript port, under `@core-ease/telegram-kit/sdk` (source: `src/sdk/`, public entry `src/sdk/index.ts`, implementation under `src/sdk/_internal/`).
 
 Practically, this means:
 
@@ -303,10 +315,10 @@ Practically, this means:
 - **Advanced use:** if you want the typed SDK classes directly instead of going through `core/`, import from `@core-ease/telegram-kit/sdk`:
 
   ```ts
-  import { bootstrapTelegramWebApp } from '@core-ease/telegram-kit/sdk';
+  import { bootstrapTelegramWebApp } from "@core-ease/telegram-kit/sdk";
 
   const { webApp } = bootstrapTelegramWebApp();
-  webApp.MainButton.setText('Continue').show();
+  webApp.MainButton.setText("Continue").show();
   ```
 
 ## TypeScript
@@ -316,3 +328,17 @@ Everything is written in TypeScript and ships its own `.d.ts` files — no `@typ
 ## License
 
 MIT
+
+## PremiumStar (WebGL2 star / coin from Telegram iOS)
+
+```tsx
+import { PremiumStar } from "@core-ease/telegram-kit/premium-star";
+
+<PremiumStar variant="stars" width={200} height={200} />     // gold star (Stars purchase page)
+<PremiumStar variant="premium" width={200} height={200} />   // violet star (Premium page)
+<PremiumStar variant="business" width={200} height={200} />  // coin (Business)
+```
+
+Same mesh for `stars` / `premium` (only the gradient + particle tint differ); `business` uses the coin scene.
+Drag to spin, tap to tilt; `colors`, `particleColor`, `look`, `idleAnimations` are optional.
+Data is regenerated from Telegram-iOS with `tools/export_scn.py` and `tools/pack_ts.py`. Run `npm run format` to format the project.

@@ -1,37 +1,36 @@
+import { TelegramWebView, Utils } from "./core/webview";
+import { WebAppKernel } from "./core/kernel";
+import { byteLength, urlParseQueryString } from "./core/utils";
+import { WebAppErrorName, throwWebAppError } from "./core/errors";
 
-import { TelegramWebView, Utils } from './core/webview';
-import { WebAppKernel } from './core/kernel';
-import { byteLength, urlParseQueryString } from './core/utils';
-import { WebAppErrorName, throwWebAppError } from './core/errors';
+import { ThemeManager } from "./theme/theme-manager";
+import { ViewportManager } from "./theme/viewport-manager";
 
-import { ThemeManager } from './theme/theme-manager';
-import { ViewportManager } from './theme/viewport-manager';
+import { BackButton } from "./ui/back-button";
+import { BottomButton } from "./ui/bottom-button";
+import { SettingsButton } from "./ui/settings-button";
+import { DebugBottomBar } from "./ui/debug-bottom-bar";
+import { PopupManager } from "./ui/popup";
+import { ScanQrManager } from "./ui/scan-qr";
 
-import { BackButton } from './ui/back-button';
-import { BottomButton } from './ui/bottom-button';
-import { SettingsButton } from './ui/settings-button';
-import { DebugBottomBar } from './ui/debug-bottom-bar';
-import { PopupManager } from './ui/popup';
-import { ScanQrManager } from './ui/scan-qr';
+import { HapticFeedback } from "./features/haptic-feedback";
+import { CloudStorage } from "./features/cloud-storage";
+import { DeviceStorage } from "./features/device-storage";
+import { SecureStorage } from "./features/secure-storage";
+import { BiometricManager } from "./features/biometric-manager";
+import { LocationManager } from "./features/location-manager";
+import { InvoiceManager } from "./features/invoice";
+import { ClipboardManager } from "./features/clipboard";
+import { ContactManager } from "./features/contact";
+import { HomeScreenManager } from "./features/home-screen";
+import { DownloadFileManager } from "./features/download-file";
+import { SharingManager } from "./features/sharing";
+import { EmojiStatusManager } from "./features/emoji-status";
+import { LinkManager } from "./features/links";
 
-import { HapticFeedback } from './features/haptic-feedback';
-import { CloudStorage } from './features/cloud-storage';
-import { DeviceStorage } from './features/device-storage';
-import { SecureStorage } from './features/secure-storage';
-import { BiometricManager } from './features/biometric-manager';
-import { LocationManager } from './features/location-manager';
-import { InvoiceManager } from './features/invoice';
-import { ClipboardManager } from './features/clipboard';
-import { ContactManager } from './features/contact';
-import { HomeScreenManager } from './features/home-screen';
-import { DownloadFileManager } from './features/download-file';
-import { SharingManager } from './features/sharing';
-import { EmojiStatusManager } from './features/emoji-status';
-import { LinkManager } from './features/links';
-
-import { Accelerometer } from './sensors/accelerometer';
-import { Gyroscope } from './sensors/gyroscope';
-import { DeviceOrientation } from './sensors/device-orientation';
+import { Accelerometer } from "./sensors/accelerometer";
+import { Gyroscope } from "./sensors/gyroscope";
+import { DeviceOrientation } from "./sensors/device-orientation";
 
 import type {
   CloseOptions,
@@ -46,14 +45,14 @@ import type {
   ShareToStoryParams,
   ThemeParams,
   WebAppInitDataUnsafe,
-} from './types';
+} from "./types";
 
 export class WebApp {
   private readonly kernel: WebAppKernel;
 
-  private webAppInitData = '';
+  private webAppInitData = "";
   private webAppInitDataUnsafe: WebAppInitDataUnsafe = {};
-  private webAppPlatform = 'unknown';
+  private webAppPlatform = "unknown";
   private webAppIsActive = true;
 
   private readonly theme: ThemeManager;
@@ -96,12 +95,13 @@ export class WebApp {
       for (const key in parsed) {
         const val = (parsed as any)[key];
         try {
-          if ((val?.substr(0, 1) == '{' && val?.substr(-1) == '}') || (val?.substr(0, 1) == '[' && val?.substr(-1) == ']')) {
+          if (
+            (val?.substr(0, 1) == "{" && val?.substr(-1) == "}") ||
+            (val?.substr(0, 1) == "[" && val?.substr(-1) == "]")
+          ) {
             (parsed as any)[key] = JSON.parse(val);
           }
-        } catch (e) {
-
-        }
+        } catch (e) {}
       }
       this.webAppInitDataUnsafe = parsed;
     }
@@ -115,8 +115,8 @@ export class WebApp {
     this.debugBar = new DebugBottomBar(kernel, () => this.theme.getBottomBarColor());
 
     this.BackButton = new BackButton(kernel);
-    this.MainButton = new BottomButton('main', kernel, this.theme, this.debugBar);
-    this.SecondaryButton = new BottomButton('secondary', kernel, this.theme, this.debugBar);
+    this.MainButton = new BottomButton("main", kernel, this.theme, this.debugBar);
+    this.SecondaryButton = new BottomButton("secondary", kernel, this.theme, this.debugBar);
     this.SettingsButton = new SettingsButton(kernel);
     this.popups = new PopupManager(kernel);
     this.scanQr = new ScanQrManager(kernel);
@@ -146,18 +146,18 @@ export class WebApp {
       this.SecondaryButton.setParams({});
     };
 
-    kernel.webView.onEvent('theme_changed', this.handleThemeChanged);
-    kernel.webView.onEvent('viewport_changed', this.viewport.handleViewportChanged);
-    kernel.webView.onEvent('safe_area_changed', this.viewport.handleSafeAreaChanged);
-    kernel.webView.onEvent('content_safe_area_changed', this.viewport.handleContentSafeAreaChanged);
-    kernel.webView.onEvent('visibility_changed', this.handleVisibilityChanged);
-    kernel.webView.onEvent('fullscreen_changed', this.viewport.handleFullscreenChanged);
-    kernel.webView.onEvent('fullscreen_failed', this.viewport.handleFullscreenFailed);
-    kernel.webView.onEvent('custom_method_invoked', kernel.onCustomMethodInvoked);
+    kernel.webView.onEvent("theme_changed", this.handleThemeChanged);
+    kernel.webView.onEvent("viewport_changed", this.viewport.handleViewportChanged);
+    kernel.webView.onEvent("safe_area_changed", this.viewport.handleSafeAreaChanged);
+    kernel.webView.onEvent("content_safe_area_changed", this.viewport.handleContentSafeAreaChanged);
+    kernel.webView.onEvent("visibility_changed", this.handleVisibilityChanged);
+    kernel.webView.onEvent("fullscreen_changed", this.viewport.handleFullscreenChanged);
+    kernel.webView.onEvent("fullscreen_failed", this.viewport.handleFullscreenFailed);
+    kernel.webView.onEvent("custom_method_invoked", kernel.onCustomMethodInvoked);
 
-    window.addEventListener('resize', this.viewport.onWindowResize);
+    window.addEventListener("resize", this.viewport.onWindowResize);
     if (webView.isIframe) {
-      document.addEventListener('click', this.links.handleDocumentClick);
+      document.addEventListener("click", this.links.handleDocumentClick);
     }
 
     this.theme.updateHeaderColor();
@@ -168,10 +168,10 @@ export class WebApp {
       this.SettingsButton.show();
     }
 
-    kernel.webView.postEvent('web_app_request_theme');
-    kernel.webView.postEvent('web_app_request_viewport');
-    kernel.webView.postEvent('web_app_request_safe_area');
-    kernel.webView.postEvent('web_app_request_content_safe_area');
+    kernel.webView.postEvent("web_app_request_theme");
+    kernel.webView.postEvent("web_app_request_viewport");
+    kernel.webView.postEvent("web_app_request_safe_area");
+    kernel.webView.postEvent("web_app_request_content_safe_area");
   }
 
   private handleThemeChanged = (_eventType: string, eventData: any): void => {
@@ -182,17 +182,17 @@ export class WebApp {
       this.theme.updateHeaderColor();
       this.theme.updateBackgroundColor();
       this.theme.updateBottomBarColor();
-      this.kernel.receiveWebViewEvent('themeChanged');
+      this.kernel.receiveWebViewEvent("themeChanged");
     }
   };
 
   private handleVisibilityChanged = (_eventType: string, eventData: any): void => {
     if (eventData.is_visible) {
       this.webAppIsActive = true;
-      this.kernel.receiveWebViewEvent('activated');
+      this.kernel.receiveWebViewEvent("activated");
     } else {
       this.webAppIsActive = false;
-      this.kernel.receiveWebViewEvent('deactivated');
+      this.kernel.receiveWebViewEvent("deactivated");
     }
   };
 
@@ -332,16 +332,14 @@ export class WebApp {
 
   sendData(data: string): void {
     if (!data || !data.length) {
-
-      console.error('[@core-ease/telegram-kit] Data is required', data);
+      console.error("[@core-ease/telegram-kit] Data is required", data);
       throwWebAppError(WebAppErrorName.DataInvalid);
     }
     if (byteLength(data) > 4096) {
-
-      console.error('[@core-ease/telegram-kit] Data is too long', data);
+      console.error("[@core-ease/telegram-kit] Data is too long", data);
       throwWebAppError(WebAppErrorName.DataInvalid);
     }
-    this.kernel.webView.postEvent('web_app_data_send', undefined, { data });
+    this.kernel.webView.postEvent("web_app_data_send", undefined, { data });
   }
 
   switchInlineQuery(query: string, chooseChatTypes?: string[]): void {
@@ -355,7 +353,10 @@ export class WebApp {
     this.links.openTelegramLink(url, options);
   }
 
-  openInvoice(url: string, callback?: (status: 'paid' | 'cancelled' | 'failed' | 'pending') => void): void {
+  openInvoice(
+    url: string,
+    callback?: (status: "paid" | "cancelled" | "failed" | "pending") => void,
+  ): void {
     this.invoices.openInvoice(url, callback);
   }
 
@@ -369,7 +370,10 @@ export class WebApp {
     this.popups.showConfirm(message, callback);
   }
 
-  showScanQrPopup(params: ScanQrPopupParams, callback?: (data: string | null) => boolean | void): void {
+  showScanQrPopup(
+    params: ScanQrPopupParams,
+    callback?: (data: string | null) => boolean | void,
+  ): void {
     this.scanQr.showScanQrPopup(params, callback);
   }
   closeScanQrPopup(): void {
@@ -401,32 +405,40 @@ export class WebApp {
     this.sharing.requestChat(reqId, callback);
   }
 
-  setEmojiStatus(customEmojiId: string, params?: { duration?: number }, callback?: (applied: boolean) => void): void {
+  setEmojiStatus(
+    customEmojiId: string,
+    params?: { duration?: number },
+    callback?: (applied: boolean) => void,
+  ): void {
     this.emojiStatus.setEmojiStatus(customEmojiId, params, callback);
   }
   requestEmojiStatusAccess(callback?: (granted: boolean) => void): void {
     this.emojiStatus.requestEmojiStatusAccess(callback);
   }
 
-  invokeCustomMethod(method: string, params?: Record<string, any>, callback?: (err: any, res: any) => void): void {
+  invokeCustomMethod(
+    method: string,
+    params?: Record<string, any>,
+    callback?: (err: any, res: any) => void,
+  ): void {
     this.kernel.invokeCustomMethod(method, params, callback);
   }
 
   hideKeyboard(): void {
-    this.kernel.webView.postEvent('web_app_hide_keyboard');
+    this.kernel.webView.postEvent("web_app_hide_keyboard");
   }
   ready(): void {
-    this.kernel.webView.postEvent('web_app_ready');
+    this.kernel.webView.postEvent("web_app_ready");
   }
   expand(): void {
-    this.kernel.webView.postEvent('web_app_expand');
+    this.kernel.webView.postEvent("web_app_expand");
   }
   close(options: CloseOptions = {}): void {
     const reqParams: { return_back?: boolean } = {};
-    if (this.kernel.versionAtLeast('7.6') && options.return_back) {
+    if (this.kernel.versionAtLeast("7.6") && options.return_back) {
       reqParams.return_back = true;
     }
-    this.kernel.webView.postEvent('web_app_close', undefined, reqParams);
+    this.kernel.webView.postEvent("web_app_close", undefined, reqParams);
   }
 }
 

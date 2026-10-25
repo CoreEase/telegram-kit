@@ -1,5 +1,4 @@
-
-import type { WebApp } from '../sdk';
+import type { WebApp } from "../sdk";
 
 export type {
   WebAppUser as TgUser,
@@ -17,72 +16,72 @@ export type {
   LocationData,
   HomeScreenStatus,
   ColorScheme,
-} from '../sdk';
+} from "../sdk";
 
 export interface EmojiStatusParams {
   duration?: number;
 }
 
 export type WebAppEventType =
-  | 'activated'
-  | 'deactivated'
-  | 'themeChanged'
-  | 'viewportChanged'
-  | 'safeAreaChanged'
-  | 'contentSafeAreaChanged'
-  | 'mainButtonClicked'
-  | 'secondaryButtonClicked'
-  | 'backButtonClicked'
-  | 'settingsButtonClicked'
-  | 'invoiceClosed'
-  | 'popupClosed'
-  | 'qrTextReceived'
-  | 'scanQrPopupClosed'
-  | 'clipboardTextReceived'
-  | 'writeAccessRequested'
-  | 'contactRequested'
-  | 'biometricManagerUpdated'
-  | 'biometricAuthRequested'
-  | 'biometricTokenUpdated'
-  | 'fullscreenChanged'
-  | 'fullscreenFailed'
-  | 'homeScreenAdded'
-  | 'homeScreenChecked'
-  | 'accelerometerStarted'
-  | 'accelerometerStopped'
-  | 'accelerometerChanged'
-  | 'accelerometerFailed'
-  | 'deviceOrientationStarted'
-  | 'deviceOrientationStopped'
-  | 'deviceOrientationChanged'
-  | 'deviceOrientationFailed'
-  | 'gyroscopeStarted'
-  | 'gyroscopeStopped'
-  | 'gyroscopeChanged'
-  | 'gyroscopeFailed'
-  | 'locationManagerUpdated'
-  | 'locationRequested'
-  | 'shareMessageSent'
-  | 'shareMessageFailed'
-  | 'emojiStatusSet'
-  | 'emojiStatusFailed'
-  | 'emojiStatusAccessRequested'
-  | 'fileDownloadRequested'
-  | 'customMethodInvoked';
+  | "activated"
+  | "deactivated"
+  | "themeChanged"
+  | "viewportChanged"
+  | "safeAreaChanged"
+  | "contentSafeAreaChanged"
+  | "mainButtonClicked"
+  | "secondaryButtonClicked"
+  | "backButtonClicked"
+  | "settingsButtonClicked"
+  | "invoiceClosed"
+  | "popupClosed"
+  | "qrTextReceived"
+  | "scanQrPopupClosed"
+  | "clipboardTextReceived"
+  | "writeAccessRequested"
+  | "contactRequested"
+  | "biometricManagerUpdated"
+  | "biometricAuthRequested"
+  | "biometricTokenUpdated"
+  | "fullscreenChanged"
+  | "fullscreenFailed"
+  | "homeScreenAdded"
+  | "homeScreenChecked"
+  | "accelerometerStarted"
+  | "accelerometerStopped"
+  | "accelerometerChanged"
+  | "accelerometerFailed"
+  | "deviceOrientationStarted"
+  | "deviceOrientationStopped"
+  | "deviceOrientationChanged"
+  | "deviceOrientationFailed"
+  | "gyroscopeStarted"
+  | "gyroscopeStopped"
+  | "gyroscopeChanged"
+  | "gyroscopeFailed"
+  | "locationManagerUpdated"
+  | "locationRequested"
+  | "shareMessageSent"
+  | "shareMessageFailed"
+  | "emojiStatusSet"
+  | "emojiStatusFailed"
+  | "emojiStatusAccessRequested"
+  | "fileDownloadRequested"
+  | "customMethodInvoked";
 
 export type TgPlatform =
-  | 'android'
-  | 'android_x'
-  | 'ios'
-  | 'macos'
-  | 'tdesktop'
-  | 'weba'
-  | 'webz'
-  | 'webk'
-  | 'unigram'
-  | 'unknown';
+  | "android"
+  | "android_x"
+  | "ios"
+  | "macos"
+  | "tdesktop"
+  | "weba"
+  | "webz"
+  | "webk"
+  | "unigram"
+  | "unknown";
 
-export type RuntimeMode = 'node' | 'edge';
+export type RuntimeMode = "node" | "edge";
 
 export type TgWebApp = WebApp;
 

@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
-import { encodeQRCode } from './Qr';
-import type { ErrorCorrectionLevel } from './Qr';
+import React, { useMemo } from "react";
+import { encodeQRCode } from "./Qr";
+import type { ErrorCorrectionLevel } from "./Qr";
 
-export type QRDotShape = 'square' | 'dots' | 'rounded' | 'extra-rounded' | 'classy' | 'classy-rounded';
-export type QRCornerSquareShape = 'square' | 'dot' | 'rounded' | 'classy';
-export type QRCornerDotShape = 'square' | 'dot' | 'rounded';
-export type QRLogoShape = 'circle' | 'square' | 'rounded' | 'none';
+export type QRDotShape =
+  "square" | "dots" | "rounded" | "extra-rounded" | "classy" | "classy-rounded";
+export type QRCornerSquareShape = "square" | "dot" | "rounded" | "classy";
+export type QRCornerDotShape = "square" | "dot" | "rounded";
+export type QRLogoShape = "circle" | "square" | "rounded" | "none";
 
 export interface QRDotsOptions {
   color?: string;
@@ -51,7 +52,7 @@ function roundedRectPath(
   cx: number,
   cy: number,
   halfSize: number,
-  radii: { tl: number; tr: number; br: number; bl: number }
+  radii: { tl: number; tr: number; br: number; bl: number },
 ): string {
   const x = cx - halfSize;
   const y = cy - halfSize;
@@ -61,17 +62,17 @@ function roundedRectPath(
   return [
     `M${x + tl},${y}`,
     `L${x + w - tr},${y}`,
-    tr > 0 ? `A${tr},${tr} 0 0 1 ${x + w},${y + tr}` : '',
+    tr > 0 ? `A${tr},${tr} 0 0 1 ${x + w},${y + tr}` : "",
     `L${x + w},${y + h - br}`,
-    br > 0 ? `A${br},${br} 0 0 1 ${x + w - br},${y + h}` : '',
+    br > 0 ? `A${br},${br} 0 0 1 ${x + w - br},${y + h}` : "",
     `L${x + bl},${y + h}`,
-    bl > 0 ? `A${bl},${bl} 0 0 1 ${x},${y + h - bl}` : '',
+    bl > 0 ? `A${bl},${bl} 0 0 1 ${x},${y + h - bl}` : "",
     `L${x},${y + tl}`,
-    tl > 0 ? `A${tl},${tl} 0 0 1 ${x + tl},${y}` : '',
-    'Z',
+    tl > 0 ? `A${tl},${tl} 0 0 1 ${x + tl},${y}` : "",
+    "Z",
   ]
     .filter(Boolean)
-    .join('');
+    .join("");
 }
 
 function dotPath(
@@ -79,21 +80,21 @@ function dotPath(
   cy: number,
   cellSize: number,
   shape: QRDotShape,
-  neighbors: { top: boolean; right: boolean; bottom: boolean; left: boolean }
+  neighbors: { top: boolean; right: boolean; bottom: boolean; left: boolean },
 ): { d?: string; circle?: boolean } {
   const half = cellSize / 2;
 
-  if (shape === 'square') {
+  if (shape === "square") {
     return { d: roundedRectPath(cx, cy, half * 0.98, { tl: 0, tr: 0, br: 0, bl: 0 }) };
   }
-  if (shape === 'dots') {
+  if (shape === "dots") {
     return { circle: true };
   }
 
   const isolatedCorner = (a: boolean, b: boolean) => (a ? 0 : 1) + (b ? 0 : 1) === 2;
 
-  if (shape === 'rounded' || shape === 'extra-rounded') {
-    const r = half * (shape === 'extra-rounded' ? 0.7 : 0.5);
+  if (shape === "rounded" || shape === "extra-rounded") {
+    const r = half * (shape === "extra-rounded" ? 0.7 : 0.5);
     return {
       d: roundedRectPath(cx, cy, half * 0.98, {
         tl: isolatedCorner(neighbors.top, neighbors.left) ? r : 0,
@@ -104,7 +105,7 @@ function dotPath(
     };
   }
 
-  const r = half * (shape === 'classy-rounded' ? 0.65 : 0.4);
+  const r = half * (shape === "classy-rounded" ? 0.65 : 0.4);
   return {
     d: roundedRectPath(cx, cy, half * 0.98, {
       tl: isolatedCorner(neighbors.top, neighbors.left) ? r : 0,
@@ -123,45 +124,41 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     dotsOptions,
     cornersSquareOptions,
     cornersDotOptions,
-    dotColor = '#000',
+    dotColor = "#000",
     eyeColor,
-    backgroundColor = 'transparent',
+    backgroundColor = "transparent",
     logo,
     logoSize,
     logoPadding = 2,
-    logoShape = 'circle',
-    logoBackgroundColor = 'transparent',
+    logoShape = "circle",
+    logoBackgroundColor = "transparent",
     onLogoSizeClamped,
     quietZone = 4,
     borderRadius = 25,
-    className = '',
+    className = "",
     style = {},
   },
-  ref
+  ref,
 ) {
   const resolvedDotColor = dotsOptions?.color ?? dotColor;
-  const resolvedDotShape: QRDotShape = dotsOptions?.style ?? 'square';
+  const resolvedDotShape: QRDotShape = dotsOptions?.style ?? "square";
   const resolvedCornerSquareColor = cornersSquareOptions?.color ?? eyeColor ?? resolvedDotColor;
-  const resolvedCornerSquareShape: QRCornerSquareShape = cornersSquareOptions?.style ?? 'square';
+  const resolvedCornerSquareShape: QRCornerSquareShape = cornersSquareOptions?.style ?? "square";
   const resolvedCornerDotColor = cornersDotOptions?.color ?? resolvedCornerSquareColor;
-  const resolvedCornerDotShape: QRCornerDotShape = cornersDotOptions?.style ?? 'square';
+  const resolvedCornerDotShape: QRCornerDotShape = cornersDotOptions?.style ?? "square";
   const resolvedCornerOuterSize = cornersSquareOptions?.outerSize ?? 3.5;
   const resolvedCornerInnerSize = cornersSquareOptions?.innerSize ?? 2.5;
   const resolvedCornerDotSize = cornersDotOptions?.dotSize ?? 1.5;
 
   const isStylized =
-    resolvedDotShape !== 'square' ||
-    resolvedCornerSquareShape !== 'square' ||
-    resolvedCornerDotShape !== 'square';
+    resolvedDotShape !== "square" ||
+    resolvedCornerSquareShape !== "square" ||
+    resolvedCornerDotShape !== "square";
 
-  const resolvedLevel: ErrorCorrectionLevel =
-    errorCorrectionLevel ?? (isStylized ? 'Q' : 'M');
+  const resolvedLevel: ErrorCorrectionLevel = errorCorrectionLevel ?? (isStylized ? "Q" : "M");
 
   const requestedLogoSize = logoSize ?? size * 0.2;
-  const clipIdSuffix = useMemo(
-    () => Math.random().toString(36).slice(2, 9),
-    []
-  );
+  const clipIdSuffix = useMemo(() => Math.random().toString(36).slice(2, 9), []);
 
   const result = useMemo(() => {
     if (!value) return null;
@@ -180,9 +177,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   const cellSize = size / dimension;
 
   const isEyeModule = (r: number, c: number): boolean =>
-    (r < 7 && c < 7) ||
-    (r < 7 && c >= matrixSize - 7) ||
-    (r >= matrixSize - 7 && c < 7);
+    (r < 7 && c < 7) || (r < 7 && c >= matrixSize - 7) || (r >= matrixSize - 7 && c < 7);
 
   const MAX_SAFE_LOGO_AREA_RATIO: Record<ErrorCorrectionLevel, number> = {
     L: 0.06,
@@ -196,16 +191,13 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   if (logo) {
     const requestedRadiusPx = requestedLogoSize / 2 + logoPadding;
     const requestedRadiusModules = requestedRadiusPx / cellSize;
-    const requestedAreaRatio =
-      (Math.PI * requestedRadiusModules ** 2) / (matrixSize * matrixSize);
+    const requestedAreaRatio = (Math.PI * requestedRadiusModules ** 2) / (matrixSize * matrixSize);
 
     let clearRadiusModules = requestedRadiusModules;
 
     const maxAreaRatio = MAX_SAFE_LOGO_AREA_RATIO[resolvedLevel];
     if (requestedAreaRatio > maxAreaRatio) {
-      clearRadiusModules = Math.sqrt(
-        (maxAreaRatio * matrixSize * matrixSize) / Math.PI
-      );
+      clearRadiusModules = Math.sqrt((maxAreaRatio * matrixSize * matrixSize) / Math.PI);
     }
 
     const maxRadiusByBorder = Math.max(matrixSize / 2 - 8, 0);
@@ -227,7 +219,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     const dx = c + 0.5 - centerModule;
     const dy = r + 0.5 - centerModule;
     const radiusModules = logoClearRadiusPx / cellSize;
-    if (logoShape === 'circle' || logoShape === 'none') {
+    if (logoShape === "circle" || logoShape === "none") {
       return Math.sqrt(dx * dx + dy * dy) < radiusModules;
     }
     const half = radiusModules;
@@ -259,7 +251,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
               cy={cy}
               r={cellSize * 0.46}
               fill={resolvedDotColor}
-            />
+            />,
           );
         } else if (shape.d) {
           elements.push(<path key={`${r}-${c}`} d={shape.d} fill={resolvedDotColor} />);
@@ -275,7 +267,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     const strokeMid = (outerHalf + innerHalf) / 2;
     const strokeWidth = outerHalf - innerHalf;
 
-    if (resolvedCornerSquareShape === 'dot') {
+    if (resolvedCornerSquareShape === "dot") {
       return (
         <circle
           key={key}
@@ -288,42 +280,35 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
         />
       );
     }
-    if (resolvedCornerSquareShape === 'square') {
+    if (resolvedCornerSquareShape === "square") {
       const d = `${roundedRectPath(cx, cy, outerHalf, {
         tl: 0,
         tr: 0,
         br: 0,
         bl: 0,
       })}${roundedRectPath(cx, cy, innerHalf, { tl: 0, tr: 0, br: 0, bl: 0 })}`;
-      return (
-        <path key={key} d={d} fill={resolvedCornerSquareColor} fillRule="evenodd" />
-      );
+      return <path key={key} d={d} fill={resolvedCornerSquareColor} fillRule="evenodd" />;
     }
-    const radius =
-      resolvedCornerSquareShape === 'classy' ? outerHalf * 0.35 : outerHalf * 0.3;
+    const radius = resolvedCornerSquareShape === "classy" ? outerHalf * 0.35 : outerHalf * 0.3;
     const outerRadii =
-      resolvedCornerSquareShape === 'classy'
+      resolvedCornerSquareShape === "classy"
         ? { tl: radius, tr: 0, br: radius, bl: 0 }
         : { tl: radius, tr: radius, br: radius, bl: radius };
     const d = `${roundedRectPath(
       cx,
       cy,
       outerHalf,
-      outerRadii
+      outerRadii,
     )}${roundedRectPath(cx, cy, innerHalf, outerRadii)}`;
-    return (
-      <path key={key} d={d} fill={resolvedCornerSquareColor} fillRule="evenodd" />
-    );
+    return <path key={key} d={d} fill={resolvedCornerSquareColor} fillRule="evenodd" />;
   };
 
   const renderCornerDot = (cx: number, cy: number, key: string) => {
     const half = cellSize * resolvedCornerDotSize;
-    if (resolvedCornerDotShape === 'dot') {
-      return (
-        <circle key={key} cx={cx} cy={cy} r={half} fill={resolvedCornerDotColor} />
-      );
+    if (resolvedCornerDotShape === "dot") {
+      return <circle key={key} cx={cx} cy={cy} r={half} fill={resolvedCornerDotColor} />;
     }
-    const radius = resolvedCornerDotShape === 'rounded' ? half * 0.4 : 0;
+    const radius = resolvedCornerDotShape === "rounded" ? half * 0.4 : 0;
     return (
       <path
         key={key}
@@ -360,25 +345,18 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     if (!logo || logoClearRadiusPx <= 0) return null;
 
     const center = size / 2;
-    const backdropColor = logoBackgroundColor ?? 'transparent';
+    const backdropColor = logoBackgroundColor ?? "transparent";
     const imageHalf = effectiveLogoImageSize / 2;
     const imageX = center - imageHalf;
     const imageY = center - imageHalf;
 
     let backdrop: React.ReactElement | null = null;
-    if (backdropColor !== 'transparent') {
-      if (logoShape === 'circle') {
-        backdrop = (
-          <circle
-            cx={center}
-            cy={center}
-            r={imageHalf}
-            fill={backdropColor}
-          />
-        );
-      } else if (logoShape === 'square' || logoShape === 'rounded') {
+    if (backdropColor !== "transparent") {
+      if (logoShape === "circle") {
+        backdrop = <circle cx={center} cy={center} r={imageHalf} fill={backdropColor} />;
+      } else if (logoShape === "square" || logoShape === "rounded") {
         const radii =
-          logoShape === 'rounded'
+          logoShape === "rounded"
             ? {
                 tl: imageHalf * 0.25,
                 tr: imageHalf * 0.25,
@@ -387,10 +365,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
               }
             : { tl: 0, tr: 0, br: 0, bl: 0 };
         backdrop = (
-          <path
-            d={roundedRectPath(center, center, imageHalf, radii)}
-            fill={backdropColor}
-          />
+          <path d={roundedRectPath(center, center, imageHalf, radii)} fill={backdropColor} />
         );
       }
     }
@@ -398,7 +373,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
     let clipDef: React.ReactElement | null = null;
     let clipUrl: string | undefined;
 
-    if (logoShape === 'circle') {
+    if (logoShape === "circle") {
       const id = `qr-logo-circle-${clipIdSuffix}`;
       clipDef = (
         <clipPath id={id} clipPathUnits="userSpaceOnUse">
@@ -406,7 +381,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
         </clipPath>
       );
       clipUrl = `url(#${id})`;
-    } else if (logoShape === 'rounded') {
+    } else if (logoShape === "rounded") {
       const id = `qr-logo-rounded-${clipIdSuffix}`;
       const r = imageHalf * 0.25;
       clipDef = (
@@ -422,7 +397,7 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
         </clipPath>
       );
       clipUrl = `url(#${id})`;
-    } else if (logoShape === 'square') {
+    } else if (logoShape === "square") {
       const id = `qr-logo-square-${clipIdSuffix}`;
       clipDef = (
         <clipPath id={id} clipPathUnits="userSpaceOnUse">
@@ -463,11 +438,11 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
       className={className}
       style={{
         borderRadius: `${borderRadius}px`,
-        overflow: borderRadius ? 'hidden' : undefined,
+        overflow: borderRadius ? "hidden" : undefined,
         ...style,
       }}
     >
-      {backgroundColor !== 'transparent' && (
+      {backgroundColor !== "transparent" && (
         <rect x={0} y={0} width={size} height={size} fill={backgroundColor} />
       )}
       {renderDots()}
@@ -477,10 +452,10 @@ export const QRCode = React.forwardRef<SVGSVGElement, QRCodeProps>(function QRCo
   );
 });
 
-QRCode.displayName = 'QRCode';
+QRCode.displayName = "QRCode";
 
 export interface DownloadQRCodeOptions {
-  format?: 'svg' | 'png';
+  format?: "svg" | "png";
   fileName?: string;
   scale?: number;
   pngBackgroundColor?: string;
@@ -488,7 +463,7 @@ export interface DownloadQRCodeOptions {
 
 function triggerBlobDownload(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
   link.download = fileName;
   link.click();
@@ -500,25 +475,25 @@ function rasterizeSvgToPngBlob(
   widthPx: number,
   heightPx: number,
   scale: number,
-  backgroundColor: string
+  backgroundColor: string,
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
     const svgUrl = URL.createObjectURL(svgBlob);
     const image = new Image();
 
     image.onload = () => {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       canvas.width = Math.max(1, Math.round(widthPx * scale));
       canvas.height = Math.max(1, Math.round(heightPx * scale));
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       URL.revokeObjectURL(svgUrl);
 
       if (!ctx) {
         reject(
           new Error(
-            '[@core-ease/telegram-kit] Canvas 2D context is not available in this environment.'
-          )
+            "[@core-ease/telegram-kit] Canvas 2D context is not available in this environment.",
+          ),
         );
         return;
       }
@@ -533,21 +508,19 @@ function rasterizeSvgToPngBlob(
         } else {
           reject(
             new Error(
-              '[@core-ease/telegram-kit] Failed to export PNG. If you set a `logo`, this usually means it is a ' +
-                'cross-origin image without CORS headers, which taints the canvas. Use a same-origin ' +
-                'image, an image served with CORS enabled, or a data URI logo instead.'
-            )
+              "[@core-ease/telegram-kit] Failed to export PNG. If you set a `logo`, this usually means it is a " +
+                "cross-origin image without CORS headers, which taints the canvas. Use a same-origin " +
+                "image, an image served with CORS enabled, or a data URI logo instead.",
+            ),
           );
         }
-      }, 'image/png');
+      }, "image/png");
     };
 
     image.onerror = () => {
       URL.revokeObjectURL(svgUrl);
       reject(
-        new Error(
-          '[@core-ease/telegram-kit] Failed to rasterize the QR code SVG for PNG export.'
-        )
+        new Error("[@core-ease/telegram-kit] Failed to rasterize the QR code SVG for PNG export."),
       );
     };
 
@@ -557,43 +530,36 @@ function rasterizeSvgToPngBlob(
 
 export async function downloadQRCode(
   svgElement: SVGSVGElement | null | undefined,
-  options: DownloadQRCodeOptions = {}
+  options: DownloadQRCodeOptions = {},
 ): Promise<void> {
   const {
-    format = 'svg',
-    fileName = 'qrcode',
+    format = "svg",
+    fileName = "qrcode",
     scale = 2,
-    pngBackgroundColor = '#ffffff',
+    pngBackgroundColor = "#ffffff",
   } = options;
 
   if (!svgElement) {
     throw new Error(
-      '[@core-ease/telegram-kit] downloadQRCode: no <svg> element was provided (is the ref attached yet?).'
+      "[@core-ease/telegram-kit] downloadQRCode: no <svg> element was provided (is the ref attached yet?).",
     );
   }
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     throw new Error(
-      '[@core-ease/telegram-kit] downloadQRCode can only run in a browser environment.'
+      "[@core-ease/telegram-kit] downloadQRCode can only run in a browser environment.",
     );
   }
 
   const svgString = new XMLSerializer().serializeToString(svgElement);
 
-  if (format === 'svg') {
-    const blob = new Blob([svgString], { type: 'image/svg+xml' });
+  if (format === "svg") {
+    const blob = new Blob([svgString], { type: "image/svg+xml" });
     triggerBlobDownload(blob, `${fileName}.svg`);
     return;
   }
 
   const width = svgElement.width.baseVal.value || svgElement.clientWidth || 512;
-  const height =
-    svgElement.height.baseVal.value || svgElement.clientHeight || 512;
-  const pngBlob = await rasterizeSvgToPngBlob(
-    svgString,
-    width,
-    height,
-    scale,
-    pngBackgroundColor
-  );
+  const height = svgElement.height.baseVal.value || svgElement.clientHeight || 512;
+  const pngBlob = await rasterizeSvgToPngBlob(svgString, width, height, scale, pngBackgroundColor);
   triggerBlobDownload(pngBlob, `${fileName}.png`);
 }

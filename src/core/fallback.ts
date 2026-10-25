@@ -1,25 +1,24 @@
+import type { LocationData } from "../types/webapp";
 
-import type { LocationData } from '../types/webapp';
-
-const DEV_MODE_STORAGE_KEY = '@core-ease/telegram-kit:dev-mode-active';
+const DEV_MODE_STORAGE_KEY = "@core-ease/telegram-kit:dev-mode-active";
 
 export function markDevModeActive(): void {
   try {
-    if (typeof window !== 'undefined') window.sessionStorage.setItem(DEV_MODE_STORAGE_KEY, '1');
-  } catch {
-
-  }
+    if (typeof window !== "undefined") window.sessionStorage.setItem(DEV_MODE_STORAGE_KEY, "1");
+  } catch {}
 }
 
 export function isDevModeActive(): boolean {
   try {
-    return typeof window !== 'undefined' && window.sessionStorage.getItem(DEV_MODE_STORAGE_KEY) === '1';
+    return (
+      typeof window !== "undefined" && window.sessionStorage.getItem(DEV_MODE_STORAGE_KEY) === "1"
+    );
   } catch {
     return false;
   }
 }
 
-const STORAGE_PREFIX = '@core-ease/telegram-kit:fallback:';
+const STORAGE_PREFIX = "@core-ease/telegram-kit:fallback:";
 
 export interface FallbackKeyValueStore {
   setItem(key: string, value: string): Promise<boolean>;
@@ -33,7 +32,7 @@ export interface FallbackKeyValueStore {
 
 export function createLocalStorageFallback(namespace: string): FallbackKeyValueStore {
   const prefix = `${STORAGE_PREFIX}${namespace}:`;
-  const hasLocalStorage = () => typeof window !== 'undefined' && !!window.localStorage;
+  const hasLocalStorage = () => typeof window !== "undefined" && !!window.localStorage;
 
   return {
     async setItem(key, value) {
@@ -61,9 +60,7 @@ export function createLocalStorageFallback(namespace: string): FallbackKeyValueS
         try {
           const value = window.localStorage.getItem(prefix + key);
           if (value !== null) result[key] = value;
-        } catch {
-
-        }
+        } catch {}
       }
       return result;
     },
@@ -125,22 +122,20 @@ const HAPTIC_PATTERNS = {
 
 export function vibrateFallback(kind: keyof typeof HAPTIC_PATTERNS): void {
   try {
-    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
       navigator.vibrate(HAPTIC_PATTERNS[kind] as number | number[]);
     }
-  } catch {
-
-  }
+  } catch {}
 }
 
 export function downloadFileFallback(url: string, fileName: string): boolean {
   try {
-    if (typeof document === 'undefined') return false;
-    const a = document.createElement('a');
+    if (typeof document === "undefined") return false;
+    const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
-    a.rel = 'noopener';
-    a.target = '_blank';
+    a.rel = "noopener";
+    a.target = "_blank";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -152,7 +147,7 @@ export function downloadFileFallback(url: string, fileName: string): boolean {
 
 export function getLocationFallback(): Promise<LocationData | null> {
   return new Promise((resolve) => {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
       resolve(null);
       return;
     }
@@ -171,50 +166,48 @@ export function getLocationFallback(): Promise<LocationData | null> {
         });
       },
       () => resolve(null),
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 },
     );
   });
 }
 
 export async function readClipboardFallback(): Promise<string | null> {
   try {
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.readText) {
       const text = await navigator.clipboard.readText();
       return text ?? null;
     }
-  } catch {
-
-  }
+  } catch {}
   return null;
 }
 
 export function scanQrFallback(promptText?: string): string | null {
-  if (typeof window === 'undefined' || typeof window.prompt !== 'function') return null;
-  const value = window.prompt(promptText || 'Enter the QR code value:');
+  if (typeof window === "undefined" || typeof window.prompt !== "function") return null;
+  const value = window.prompt(promptText || "Enter the QR code value:");
   return value && value.length ? value : null;
 }
 
 export async function shareTextFallback(text: string, url?: string): Promise<boolean> {
   try {
-    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
       await navigator.share({ text, url });
       return true;
     }
-  } catch {
-
-  }
+  } catch {}
   try {
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(url ? `${text}\n${url}` : text);
       return true;
     }
-  } catch {
-
-  }
+  } catch {}
   return false;
 }
 
-export function withTimeoutFallback<T>(factory: () => Promise<T>, fallback: T, timeoutMs = 4000): Promise<T> {
+export function withTimeoutFallback<T>(
+  factory: () => Promise<T>,
+  fallback: T,
+  timeoutMs = 4000,
+): Promise<T> {
   return new Promise((resolve) => {
     let settled = false;
     const timer = setTimeout(() => {
@@ -239,7 +232,7 @@ export function withTimeoutFallback<T>(factory: () => Promise<T>, fallback: T, t
             clearTimeout(timer);
             resolve(fallback);
           }
-        }
+        },
       );
     } catch {
       if (!settled) {
@@ -278,7 +271,7 @@ export function callNativeOrFallback<T>(options: {
     try {
       native().then(
         (value) => finish(false, value),
-        () => finish(true)
+        () => finish(true),
       );
     } catch {
       finish(true);
@@ -288,23 +281,22 @@ export function callNativeOrFallback<T>(options: {
 
 export async function orientationLockFallback(locked: boolean): Promise<boolean> {
   try {
-    const orientation = typeof screen !== 'undefined' ? (screen as any).orientation : undefined;
+    const orientation = typeof screen !== "undefined" ? (screen as any).orientation : undefined;
     if (!orientation) return false;
     if (locked) {
-      await orientation.lock('portrait');
-    } else if (typeof orientation.unlock === 'function') {
+      await orientation.lock("portrait");
+    } else if (typeof orientation.unlock === "function") {
       orientation.unlock();
     }
     return true;
   } catch {
-
     return false;
   }
 }
 
 export async function fullscreenFallback(enter: boolean, el?: HTMLElement): Promise<boolean> {
   try {
-    if (typeof document === 'undefined') return false;
+    if (typeof document === "undefined") return false;
     if (enter) {
       const target = el ?? document.documentElement;
       await target.requestFullscreen?.();
@@ -320,7 +312,5 @@ export async function fullscreenFallback(enter: boolean, el?: HTMLElement): Prom
 export function safeInvoke(fn: () => void): void {
   try {
     fn();
-  } catch {
-
-  }
+  } catch {}
 }

@@ -1,6 +1,6 @@
-import { encodeQrMatrix } from './encoder';
-import type { QrEncodeOptions, QrEncodeResult } from './types';
-import type { ErrorCorrectionLevel } from './tables';
+import { encodeQrMatrix } from "./encoder";
+import type { QrEncodeOptions, QrEncodeResult } from "./types";
+import type { ErrorCorrectionLevel } from "./tables";
 
 export type { QrEncodeOptions, QrEncodeResult, ErrorCorrectionLevel };
 
@@ -16,12 +16,18 @@ export interface QrSvgOptions extends QrEncodeOptions {
 }
 
 export function qrCodeToSVG(text: string, options: QrSvgOptions = {}): string {
-  const { size = 512, color = '#000000', background = '#ffffff', quietZone = 4, ...encodeOptions } = options;
+  const {
+    size = 512,
+    color = "#000000",
+    background = "#ffffff",
+    quietZone = 4,
+    ...encodeOptions
+  } = options;
   const { modules } = encodeQrMatrix(text, encodeOptions);
   const dimension = modules.length + quietZone * 2;
   const cell = size / dimension;
 
-  let path = '';
+  let path = "";
   for (let y = 0; y < modules.length; y++) {
     for (let x = 0; x < modules.length; x++) {
       if (!modules[y][x]) continue;

@@ -17,7 +17,7 @@ import type {
   PaidMediaPurchased,
   Poll,
   BusinessMessagesDeleted,
-} from '../../types/bot';
+} from "../../types/bot";
 
 export type MessageFilter = (message: Message) => boolean | Promise<boolean>;
 export type UpdateHandler = (update: Update) => void | Promise<void>;
@@ -95,11 +95,11 @@ export class Dispatcher {
   private botUsername: string | undefined;
 
   constructor(private readonly options: DispatcherOptions = {}) {
-    this.botUsername = options.botUsername?.replace(/^@/, '');
+    this.botUsername = options.botUsername?.replace(/^@/, "");
   }
 
   setBotUsername(username: string): this {
-    this.botUsername = username.replace(/^@/, '');
+    this.botUsername = username.replace(/^@/, "");
     return this;
   }
 
@@ -110,8 +110,8 @@ export class Dispatcher {
 
   onCommand(command: string, handler: (message: Message) => void | Promise<void>): this {
     const commandFilter: MessageFilter = (msg) => {
-      const text = msg.text?.trim() ?? '';
-      const cmd = text.split(' ')[0];
+      const text = msg.text?.trim() ?? "";
+      const cmd = text.split(" ")[0];
       if (cmd === `/${command}`) return true;
       if (this.botUsername && cmd === `/${command}@${this.botUsername}`) return true;
       return false;
@@ -120,7 +120,10 @@ export class Dispatcher {
     return this;
   }
 
-  onEditedMessage(handler: (message: Message) => void | Promise<void>, filter?: MessageFilter): this {
+  onEditedMessage(
+    handler: (message: Message) => void | Promise<void>,
+    filter?: MessageFilter,
+  ): this {
     this.editedMessageHandlers.push({ handler, filter });
     return this;
   }
@@ -132,7 +135,7 @@ export class Dispatcher {
 
   onEditedChannelPost(
     handler: (message: Message) => void | Promise<void>,
-    filter?: MessageFilter
+    filter?: MessageFilter,
   ): this {
     this.editedChannelPostHandlers.push({ handler, filter });
     return this;
@@ -140,7 +143,7 @@ export class Dispatcher {
 
   onBusinessMessage(
     handler: (message: Message) => void | Promise<void>,
-    filter?: MessageFilter
+    filter?: MessageFilter,
   ): this {
     this.businessMessageHandlers.push({ handler, filter });
     return this;
@@ -148,14 +151,14 @@ export class Dispatcher {
 
   onEditedBusinessMessage(
     handler: (message: Message) => void | Promise<void>,
-    filter?: MessageFilter
+    filter?: MessageFilter,
   ): this {
     this.editedBusinessMessageHandlers.push({ handler, filter });
     return this;
   }
 
   onDeletedBusinessMessages(
-    handler: (event: BusinessMessagesDeleted) => void | Promise<void>
+    handler: (event: BusinessMessagesDeleted) => void | Promise<void>,
   ): this {
     this.deletedBusinessMessagesHandlers.push({ handler });
     return this;
@@ -168,7 +171,7 @@ export class Dispatcher {
 
   onCallbackQuery(
     handler: (query: CallbackQuery) => void | Promise<void>,
-    pattern?: string | RegExp
+    pattern?: string | RegExp,
   ): this {
     this.callbackQueryHandlers.push({ handler, pattern });
     return this;
@@ -239,7 +242,9 @@ export class Dispatcher {
     return this;
   }
 
-  onMessageReactionCount(handler: (reaction: MessageReactionCountUpdated) => void | Promise<void>): this {
+  onMessageReactionCount(
+    handler: (reaction: MessageReactionCountUpdated) => void | Promise<void>,
+  ): this {
     this.messageReactionCountHandlers.push({ handler });
     return this;
   }
@@ -259,7 +264,7 @@ export class Dispatcher {
       } else if (update.edited_business_message) {
         await this._runMessageHandlers(
           update.edited_business_message,
-          this.editedBusinessMessageHandlers
+          this.editedBusinessMessageHandlers,
         );
       } else if (update.deleted_business_messages) {
         for (const { handler } of this.deletedBusinessMessagesHandlers) {
@@ -334,10 +339,7 @@ export class Dispatcher {
     }
   }
 
-  private async _runMessageHandlers(
-    message: Message,
-    handlers: MessageHandler[]
-  ): Promise<void> {
+  private async _runMessageHandlers(message: Message, handlers: MessageHandler[]): Promise<void> {
     for (const { handler, filter } of handlers) {
       if (filter) {
         const passes = await Promise.resolve(filter(message));
@@ -350,9 +352,8 @@ export class Dispatcher {
   private async _runCallbackQueryHandlers(query: CallbackQuery): Promise<void> {
     for (const { handler, pattern } of this.callbackQueryHandlers) {
       if (pattern !== undefined) {
-        const data = query.data ?? '';
-        const matches =
-          typeof pattern === 'string' ? data === pattern : pattern.test(data);
+        const data = query.data ?? "";
+        const matches = typeof pattern === "string" ? data === pattern : pattern.test(data);
         if (!matches) continue;
       }
       await handler(query);

@@ -1,4 +1,3 @@
-
 export type AnyRecord = Record<string, any>;
 
 export type VoidCallback = (...args: any[]) => void;
@@ -43,7 +42,7 @@ export interface DefaultColors {
   header_dark_color?: string;
 }
 
-export type ColorScheme = 'light' | 'dark';
+export type ColorScheme = "light" | "dark";
 
 export interface SafeAreaInset {
   top: number;
@@ -87,7 +86,7 @@ export interface WebAppChat extends AnyRecord {
   photo_url?: string;
 }
 
-export type BottomButtonPosition = 'left' | 'right' | 'top' | 'bottom';
+export type BottomButtonPosition = "left" | "right" | "top" | "bottom";
 
 export interface BottomButtonParams {
   is_visible?: boolean;
@@ -101,7 +100,7 @@ export interface BottomButtonParams {
   position?: BottomButtonPosition;
 }
 
-export type PopupButtonType = 'default' | 'ok' | 'close' | 'cancel' | 'destructive';
+export type PopupButtonType = "default" | "ok" | "close" | "cancel" | "destructive";
 
 export interface PopupButton {
   id?: string | number;
@@ -132,12 +131,12 @@ export interface CloseOptions {
   return_back?: boolean;
 }
 
-export type HapticImpactStyle = 'light' | 'medium' | 'heavy' | 'rigid' | 'soft';
-export type HapticNotificationType = 'error' | 'success' | 'warning';
+export type HapticImpactStyle = "light" | "medium" | "heavy" | "rigid" | "soft";
+export type HapticNotificationType = "error" | "success" | "warning";
 
-export type HomeScreenStatus = 'unsupported' | 'unknown' | 'added' | 'missed';
+export type HomeScreenStatus = "unsupported" | "unknown" | "added" | "missed";
 
-export type BiometricType = 'unknown' | 'finger' | 'face';
+export type BiometricType = "unknown" | "finger" | "face";
 
 export interface BiometricRequestAccessParams {
   reason?: string;

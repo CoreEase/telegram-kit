@@ -62,6 +62,11 @@
       "import": "./dist/gram-diamond/index.mjs",
       "require": "./dist/gram-diamond/index.js"
     },
+    "./premium-star": {
+      "types": "./dist/premium-star/index.d.ts",
+      "import": "./dist/premium-star/index.mjs",
+      "require": "./dist/premium-star/index.js"
+    },
     "./tgs": {
       "types": "./dist/tgs/index.d.ts",
       "import": "./dist/tgs/index.mjs",
@@ -101,7 +106,9 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [
     "telegram",
@@ -162,6 +169,7 @@
     "@types/node": "^24.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "prettier": "^3.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "tsup": "^8.5.1",

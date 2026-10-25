@@ -1,4 +1,4 @@
-import { BitBuffer } from './bitBuffer';
+import { BitBuffer } from "./bitBuffer";
 
 export const QR_MODE = {
   NUMERIC: 0b0001,
@@ -8,7 +8,7 @@ export const QR_MODE = {
 
 export type QrMode = (typeof QR_MODE)[keyof typeof QR_MODE];
 
-const ALPHANUMERIC_CHARSET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:';
+const ALPHANUMERIC_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
 function isNumeric(text: string): boolean {
   return /^[0-9]*$/.test(text);

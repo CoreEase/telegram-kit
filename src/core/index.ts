@@ -1,5 +1,4 @@
-
-import { bootstrapTelegramWebApp, type WebApp } from '../sdk';
+import { bootstrapTelegramWebApp, type WebApp } from "../sdk";
 import type {
   TgUser,
   DownloadFileParams,
@@ -7,7 +6,7 @@ import type {
   StoryShareParams,
   LocationData,
   PopupParams,
-} from '../types/webapp';
+} from "../types/webapp";
 import {
   callNativeOrFallback,
   createLocalStorageFallback,
@@ -21,14 +20,14 @@ import {
   shareTextFallback,
   vibrateFallback,
   safeInvoke,
-} from './fallback';
+} from "./fallback";
 
-export { safeInvoke } from './fallback';
+export { safeInvoke } from "./fallback";
 
 let cachedWebApp: WebApp | null = null;
 
 export function getWebApp(): WebApp | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   if (!cachedWebApp) {
     cachedWebApp = bootstrapTelegramWebApp().webApp;
   }
@@ -56,8 +55,8 @@ export function getRawUserData(): TgUser | null {
 }
 
 export function getUserDisplayName(user?: TgUser): string {
-  if (!user) return 'User';
-  const fullName = `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim();
+  if (!user) return "User";
+  const fullName = `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim();
   if (fullName) return fullName;
   if (user.username) return `@${user.username}`;
   return `User_${user.id}`;
@@ -66,26 +65,26 @@ export function getUserDisplayName(user?: TgUser): string {
 export function getUserIdentifier(user?: TgUser): string {
   if (user?.username) return user.username;
   if (user?.id) return String(user.id);
-  return 'unknown';
+  return "unknown";
 }
 
 export function getUserAvatarUrl(
   user?: TgUser,
-  fallback = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNjY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNDAiIGZpbGw9IndoaXRlIj4/PC90ZXh0Pjwvc3ZnPg=='
+  fallback = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNjY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iNDAiIGZpbGw9IndoaXRlIj4/PC90ZXh0Pjwvc3ZnPg==",
 ): string {
   if (user?.photo_url) return user.photo_url;
 
   if (user?.id) {
     const name =
-      `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() ||
+      `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() ||
       user.username ||
       `user_${user.id}`;
 
     const initials = name
       .split(/\s+/)
       .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? '')
-      .join('');
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("");
 
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
@@ -105,10 +104,7 @@ export function getUserAvatarUrl(
       </svg>
     `;
 
-    const base64 =
-      typeof Buffer !== 'undefined'
-        ? Buffer.from(svg).toString('base64')
-        : btoa(svg);
+    const base64 = typeof Buffer !== "undefined" ? Buffer.from(svg).toString("base64") : btoa(svg);
 
     return `data:image/svg+xml;base64,${base64}`;
   }
@@ -129,7 +125,7 @@ export function getUserInfoWithAvatar() {
 export function openExternalLink(url: string, tryInstantView = false): void {
   const wa = getWebApp();
   if (!wa) {
-    if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener");
     return;
   }
   wa.openLink(url, { try_instant_view: tryInstantView });
@@ -138,27 +134,28 @@ export function openExternalLink(url: string, tryInstantView = false): void {
 export function openTelegramLink(url: string): void {
   const wa = getWebApp();
   if (!wa) {
-    if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener");
     return;
   }
   wa.openTelegramLink(url);
 }
 
-export function openInvoice(url: string): Promise<'paid' | 'cancelled' | 'failed' | 'pending'> {
+export function openInvoice(url: string): Promise<"paid" | "cancelled" | "failed" | "pending"> {
   return callNativeOrFallback({
-    ready: nativeReady('6.1'),
-    native: () => new Promise((resolve) => getWebApp()!.openInvoice(url, (status) => resolve(status as any))),
+    ready: nativeReady("6.1"),
+    native: () =>
+      new Promise((resolve) => getWebApp()!.openInvoice(url, (status) => resolve(status as any))),
     fallback: () => {
-      throw new Error('openInvoice requires the Telegram app (Bot API 6.1+).');
+      throw new Error("openInvoice requires the Telegram app (Bot API 6.1+).");
     },
   });
 }
 
 export function switchInlineQuery(
   query: string,
-  chooseChatTypes?: Array<'users' | 'bots' | 'groups' | 'channels'>
+  chooseChatTypes?: Array<"users" | "bots" | "groups" | "channels">,
 ): void {
-  if (!nativeReady('6.6')) return;
+  if (!nativeReady("6.6")) return;
   safeInvoke(() => getWebApp()!.switchInlineQuery(query, chooseChatTypes));
 }
 
@@ -168,14 +165,15 @@ export function hideKeyboard(): void {
 
 export function getTheme() {
   const wa = getWebApp();
-  return { colorScheme: wa?.colorScheme ?? 'dark', themeParams: wa?.themeParams ?? {} };
+  return { colorScheme: wa?.colorScheme ?? "dark", themeParams: wa?.themeParams ?? {} };
 }
 
 export function getViewport() {
   const wa = getWebApp();
   return {
-    height: wa?.viewportHeight ?? (typeof window !== 'undefined' ? window.innerHeight : 0),
-    stableHeight: wa?.viewportStableHeight ?? (typeof window !== 'undefined' ? window.innerHeight : 0),
+    height: wa?.viewportHeight ?? (typeof window !== "undefined" ? window.innerHeight : 0),
+    stableHeight:
+      wa?.viewportStableHeight ?? (typeof window !== "undefined" ? window.innerHeight : 0),
     isExpanded: wa?.isExpanded ?? true,
   };
 }
@@ -194,14 +192,14 @@ export function close(): void {
 
 export const fullscreen = {
   enter: (): Promise<boolean> => {
-    if (nativeReady('8.0')) {
+    if (nativeReady("8.0")) {
       safeInvoke(() => getWebApp()!.requestFullscreen());
       return Promise.resolve(true);
     }
     return fullscreenFallback(true);
   },
   exit: (): Promise<boolean> => {
-    if (nativeReady('8.0')) {
+    if (nativeReady("8.0")) {
       safeInvoke(() => getWebApp()!.exitFullscreen());
       return Promise.resolve(true);
     }
@@ -211,14 +209,14 @@ export const fullscreen = {
 
 export const orientation = {
   lock: (): Promise<boolean> => {
-    if (nativeReady('8.0')) {
+    if (nativeReady("8.0")) {
       safeInvoke(() => getWebApp()!.lockOrientation());
       return Promise.resolve(true);
     }
     return orientationLockFallback(true);
   },
   unlock: (): Promise<boolean> => {
-    if (nativeReady('8.0')) {
+    if (nativeReady("8.0")) {
       safeInvoke(() => getWebApp()!.unlockOrientation());
       return Promise.resolve(true);
     }
@@ -255,74 +253,130 @@ export function setBottomBarColor(color: string): void {
 }
 
 export function addToHomeScreen(): void {
-  if (!nativeReady('8.0')) return;
+  if (!nativeReady("8.0")) return;
   safeInvoke(() => getWebApp()!.addToHomeScreen());
 }
 
-export function checkHomeScreenStatus(): Promise<'unsupported' | 'unknown' | 'added' | 'missed'> {
+export function checkHomeScreenStatus(): Promise<"unsupported" | "unknown" | "added" | "missed"> {
   return callNativeOrFallback({
-    ready: nativeReady('8.0'),
-    native: () => new Promise((resolve) => getWebApp()!.checkHomeScreenStatus((status) => resolve(status))),
-    fallback: () => 'unsupported' as const,
+    ready: nativeReady("8.0"),
+    native: () =>
+      new Promise((resolve) => getWebApp()!.checkHomeScreenStatus((status) => resolve(status))),
+    fallback: () => "unsupported" as const,
   });
 }
 
 export const haptic = {
-  light: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.impactOccurred('light') : vibrateFallback('light')),
-  medium: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.impactOccurred('medium') : vibrateFallback('medium')),
-  heavy: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.impactOccurred('heavy') : vibrateFallback('heavy')),
-  rigid: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.impactOccurred('rigid') : vibrateFallback('rigid')),
-  soft: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.impactOccurred('soft') : vibrateFallback('soft')),
-  success: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.notificationOccurred('success') : vibrateFallback('success')),
-  warning: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.notificationOccurred('warning') : vibrateFallback('warning')),
-  error: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.notificationOccurred('error') : vibrateFallback('error')),
-  selection: () => (nativeReady('6.1') ? getWebApp()!.HapticFeedback.selectionChanged() : vibrateFallback('selection')),
+  light: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.impactOccurred("light")
+      : vibrateFallback("light"),
+  medium: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.impactOccurred("medium")
+      : vibrateFallback("medium"),
+  heavy: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.impactOccurred("heavy")
+      : vibrateFallback("heavy"),
+  rigid: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.impactOccurred("rigid")
+      : vibrateFallback("rigid"),
+  soft: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.impactOccurred("soft")
+      : vibrateFallback("soft"),
+  success: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.notificationOccurred("success")
+      : vibrateFallback("success"),
+  warning: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.notificationOccurred("warning")
+      : vibrateFallback("warning"),
+  error: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.notificationOccurred("error")
+      : vibrateFallback("error"),
+  selection: () =>
+    nativeReady("6.1")
+      ? getWebApp()!.HapticFeedback.selectionChanged()
+      : vibrateFallback("selection"),
 };
 
-const cloudStorageFallback = createLocalStorageFallback('cloud');
-const deviceStorageFallback = createLocalStorageFallback('device');
-const secureStorageFallback = createLocalStorageFallback('secure');
+const cloudStorageFallback = createLocalStorageFallback("cloud");
+const deviceStorageFallback = createLocalStorageFallback("device");
+const secureStorageFallback = createLocalStorageFallback("secure");
 
 export const cloudStorage = {
   setItem: (key: string, value: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('6.9'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.CloudStorage.setItem(key, value, (e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("6.9"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.CloudStorage.setItem(key, value, (e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => cloudStorageFallback.setItem(key, value),
     }),
 
   getItem: (key: string): Promise<string | undefined> =>
     callNativeOrFallback({
-      ready: nativeReady('6.9'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.CloudStorage.getItem(key, (e, v) => (e ? reject(new Error(e)) : resolve(v)))),
+      ready: nativeReady("6.9"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.CloudStorage.getItem(key, (e, v) => (e ? reject(new Error(e)) : resolve(v))),
+        ),
       fallback: () => cloudStorageFallback.getItem(key),
     }),
 
   getItems: (keys: string[]): Promise<Record<string, string>> =>
     callNativeOrFallback({
-      ready: nativeReady('6.9'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.CloudStorage.getItems(keys, (e, v) => (e ? reject(new Error(e)) : resolve(v ?? {})))),
+      ready: nativeReady("6.9"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.CloudStorage.getItems(keys, (e, v) =>
+            e ? reject(new Error(e)) : resolve(v ?? {}),
+          ),
+        ),
       fallback: () => cloudStorageFallback.getItems(keys),
     }),
 
   removeItem: (key: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('6.9'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.CloudStorage.removeItem(key, (e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("6.9"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.CloudStorage.removeItem(key, (e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => cloudStorageFallback.removeItem(key),
     }),
 
   removeItems: (keys: string[]): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('6.9'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.CloudStorage.removeItems(keys, (e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("6.9"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.CloudStorage.removeItems(keys, (e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => cloudStorageFallback.removeItems(keys),
     }),
 
   getKeys: (): Promise<string[]> =>
     callNativeOrFallback({
-      ready: nativeReady('6.9'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.CloudStorage.getKeys((e, keys) => (e ? reject(new Error(e)) : resolve(keys ?? [])))),
+      ready: nativeReady("6.9"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.CloudStorage.getKeys((e, keys) =>
+            e ? reject(new Error(e)) : resolve(keys ?? []),
+          ),
+        ),
       fallback: () => cloudStorageFallback.getKeys(),
     }),
 };
@@ -330,29 +384,49 @@ export const cloudStorage = {
 export const deviceStorage = {
   setItem: (key: string, value: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.DeviceStorage.setItem(key, value, (e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.DeviceStorage.setItem(key, value, (e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => deviceStorageFallback.setItem(key, value),
     }),
 
   getItem: (key: string): Promise<string | undefined> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.DeviceStorage.getItem(key, (e, v) => (e ? reject(new Error(e)) : resolve(v)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.DeviceStorage.getItem(key, (e, v) =>
+            e ? reject(new Error(e)) : resolve(v),
+          ),
+        ),
       fallback: () => deviceStorageFallback.getItem(key),
     }),
 
   removeItem: (key: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.DeviceStorage.removeItem(key, (e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.DeviceStorage.removeItem(key, (e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => deviceStorageFallback.removeItem(key),
     }),
 
   clear: (): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.DeviceStorage.clear((e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.DeviceStorage.clear((e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => deviceStorageFallback.clear(),
     }),
 };
@@ -360,39 +434,64 @@ export const deviceStorage = {
 export const secureStorage = {
   setItem: (key: string, value: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.SecureStorage.setItem(key, value, (e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.SecureStorage.setItem(key, value, (e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => secureStorageFallback.setItem(key, value),
     }),
 
   getItem: (key: string): Promise<{ value: string | null | undefined; canRestore: boolean }> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
+      ready: nativeReady("9.0"),
       native: () =>
         new Promise((resolve, reject) =>
-          getWebApp()!.SecureStorage.getItem(key, (e, v, canRestore) => (e ? reject(new Error(e)) : resolve({ value: v, canRestore: canRestore ?? false })))
+          getWebApp()!.SecureStorage.getItem(key, (e, v, canRestore) =>
+            e ? reject(new Error(e)) : resolve({ value: v, canRestore: canRestore ?? false }),
+          ),
         ),
-      fallback: async () => ({ value: await secureStorageFallback.getItem(key), canRestore: false }),
+      fallback: async () => ({
+        value: await secureStorageFallback.getItem(key),
+        canRestore: false,
+      }),
     }),
 
   removeItem: (key: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.SecureStorage.removeItem(key, (e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.SecureStorage.removeItem(key, (e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => secureStorageFallback.removeItem(key),
     }),
 
   clear: (): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.SecureStorage.clear((e, ok) => (e ? reject(new Error(e)) : resolve(ok ?? false)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.SecureStorage.clear((e, ok) =>
+            e ? reject(new Error(e)) : resolve(ok ?? false),
+          ),
+        ),
       fallback: () => secureStorageFallback.clear(),
     }),
 
   restoreItem: (key: string): Promise<string | undefined> =>
     callNativeOrFallback({
-      ready: nativeReady('9.0'),
-      native: () => new Promise((resolve, reject) => getWebApp()!.SecureStorage.restoreItem(key, (e, v) => (e ? reject(new Error(e)) : resolve(v)))),
+      ready: nativeReady("9.0"),
+      native: () =>
+        new Promise((resolve, reject) =>
+          getWebApp()!.SecureStorage.restoreItem(key, (e, v) =>
+            e ? reject(new Error(e)) : resolve(v),
+          ),
+        ),
       fallback: () => secureStorageFallback.getItem(key),
     }),
 };
@@ -400,53 +499,57 @@ export const secureStorage = {
 export const dialog = {
   alert: (message: string): Promise<void> =>
     callNativeOrFallback({
-      ready: nativeReady('6.2'),
+      ready: nativeReady("6.2"),
       native: () => new Promise((resolve) => getWebApp()!.showAlert(message, resolve)),
       fallback: () => {
-        if (typeof window !== 'undefined') window.alert(message);
+        if (typeof window !== "undefined") window.alert(message);
       },
     }),
 
   confirm: (message: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('6.2'),
+      ready: nativeReady("6.2"),
       native: () => new Promise((resolve) => getWebApp()!.showConfirm(message, resolve)),
-      fallback: () => typeof window !== 'undefined' && window.confirm(message),
+      fallback: () => typeof window !== "undefined" && window.confirm(message),
     }),
 
   popup: (params: PopupParams): Promise<string | null> =>
     callNativeOrFallback({
-      ready: nativeReady('6.2'),
-      native: () => new Promise((resolve) => getWebApp()!.showPopup(params, (buttonId) => resolve(buttonId ?? null))),
+      ready: nativeReady("6.2"),
+      native: () =>
+        new Promise((resolve) =>
+          getWebApp()!.showPopup(params, (buttonId) => resolve(buttonId ?? null)),
+        ),
       fallback: () => {
-        if (typeof window === 'undefined') return null;
+        if (typeof window === "undefined") return null;
 
-        const okButton = params.buttons?.find((b) => b.type === 'ok' || b.type === 'default');
+        const okButton = params.buttons?.find((b) => b.type === "ok" || b.type === "default");
         const okButtonId = okButton?.id != null ? String(okButton.id) : null;
         if (params.buttons && params.buttons.length > 1) {
-          const ok = window.confirm(`${params.title ? params.title + '\n' : ''}${params.message}`);
-          return ok ? okButtonId ?? 'ok' : null;
+          const ok = window.confirm(`${params.title ? params.title + "\n" : ""}${params.message}`);
+          return ok ? (okButtonId ?? "ok") : null;
         }
-        window.alert(`${params.title ? params.title + '\n' : ''}${params.message}`);
+        window.alert(`${params.title ? params.title + "\n" : ""}${params.message}`);
         return okButtonId;
       },
     }),
 
-  prompt: (message: string, defaultValue = ''): Promise<string | null> =>
-    Promise.resolve(typeof window === 'undefined' ? null : window.prompt(message, defaultValue)),
+  prompt: (message: string, defaultValue = ""): Promise<string | null> =>
+    Promise.resolve(typeof window === "undefined" ? null : window.prompt(message, defaultValue)),
 };
 
 export function readClipboard(): Promise<string | null> {
   return callNativeOrFallback({
-    ready: nativeReady('6.4'),
-    native: () => new Promise((resolve) => getWebApp()!.readTextFromClipboard((text) => resolve(text ?? null))),
+    ready: nativeReady("6.4"),
+    native: () =>
+      new Promise((resolve) => getWebApp()!.readTextFromClipboard((text) => resolve(text ?? null))),
     fallback: () => readClipboardFallback(),
   });
 }
 
 export function scanQr(text?: string): Promise<string | null> {
   return callNativeOrFallback({
-    ready: nativeReady('6.4'),
+    ready: nativeReady("6.4"),
     native: () =>
       new Promise((resolve) => {
         const wa = getWebApp()!;
@@ -461,13 +564,13 @@ export function scanQr(text?: string): Promise<string | null> {
 }
 
 export function shareToStory(mediaUrl: string, params?: StoryShareParams): void {
-  if (!nativeReady('7.8')) return;
+  if (!nativeReady("7.8")) return;
   safeInvoke(() => getWebApp()!.shareToStory(mediaUrl, params));
 }
 
 export function shareMessage(msgId: string): Promise<boolean> {
   return callNativeOrFallback({
-    ready: nativeReady('8.0'),
+    ready: nativeReady("8.0"),
     native: () => new Promise((resolve) => getWebApp()!.shareMessage(msgId, resolve)),
     fallback: () => shareTextFallback(msgId),
   });
@@ -475,23 +578,27 @@ export function shareMessage(msgId: string): Promise<boolean> {
 
 export function downloadFile(params: DownloadFileParams): Promise<boolean> {
   return callNativeOrFallback({
-    ready: nativeReady('8.0'),
+    ready: nativeReady("8.0"),
     native: () => new Promise((resolve) => getWebApp()!.downloadFile(params, resolve)),
     fallback: () => downloadFileFallback(params.url, params.file_name),
   });
 }
 
-export function setEmojiStatus(customEmojiId: string, params?: EmojiStatusParams): Promise<boolean> {
+export function setEmojiStatus(
+  customEmojiId: string,
+  params?: EmojiStatusParams,
+): Promise<boolean> {
   return callNativeOrFallback({
-    ready: nativeReady('8.0'),
-    native: () => new Promise((resolve) => getWebApp()!.setEmojiStatus(customEmojiId, params, resolve)),
+    ready: nativeReady("8.0"),
+    native: () =>
+      new Promise((resolve) => getWebApp()!.setEmojiStatus(customEmojiId, params, resolve)),
     fallback: () => false,
   });
 }
 
 export function requestEmojiStatusAccess(): Promise<boolean> {
   return callNativeOrFallback({
-    ready: nativeReady('8.0'),
+    ready: nativeReady("8.0"),
     native: () => new Promise((resolve) => getWebApp()!.requestEmojiStatusAccess(resolve)),
     fallback: () => false,
   });
@@ -499,7 +606,7 @@ export function requestEmojiStatusAccess(): Promise<boolean> {
 
 export function requestWriteAccess(): Promise<boolean> {
   return callNativeOrFallback({
-    ready: nativeReady('6.9'),
+    ready: nativeReady("6.9"),
     native: () => new Promise((resolve) => getWebApp()!.requestWriteAccess(resolve)),
     fallback: () => false,
   });
@@ -507,7 +614,7 @@ export function requestWriteAccess(): Promise<boolean> {
 
 export function requestContact(): Promise<boolean> {
   return callNativeOrFallback({
-    ready: nativeReady('6.9'),
+    ready: nativeReady("6.9"),
     native: () => new Promise((resolve) => getWebApp()!.requestContact(resolve)),
     fallback: () => false,
   });
@@ -515,7 +622,7 @@ export function requestContact(): Promise<boolean> {
 
 export function requestChat(reqId: string): Promise<boolean> {
   return callNativeOrFallback({
-    ready: nativeReady('9.6'),
+    ready: nativeReady("9.6"),
     native: () => new Promise((resolve) => getWebApp()!.requestChat(reqId, resolve)),
     fallback: () => false,
   });
@@ -523,10 +630,15 @@ export function requestChat(reqId: string): Promise<boolean> {
 
 export function invokeCustomMethod(method: string, params: object = {}): Promise<unknown> {
   return callNativeOrFallback({
-    ready: nativeReady('6.9'),
-    native: () => new Promise((resolve, reject) => getWebApp()!.invokeCustomMethod(method, params, (e, r) => (e ? reject(new Error(e)) : resolve(r)))),
+    ready: nativeReady("6.9"),
+    native: () =>
+      new Promise((resolve, reject) =>
+        getWebApp()!.invokeCustomMethod(method, params, (e, r) =>
+          e ? reject(new Error(e)) : resolve(r),
+        ),
+      ),
     fallback: () => {
-      throw new Error('invokeCustomMethod requires the Telegram app (Bot API 6.9+).');
+      throw new Error("invokeCustomMethod requires the Telegram app (Bot API 6.9+).");
     },
   });
 }
@@ -534,37 +646,45 @@ export function invokeCustomMethod(method: string, params: object = {}): Promise
 export const biometric = {
   init: (): Promise<void> =>
     callNativeOrFallback({
-      ready: nativeReady('7.2'),
+      ready: nativeReady("7.2"),
       native: () => new Promise<void>((resolve) => getWebApp()!.BiometricManager.init(resolve)),
       fallback: () => undefined,
     }),
 
   requestAccess: (reason?: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('7.2'),
-      native: () => new Promise<boolean>((resolve) => getWebApp()!.BiometricManager.requestAccess({ reason }, resolve)),
+      ready: nativeReady("7.2"),
+      native: () =>
+        new Promise<boolean>((resolve) =>
+          getWebApp()!.BiometricManager.requestAccess({ reason }, resolve),
+        ),
       fallback: () => false,
     }),
 
   authenticate: (reason?: string): Promise<{ authenticated: boolean; token?: string }> =>
     callNativeOrFallback({
-      ready: nativeReady('7.2'),
+      ready: nativeReady("7.2"),
       native: () =>
         new Promise<{ authenticated: boolean; token?: string }>((resolve) =>
-          getWebApp()!.BiometricManager.authenticate({ reason }, (authenticated, token) => resolve({ authenticated, token: token ?? undefined }))
+          getWebApp()!.BiometricManager.authenticate({ reason }, (authenticated, token) =>
+            resolve({ authenticated, token: token ?? undefined }),
+          ),
         ),
       fallback: () => ({ authenticated: false }),
     }),
 
   updateBiometricToken: (token: string): Promise<boolean> =>
     callNativeOrFallback({
-      ready: nativeReady('7.2'),
-      native: () => new Promise<boolean>((resolve) => getWebApp()!.BiometricManager.updateBiometricToken(token, resolve)),
+      ready: nativeReady("7.2"),
+      native: () =>
+        new Promise<boolean>((resolve) =>
+          getWebApp()!.BiometricManager.updateBiometricToken(token, resolve),
+        ),
       fallback: () => false,
     }),
 
   openSettings: (): void => {
-    if (!nativeReady('7.2')) return;
+    if (!nativeReady("7.2")) return;
     safeInvoke(() => getWebApp()!.BiometricManager.openSettings());
   },
 };
@@ -572,20 +692,24 @@ export const biometric = {
 export const location = {
   init: (): Promise<void> =>
     callNativeOrFallback({
-      ready: nativeReady('8.0'),
-      native: () => new Promise<void>((resolve) => getWebApp()!.LocationManager.init(() => resolve())),
+      ready: nativeReady("8.0"),
+      native: () =>
+        new Promise<void>((resolve) => getWebApp()!.LocationManager.init(() => resolve())),
       fallback: () => undefined,
     }),
 
   getLocation: (): Promise<LocationData | null> =>
     callNativeOrFallback({
-      ready: nativeReady('8.0'),
-      native: () => new Promise<LocationData | null>((resolve) => getWebApp()!.LocationManager.getLocation((data) => resolve(data))),
+      ready: nativeReady("8.0"),
+      native: () =>
+        new Promise<LocationData | null>((resolve) =>
+          getWebApp()!.LocationManager.getLocation((data) => resolve(data)),
+        ),
       fallback: () => getLocationFallback(),
     }),
 
   openSettings: (): void => {
-    if (!nativeReady('8.0')) return;
+    if (!nativeReady("8.0")) return;
     safeInvoke(() => getWebApp()!.LocationManager.openSettings());
   },
 };

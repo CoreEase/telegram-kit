@@ -1,4 +1,4 @@
-import type { ErrorCorrectionLevel } from './tables';
+import type { ErrorCorrectionLevel } from "./tables";
 
 export interface QrEncodeOptions {
   errorCorrectionLevel?: ErrorCorrectionLevel;

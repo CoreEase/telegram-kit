@@ -1,4 +1,4 @@
-export { QRCode, downloadQRCode } from '../_internal/qr/QrCode';
+export { QRCode, downloadQRCode } from "../_internal/qr/QrCode";
 export type {
   QRCodeProps,
   DownloadQRCodeOptions,
@@ -9,10 +9,15 @@ export type {
   QRDotsOptions,
   QRCornersSquareOptions,
   QRCornersDotOptions,
-} from '../_internal/qr/QrCode';
+} from "../_internal/qr/QrCode";
 
-export { encodeQRCode, qrCodeToSVG } from '../_internal/qr/Qr';
-export type { QrEncodeOptions, QrEncodeResult, ErrorCorrectionLevel, QrSvgOptions } from '../_internal/qr/Qr';
+export { encodeQRCode, qrCodeToSVG } from "../_internal/qr/Qr";
+export type {
+  QrEncodeOptions,
+  QrEncodeResult,
+  ErrorCorrectionLevel,
+  QrSvgOptions,
+} from "../_internal/qr/Qr";
 
-export { generateStyledQRSVG } from '../_internal/qr/generateStyledQR';
-export type { GenerateStyledQROptions } from '../_internal/qr/generateStyledQR';
+export { generateStyledQRSVG } from "../_internal/qr/generateStyledQR";
+export type { GenerateStyledQROptions } from "../_internal/qr/generateStyledQR";

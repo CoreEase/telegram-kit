@@ -1,24 +1,25 @@
-import type { RuntimeMode, TgUser } from '../../types/webapp';
+import type { RuntimeMode, TgUser } from "../../types/webapp";
 
-type NodeCrypto = typeof import('node:crypto');
+type NodeCrypto = typeof import("node:crypto");
 let _nodeCryptoPromise: Promise<NodeCrypto> | null = null;
 async function getNodeCrypto(): Promise<NodeCrypto> {
   if (!_nodeCryptoPromise) {
-    _nodeCryptoPromise = import('node:crypto');
+    _nodeCryptoPromise = import("node:crypto");
   }
   return _nodeCryptoPromise;
 }
 
 function getNodeCryptoSync(): NodeCrypto {
-  return require('node:crypto') as NodeCrypto;
+  return require("node:crypto") as NodeCrypto;
 }
 
 function detectRuntime(): RuntimeMode {
   const hasNodeProcess =
-    typeof process !== 'undefined' && typeof process.versions?.node === 'string';
-  const hasWebCrypto = typeof crypto !== 'undefined' && typeof crypto.subtle?.importKey === 'function';
-  if (!hasNodeProcess && hasWebCrypto) return 'edge';
-  return 'node';
+    typeof process !== "undefined" && typeof process.versions?.node === "string";
+  const hasWebCrypto =
+    typeof crypto !== "undefined" && typeof crypto.subtle?.importKey === "function";
+  if (!hasNodeProcess && hasWebCrypto) return "edge";
+  return "node";
 }
 
 export interface ValidateInitDataOptions {
@@ -34,7 +35,7 @@ export interface ValidateInitDataOptions {
 
 export interface ValidateInitDataResult<TUser = TgUser> {
   valid: boolean;
-  reason?: 'invalid_hash' | 'expired' | 'missing_hash' | 'malformed';
+  reason?: "invalid_hash" | "expired" | "missing_hash" | "malformed";
   data?: Record<string, string>;
   authDate?: number;
   user?: TUser;
@@ -54,22 +55,18 @@ interface ParsedInitData {
 }
 
 function normalizeInitData(initData: string): string {
-  if (initData.includes('hash=')) {
+  if (initData.includes("hash=")) {
     return initData;
   }
 
-  if (!initData.includes('%26hash%3D')) {
+  if (!initData.includes("%26hash%3D")) {
     return initData;
   }
 
   try {
     const decoded = decodeURIComponent(initData);
 
-    if (
-      decoded.includes('user=') &&
-      decoded.includes('auth_date=') &&
-      decoded.includes('hash=')
-    ) {
+    if (decoded.includes("user=") && decoded.includes("auth_date=") && decoded.includes("hash=")) {
       return decoded;
     }
   } catch {}
@@ -80,13 +77,13 @@ function normalizeInitData(initData: string): string {
 function parseInitData(initData: string): ParsedInitData {
   const params = new URLSearchParams(initData);
 
-  const hash = params.get('hash');
-  const authDate = params.get('auth_date');
-  const startParam = params.get('start_param');
-  const chatType = params.get('chat_type');
-  const chatInstance = params.get('chat_instance');
+  const hash = params.get("hash");
+  const authDate = params.get("auth_date");
+  const startParam = params.get("start_param");
+  const chatType = params.get("chat_type");
+  const chatInstance = params.get("chat_instance");
 
-  params.delete('hash');
+  params.delete("hash");
 
   const data: Record<string, string> = {};
   for (const [k, v] of params.entries()) {
@@ -100,7 +97,7 @@ function buildDataCheckString(data: Record<string, string>): string {
   return Object.keys(data)
     .sort()
     .map((k) => `${k}=${data[k]}`)
-    .join('\n');
+    .join("\n");
 }
 
 function hexToUint8Array(hex: string): Uint8Array {
@@ -121,26 +118,30 @@ function timingSafeEqualBytes(a: Uint8Array, b: Uint8Array): boolean {
   return diff === 0;
 }
 
-async function verifyEdge(dataCheckString: string, botToken: string, hash: string): Promise<boolean> {
+async function verifyEdge(
+  dataCheckString: string,
+  botToken: string,
+  hash: string,
+): Promise<boolean> {
   const enc = new TextEncoder();
 
   const key = await crypto.subtle.importKey(
-    'raw',
-    enc.encode('WebAppData'),
-    { name: 'HMAC', hash: 'SHA-256' },
+    "raw",
+    enc.encode("WebAppData"),
+    { name: "HMAC", hash: "SHA-256" },
     false,
-    ['sign']
+    ["sign"],
   );
-  const secret = await crypto.subtle.sign('HMAC', key, enc.encode(botToken));
+  const secret = await crypto.subtle.sign("HMAC", key, enc.encode(botToken));
 
   const hmacKey = await crypto.subtle.importKey(
-    'raw',
+    "raw",
     secret,
-    { name: 'HMAC', hash: 'SHA-256' },
+    { name: "HMAC", hash: "SHA-256" },
     false,
-    ['sign']
+    ["sign"],
   );
-  const signature = await crypto.subtle.sign('HMAC', hmacKey, enc.encode(dataCheckString));
+  const signature = await crypto.subtle.sign("HMAC", hmacKey, enc.encode(dataCheckString));
 
   const computedBytes = new Uint8Array(signature);
   const hashBytes = hexToUint8Array(hash);
@@ -148,20 +149,24 @@ async function verifyEdge(dataCheckString: string, botToken: string, hash: strin
   return timingSafeEqualBytes(computedBytes, hashBytes);
 }
 
-async function verifyNode(dataCheckString: string, botToken: string, hash: string): Promise<boolean> {
+async function verifyNode(
+  dataCheckString: string,
+  botToken: string,
+  hash: string,
+): Promise<boolean> {
   const { createHmac, timingSafeEqual } = await getNodeCrypto();
-  const secretKey = createHmac('sha256', 'WebAppData').update(botToken).digest();
-  const computed = createHmac('sha256', secretKey).update(dataCheckString).digest();
-  const hashBuffer = Buffer.from(hash, 'hex');
+  const secretKey = createHmac("sha256", "WebAppData").update(botToken).digest();
+  const computed = createHmac("sha256", secretKey).update(dataCheckString).digest();
+  const hashBuffer = Buffer.from(hash, "hex");
   if (hashBuffer.length !== computed.length) return false;
   return timingSafeEqual(hashBuffer, computed);
 }
 
 function verifyNodeSync(dataCheckString: string, botToken: string, hash: string): boolean {
   const { createHmac, timingSafeEqual } = getNodeCryptoSync();
-  const secretKey = createHmac('sha256', 'WebAppData').update(botToken).digest();
-  const computed = createHmac('sha256', secretKey).update(dataCheckString).digest();
-  const hashBuffer = Buffer.from(hash, 'hex');
+  const secretKey = createHmac("sha256", "WebAppData").update(botToken).digest();
+  const computed = createHmac("sha256", secretKey).update(dataCheckString).digest();
+  const hashBuffer = Buffer.from(hash, "hex");
   if (hashBuffer.length !== computed.length) return false;
   return timingSafeEqual(hashBuffer, computed);
 }
@@ -169,7 +174,7 @@ function verifyNodeSync(dataCheckString: string, botToken: string, hash: string)
 export async function validateInitData<TUser = TgUser>(
   initData: string,
   botToken: string,
-  options: ValidateInitDataOptions = {}
+  options: ValidateInitDataOptions = {},
 ): Promise<ValidateInitDataResult<TUser>> {
   const {
     maxAgeSeconds = 86400,
@@ -182,9 +187,9 @@ export async function validateInitData<TUser = TgUser>(
     parseUnsafeData = false,
   } = options;
 
-  if (!initData || typeof initData !== 'string') {
-    if (strict) throw new Error('malformed initData');
-    return { valid: false, reason: 'malformed' };
+  if (!initData || typeof initData !== "string") {
+    if (strict) throw new Error("malformed initData");
+    return { valid: false, reason: "malformed" };
   }
 
   let parsed: ParsedInitData;
@@ -192,40 +197,40 @@ export async function validateInitData<TUser = TgUser>(
     initData = normalizeInitData(initData);
     parsed = parseInitData(initData);
   } catch {
-    if (strict) throw new Error('malformed initData');
-    return { valid: false, reason: 'malformed' };
+    if (strict) throw new Error("malformed initData");
+    return { valid: false, reason: "malformed" };
   }
 
   const { data, hash, authDate: authDateStr } = parsed;
 
   if (!hash) {
-    if (strict) throw new Error('missing_hash');
-    return { valid: false, reason: 'missing_hash' };
+    if (strict) throw new Error("missing_hash");
+    return { valid: false, reason: "missing_hash" };
   }
 
   const dataCheckString = buildDataCheckString(data);
 
   const isValid =
-    runtime === 'edge'
+    runtime === "edge"
       ? await verifyEdge(dataCheckString, botToken, hash)
       : await verifyNode(dataCheckString, botToken, hash);
 
   if (!isValid) {
-    if (strict) throw new Error('invalid_hash');
-    return { valid: false, reason: 'invalid_hash' };
+    if (strict) throw new Error("invalid_hash");
+    return { valid: false, reason: "invalid_hash" };
   }
 
   const authDate = authDateStr ? Number(authDateStr) : 0;
 
   if (!skipAuthDateCheck) {
     if (!authDate || Number.isNaN(authDate)) {
-      if (strict) throw new Error('malformed auth_date');
-      return { valid: false, reason: 'malformed' };
+      if (strict) throw new Error("malformed auth_date");
+      return { valid: false, reason: "malformed" };
     }
     const now = Math.floor(Date.now() / 1000);
     if (now - authDate > maxAgeSeconds) {
-      if (strict) throw new Error('expired');
-      return { valid: false, reason: 'expired', authDate };
+      if (strict) throw new Error("expired");
+      return { valid: false, reason: "expired", authDate };
     }
   }
 
@@ -234,13 +239,13 @@ export async function validateInitData<TUser = TgUser>(
     try {
       parsedUser = JSON.parse(data.user);
     } catch {
-      if (strict) throw new Error('invalid_user_json');
+      if (strict) throw new Error("invalid_user_json");
     }
   }
 
-  const startParam = extractStartParam ? data.start_param ?? null : undefined;
-  const chatType = extractChat ? data.chat_type ?? null : undefined;
-  const chatInstance = extractChat ? data.chat_instance ?? null : undefined;
+  const startParam = extractStartParam ? (data.start_param ?? null) : undefined;
+  const chatType = extractChat ? (data.chat_type ?? null) : undefined;
+  const chatInstance = extractChat ? (data.chat_instance ?? null) : undefined;
 
   return {
     valid: true,
@@ -257,7 +262,7 @@ export async function validateInitData<TUser = TgUser>(
 export function validateInitDataSync<TUser = TgUser>(
   initData: string,
   botToken: string,
-  options: ValidateInitDataOptions = {}
+  options: ValidateInitDataOptions = {},
 ): ValidateInitDataResult<TUser> {
   const {
     maxAgeSeconds = 86400,
@@ -269,9 +274,9 @@ export function validateInitDataSync<TUser = TgUser>(
     parseUnsafeData = false,
   } = options;
 
-  if (!initData || typeof initData !== 'string') {
-    if (strict) throw new Error('malformed initData');
-    return { valid: false, reason: 'malformed' };
+  if (!initData || typeof initData !== "string") {
+    if (strict) throw new Error("malformed initData");
+    return { valid: false, reason: "malformed" };
   }
 
   let parsed: ParsedInitData;
@@ -279,36 +284,36 @@ export function validateInitDataSync<TUser = TgUser>(
     initData = normalizeInitData(initData);
     parsed = parseInitData(initData);
   } catch {
-    if (strict) throw new Error('malformed initData');
-    return { valid: false, reason: 'malformed' };
+    if (strict) throw new Error("malformed initData");
+    return { valid: false, reason: "malformed" };
   }
 
   const { data, hash, authDate: authDateStr } = parsed;
 
   if (!hash) {
-    if (strict) throw new Error('missing_hash');
-    return { valid: false, reason: 'missing_hash' };
+    if (strict) throw new Error("missing_hash");
+    return { valid: false, reason: "missing_hash" };
   }
 
   const dataCheckString = buildDataCheckString(data);
   const isValid = verifyNodeSync(dataCheckString, botToken, hash);
 
   if (!isValid) {
-    if (strict) throw new Error('invalid_hash');
-    return { valid: false, reason: 'invalid_hash' };
+    if (strict) throw new Error("invalid_hash");
+    return { valid: false, reason: "invalid_hash" };
   }
 
   const authDate = authDateStr ? Number(authDateStr) : 0;
 
   if (!skipAuthDateCheck) {
     if (!authDate || Number.isNaN(authDate)) {
-      if (strict) throw new Error('malformed auth_date');
-      return { valid: false, reason: 'malformed' };
+      if (strict) throw new Error("malformed auth_date");
+      return { valid: false, reason: "malformed" };
     }
     const now = Math.floor(Date.now() / 1000);
     if (now - authDate > maxAgeSeconds) {
-      if (strict) throw new Error('expired');
-      return { valid: false, reason: 'expired', authDate };
+      if (strict) throw new Error("expired");
+      return { valid: false, reason: "expired", authDate };
     }
   }
 
@@ -317,13 +322,13 @@ export function validateInitDataSync<TUser = TgUser>(
     try {
       parsedUser = JSON.parse(data.user);
     } catch {
-      if (strict) throw new Error('invalid_user_json');
+      if (strict) throw new Error("invalid_user_json");
     }
   }
 
-  const startParam = extractStartParam ? data.start_param ?? null : undefined;
-  const chatType = extractChat ? data.chat_type ?? null : undefined;
-  const chatInstance = extractChat ? data.chat_instance ?? null : undefined;
+  const startParam = extractStartParam ? (data.start_param ?? null) : undefined;
+  const chatType = extractChat ? (data.chat_type ?? null) : undefined;
+  const chatInstance = extractChat ? (data.chat_instance ?? null) : undefined;
 
   return {
     valid: true,

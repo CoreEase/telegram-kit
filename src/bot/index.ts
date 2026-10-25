@@ -1,9 +1,14 @@
-export { TelegramBot, TelegramApiError } from '../_internal/bot/client';
-export type { TelegramBotOptions } from '../_internal/bot/client';
-export { Dispatcher } from '../_internal/bot/dispatcher';
-export type { DispatcherOptions, MessageFilter, MessageHandler, UpdateHandler } from '../_internal/bot/dispatcher';
-export { TelegramPoller } from '../_internal/bot/polling';
-export type { PollingOptions } from '../_internal/bot/polling';
+export { TelegramBot, TelegramApiError } from "../_internal/bot/client";
+export type { TelegramBotOptions } from "../_internal/bot/client";
+export { Dispatcher } from "../_internal/bot/dispatcher";
+export type {
+  DispatcherOptions,
+  MessageFilter,
+  MessageHandler,
+  UpdateHandler,
+} from "../_internal/bot/dispatcher";
+export { TelegramPoller } from "../_internal/bot/polling";
+export type { PollingOptions } from "../_internal/bot/polling";
 
 export type {
   User,
@@ -212,4 +217,4 @@ export type {
   TelegramApiResponse,
   ResponseParameters,
   BusinessMessagesDeleted,
-} from '../types/bot';
+} from "../types/bot";

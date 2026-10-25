@@ -1,12 +1,11 @@
+import { WebAppKernel } from "../core/kernel";
+import { parseColorToHex, strTrim } from "../core/utils";
+import { WebAppErrorName, throwWebAppError } from "../core/errors";
+import { DebugBottomBar } from "./debug-bottom-bar";
+import type { ThemeManager } from "../theme/theme-manager";
+import type { BottomButtonPosition, VoidCallback } from "../types";
 
-import { WebAppKernel } from '../core/kernel';
-import { parseColorToHex, strTrim } from '../core/utils';
-import { WebAppErrorName, throwWebAppError } from '../core/errors';
-import { DebugBottomBar } from './debug-bottom-bar';
-import type { ThemeManager } from '../theme/theme-manager';
-import type { BottomButtonPosition, VoidCallback } from '../types';
-
-export type BottomButtonType = 'main' | 'secondary';
+export type BottomButtonType = "main" | "secondary";
 
 interface ButtonParamsWire {
   is_visible: boolean;
@@ -42,7 +41,7 @@ export class BottomButton {
   private textValue: string;
   private colorValue: string | false = false;
   private textColorValue: string | false = false;
-  private positionValue: BottomButtonPosition = 'left';
+  private positionValue: BottomButtonPosition = "left";
 
   private curButtonState: string | null = null;
 
@@ -58,25 +57,25 @@ export class BottomButton {
     type: BottomButtonType,
     private readonly kernel: WebAppKernel,
     private readonly theme: ThemeManager,
-    private readonly debugBar: DebugBottomBar
+    private readonly debugBar: DebugBottomBar,
   ) {
     this.type = type;
-    this.isMain = type === 'main';
+    this.isMain = type === "main";
 
     if (this.isMain) {
-      this.setupEventName = 'web_app_setup_main_button';
-      this.nativePressEventName = 'main_button_pressed';
-      this.webViewEventName = 'mainButtonClicked';
-      this.defaultText = 'Continue';
-      this.defaultColor = () => theme.getThemeParams().button_color || '#2481cc';
-      this.defaultTextColor = () => theme.getThemeParams().button_text_color || '#ffffff';
+      this.setupEventName = "web_app_setup_main_button";
+      this.nativePressEventName = "main_button_pressed";
+      this.webViewEventName = "mainButtonClicked";
+      this.defaultText = "Continue";
+      this.defaultColor = () => theme.getThemeParams().button_color || "#2481cc";
+      this.defaultTextColor = () => theme.getThemeParams().button_text_color || "#ffffff";
     } else {
-      this.setupEventName = 'web_app_setup_secondary_button';
-      this.nativePressEventName = 'secondary_button_pressed';
-      this.webViewEventName = 'secondaryButtonClicked';
-      this.defaultText = 'Cancel';
+      this.setupEventName = "web_app_setup_secondary_button";
+      this.nativePressEventName = "secondary_button_pressed";
+      this.webViewEventName = "secondaryButtonClicked";
+      this.defaultText = "Cancel";
       this.defaultColor = () => theme.getBottomBarColor();
-      this.defaultTextColor = () => theme.getThemeParams().button_color || '#2481cc';
+      this.defaultTextColor = () => theme.getThemeParams().button_color || "#2481cc";
     }
     this.textValue = this.defaultText;
 
@@ -162,7 +161,8 @@ export class BottomButton {
       text: this.textValue,
       color: this.color,
       text_color: this.textColor,
-      has_shine_effect: this.hasShineEffectValue && this.isActiveValue && !this.isProgressVisibleValue,
+      has_shine_effect:
+        this.hasShineEffectValue && this.isActiveValue && !this.isProgressVisibleValue,
     };
     if (!this.isMain) {
       params.position = this.positionValue;
@@ -184,83 +184,88 @@ export class BottomButton {
   }
 
   setParams(params: SetBottomButtonParams): this {
-    if (typeof params.icon_custom_emoji_id !== 'undefined') {
+    if (typeof params.icon_custom_emoji_id !== "undefined") {
       let emojiId = params.icon_custom_emoji_id;
       if (emojiId === false || emojiId === null) {
-        emojiId = '';
+        emojiId = "";
       }
-      if (emojiId !== '' && !/^[0-9]{10,20}$/.test(emojiId)) {
-
-        console.error('[@core-ease/telegram-kit] Bottom button icon custom emoji is invalid', params.icon_custom_emoji_id);
+      if (emojiId !== "" && !/^[0-9]{10,20}$/.test(emojiId)) {
+        console.error(
+          "[@core-ease/telegram-kit] Bottom button icon custom emoji is invalid",
+          params.icon_custom_emoji_id,
+        );
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
       this.iconCustomEmojiIdValue = emojiId || false;
     }
-    if (typeof params.text !== 'undefined') {
+    if (typeof params.text !== "undefined") {
       const text = strTrim(params.text);
       if (!text.length && !this.iconCustomEmojiIdValue) {
-
-        console.error('[@core-ease/telegram-kit] Bottom button text is required', params.text);
+        console.error("[@core-ease/telegram-kit] Bottom button text is required", params.text);
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
       if (text.length > 64) {
-
-        console.error('[@core-ease/telegram-kit] Bottom button text is too long', text);
+        console.error("[@core-ease/telegram-kit] Bottom button text is too long", text);
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
       this.textValue = text;
     }
-    if (typeof params.color !== 'undefined') {
+    if (typeof params.color !== "undefined") {
       if (params.color === false || params.color === null) {
         this.colorValue = false;
       } else {
         const color = parseColorToHex(params.color);
         if (!color) {
-
-          console.error('[@core-ease/telegram-kit] Bottom button color format is invalid', params.color);
+          console.error(
+            "[@core-ease/telegram-kit] Bottom button color format is invalid",
+            params.color,
+          );
           throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
         }
         this.colorValue = color;
       }
     }
-    if (typeof params.text_color !== 'undefined') {
+    if (typeof params.text_color !== "undefined") {
       if (params.text_color === false || params.text_color === null) {
         this.textColorValue = false;
       } else {
         const textColor = parseColorToHex(params.text_color);
         if (!textColor) {
-
-          console.error('[@core-ease/telegram-kit] Bottom button text color format is invalid', params.text_color);
+          console.error(
+            "[@core-ease/telegram-kit] Bottom button text color format is invalid",
+            params.text_color,
+          );
           throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
         }
         this.textColorValue = textColor;
       }
     }
-    if (typeof params.is_visible !== 'undefined') {
+    if (typeof params.is_visible !== "undefined") {
       if (params.is_visible && !this.textValue.length) {
-
-        console.error('[@core-ease/telegram-kit] Bottom button text is required');
+        console.error("[@core-ease/telegram-kit] Bottom button text is required");
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
       this.isVisibleValue = !!params.is_visible;
     }
-    if (typeof params.has_shine_effect !== 'undefined') {
+    if (typeof params.has_shine_effect !== "undefined") {
       this.hasShineEffectValue = !!params.has_shine_effect;
     }
-    if (!this.isMain && typeof params.position !== 'undefined') {
+    if (!this.isMain && typeof params.position !== "undefined") {
       if (
-        params.position != 'left' &&
-        params.position != 'right' &&
-        params.position != 'top' &&
-        params.position != 'bottom'
+        params.position != "left" &&
+        params.position != "right" &&
+        params.position != "top" &&
+        params.position != "bottom"
       ) {
-
-        console.error('[@core-ease/telegram-kit] Bottom button posiition is invalid', params.position);
+        console.error(
+          "[@core-ease/telegram-kit] Bottom button posiition is invalid",
+          params.position,
+        );
         throwWebAppError(WebAppErrorName.BottomButtonParamInvalid);
       }
       this.positionValue = params.position;
     }
-    if (typeof params.is_active !== 'undefined') {
+    if (typeof params.is_active !== "undefined") {
       this.isActiveValue = !!params.is_active;
     }
     this.updateButton();

@@ -1,71 +1,68 @@
-
-import { WebAppKernel } from '../core/kernel';
-import { WebAppErrorName, throwWebAppError } from '../core/errors';
-import type { OpenLinkOptions, OpenTelegramLinkOptions } from '../types';
-import { ALLOWED_TELEGRAM_HOSTS } from '../../_internal/core/utils';
+import { WebAppKernel } from "../core/kernel";
+import { WebAppErrorName, throwWebAppError } from "../core/errors";
+import type { OpenLinkOptions, OpenTelegramLinkOptions } from "../types";
+import { ALLOWED_TELEGRAM_HOSTS } from "../../_internal/core/utils";
 
 export class LinkManager {
   constructor(private readonly kernel: WebAppKernel) {}
 
   openLink(url: string, options: OpenLinkOptions = {}): void {
-    const a = document.createElement('A') as HTMLAnchorElement;
+    const a = document.createElement("A") as HTMLAnchorElement;
     a.href = url;
-    if (a.protocol != 'http:' && a.protocol != 'https:') {
-
-      console.error('[@core-ease/telegram-kit] Url protocol is not supported', url);
+    if (a.protocol != "http:" && a.protocol != "https:") {
+      console.error("[@core-ease/telegram-kit] Url protocol is not supported", url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
     const resolvedUrl = a.href;
-    if (this.kernel.versionAtLeast('6.1')) {
+    if (this.kernel.versionAtLeast("6.1")) {
       const reqParams: Record<string, any> = { url: resolvedUrl };
-      if (this.kernel.versionAtLeast('6.4') && options.try_instant_view) {
+      if (this.kernel.versionAtLeast("6.4") && options.try_instant_view) {
         reqParams.try_instant_view = true;
       }
-      if (this.kernel.versionAtLeast('7.6') && options.try_browser) {
+      if (this.kernel.versionAtLeast("7.6") && options.try_browser) {
         reqParams.try_browser = options.try_browser;
       }
-      this.kernel.webView.postEvent('web_app_open_link', undefined, reqParams);
+      this.kernel.webView.postEvent("web_app_open_link", undefined, reqParams);
     } else {
-      window.open(resolvedUrl, '_blank');
+      window.open(resolvedUrl, "_blank");
     }
   }
 
   openTelegramLink(url: string, options: OpenTelegramLinkOptions = {}): void {
-    const a = document.createElement('A') as HTMLAnchorElement;
+    const a = document.createElement("A") as HTMLAnchorElement;
     a.href = url;
-    if (a.protocol != 'http:' && a.protocol != 'https:') {
-
-      console.error('[@core-ease/telegram-kit] Url protocol is not supported', url);
+    if (a.protocol != "http:" && a.protocol != "https:") {
+      console.error("[@core-ease/telegram-kit] Url protocol is not supported", url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
     if (!ALLOWED_TELEGRAM_HOSTS.includes(a.hostname)) {
-
-      console.error('[@core-ease/telegram-kit] Url host is not supported', url);
+      console.error("[@core-ease/telegram-kit] Url host is not supported", url);
       throwWebAppError(WebAppErrorName.TgUrlInvalid);
     }
     const pathFull = a.pathname + a.search;
-    if (this.kernel.webView.isIframe || this.kernel.versionAtLeast('6.1')) {
+    if (this.kernel.webView.isIframe || this.kernel.versionAtLeast("6.1")) {
       const reqParams: Record<string, any> = { path_full: pathFull };
       if (options.force_request) {
         reqParams.force_request = true;
       }
-      this.kernel.webView.postEvent('web_app_open_tg_link', undefined, reqParams);
+      this.kernel.webView.postEvent("web_app_open_tg_link", undefined, reqParams);
     } else {
-      location.href = 'https://telegram.me' + pathFull;
+      location.href = "https://telegram.me" + pathFull;
     }
   }
 
   handleDocumentClick = (e: MouseEvent): void => {
     if (e.metaKey || e.ctrlKey) return;
     let el = e.target as HTMLElement | null;
-    while (el && el.tagName != 'A' && el.parentNode) {
+    while (el && el.tagName != "A" && el.parentNode) {
       el = el.parentNode as HTMLElement;
     }
     if (
       el &&
-      el.tagName == 'A' &&
-      (el as HTMLAnchorElement).target != '_blank' &&
-      ((el as HTMLAnchorElement).protocol == 'http:' || (el as HTMLAnchorElement).protocol == 'https:') &&
+      el.tagName == "A" &&
+      (el as HTMLAnchorElement).target != "_blank" &&
+      ((el as HTMLAnchorElement).protocol == "http:" ||
+        (el as HTMLAnchorElement).protocol == "https:") &&
       ALLOWED_TELEGRAM_HOSTS.includes((el as HTMLAnchorElement).hostname)
     ) {
       this.openTelegramLink((el as HTMLAnchorElement).href);

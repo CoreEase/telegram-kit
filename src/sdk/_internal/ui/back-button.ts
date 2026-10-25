@@ -1,17 +1,16 @@
-
-import { WebAppKernel } from '../core/kernel';
-import type { VoidCallback } from '../types';
+import { WebAppKernel } from "../core/kernel";
+import type { VoidCallback } from "../types";
 
 export class BackButton {
   private _isVisible = false;
   private curButtonState: string | null = null;
 
   constructor(private readonly kernel: WebAppKernel) {
-    kernel.webView.onEvent('back_button_pressed', this.handleBackButtonPressed);
+    kernel.webView.onEvent("back_button_pressed", this.handleBackButtonPressed);
   }
 
   private handleBackButtonPressed = (): void => {
-    this.kernel.receiveWebViewEvent('backButtonClicked');
+    this.kernel.receiveWebViewEvent("backButtonClicked");
   };
 
   get isVisible(): boolean {
@@ -23,7 +22,7 @@ export class BackButton {
   }
 
   private checkVersion(): boolean {
-    return this.kernel.warnIfUnsupported('6.1', 'BackButton');
+    return this.kernel.warnIfUnsupported("6.1", "BackButton");
   }
 
   private buttonParams() {
@@ -37,14 +36,14 @@ export class BackButton {
       return;
     }
     this.curButtonState = state;
-    this.kernel.webView.postEvent('web_app_setup_back_button', undefined, params);
+    this.kernel.webView.postEvent("web_app_setup_back_button", undefined, params);
   }
 
   setParams(params: { is_visible?: boolean }): this {
     if (!this.checkVersion()) {
       return this;
     }
-    if (typeof params.is_visible !== 'undefined') {
+    if (typeof params.is_visible !== "undefined") {
       this._isVisible = !!params.is_visible;
     }
     this.updateButton();
@@ -53,14 +52,14 @@ export class BackButton {
 
   onClick(callback: VoidCallback): this {
     if (this.checkVersion()) {
-      this.kernel.onWebViewEvent('backButtonClicked', callback);
+      this.kernel.onWebViewEvent("backButtonClicked", callback);
     }
     return this;
   }
 
   offClick(callback: VoidCallback): this {
     if (this.checkVersion()) {
-      this.kernel.offWebViewEvent('backButtonClicked', callback);
+      this.kernel.offWebViewEvent("backButtonClicked", callback);
     }
     return this;
   }

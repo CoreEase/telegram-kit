@@ -1,10 +1,20 @@
-import { type ErrorCorrectionLevel, FORMAT_EC_BITS, getAlignmentPatternPositions, symbolSize } from './tables';
+import {
+  type ErrorCorrectionLevel,
+  FORMAT_EC_BITS,
+  getAlignmentPatternPositions,
+  symbolSize,
+} from "./tables";
 
 function createGrid(size: number): boolean[][] {
   return Array.from({ length: size }, () => new Array<boolean>(size).fill(false));
 }
 
-function drawFinderPattern(modules: boolean[][], isFunction: boolean[][], cx: number, cy: number): void {
+function drawFinderPattern(
+  modules: boolean[][],
+  isFunction: boolean[][],
+  cx: number,
+  cy: number,
+): void {
   for (let dy = -3; dy <= 3; dy++) {
     for (let dx = -3; dx <= 3; dx++) {
       const x = cx + dx;
@@ -17,7 +27,12 @@ function drawFinderPattern(modules: boolean[][], isFunction: boolean[][], cx: nu
   }
 }
 
-function drawAlignmentPattern(modules: boolean[][], isFunction: boolean[][], cx: number, cy: number): void {
+function drawAlignmentPattern(
+  modules: boolean[][],
+  isFunction: boolean[][],
+  cx: number,
+  cy: number,
+): void {
   for (let dy = -2; dy <= 2; dy++) {
     for (let dx = -2; dx <= 2; dx++) {
       const x = cx + dx;
@@ -29,7 +44,11 @@ function drawAlignmentPattern(modules: boolean[][], isFunction: boolean[][], cx:
   }
 }
 
-export function drawFunctionPatterns(modules: boolean[][], isFunction: boolean[][], version: number): void {
+export function drawFunctionPatterns(
+  modules: boolean[][],
+  isFunction: boolean[][],
+  version: number,
+): void {
   const size = modules.length;
 
   drawFinderPattern(modules, isFunction, 3, 3);
@@ -89,7 +108,11 @@ export function drawFunctionPatterns(modules: boolean[][], isFunction: boolean[]
   }
 }
 
-export function placeDataBits(modules: boolean[][], isFunction: boolean[][], dataBits: number[]): void {
+export function placeDataBits(
+  modules: boolean[][],
+  isFunction: boolean[][],
+  dataBits: number[],
+): void {
   const size = modules.length;
   let bitIndex = 0;
   let upward = true;
@@ -111,7 +134,11 @@ export function placeDataBits(modules: boolean[][], isFunction: boolean[][], dat
   }
 }
 
-export function applyMask(modules: boolean[][], isFunction: boolean[][], maskId: number): boolean[][] {
+export function applyMask(
+  modules: boolean[][],
+  isFunction: boolean[][],
+  maskId: number,
+): boolean[][] {
   const size = modules.length;
   const out = createGrid(size);
   for (let y = 0; y < size; y++) {
@@ -121,15 +148,32 @@ export function applyMask(modules: boolean[][], isFunction: boolean[][], maskId:
 
       let invert: boolean;
       switch (maskId) {
-        case 0: invert = (x + y) % 2 === 0; break;
-        case 1: invert = y % 2 === 0; break;
-        case 2: invert = x % 3 === 0; break;
-        case 3: invert = (x + y) % 3 === 0; break;
-        case 4: invert = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0; break;
-        case 5: invert = ((x * y) % 2) + ((x * y) % 3) === 0; break;
-        case 6: invert = (((x * y) % 2) + ((x * y) % 3)) % 2 === 0; break;
-        case 7: invert = (((x + y) % 2) + ((x * y) % 3)) % 2 === 0; break;
-        default: invert = false;
+        case 0:
+          invert = (x + y) % 2 === 0;
+          break;
+        case 1:
+          invert = y % 2 === 0;
+          break;
+        case 2:
+          invert = x % 3 === 0;
+          break;
+        case 3:
+          invert = (x + y) % 3 === 0;
+          break;
+        case 4:
+          invert = (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0;
+          break;
+        case 5:
+          invert = ((x * y) % 2) + ((x * y) % 3) === 0;
+          break;
+        case 6:
+          invert = (((x * y) % 2) + ((x * y) % 3)) % 2 === 0;
+          break;
+        case 7:
+          invert = (((x + y) % 2) + ((x * y) % 3)) % 2 === 0;
+          break;
+        default:
+          invert = false;
       }
       if (invert) out[y][x] = !out[y][x];
     }
@@ -137,8 +181,32 @@ export function applyMask(modules: boolean[][], isFunction: boolean[][], maskId:
   return out;
 }
 
-const FINDER_PENALTY_PATTERN_A = [true, false, true, true, true, false, true, false, false, false, false];
-const FINDER_PENALTY_PATTERN_B = [false, false, false, false, true, false, true, true, true, false, true];
+const FINDER_PENALTY_PATTERN_A = [
+  true,
+  false,
+  true,
+  true,
+  true,
+  false,
+  true,
+  false,
+  false,
+  false,
+  false,
+];
+const FINDER_PENALTY_PATTERN_B = [
+  false,
+  false,
+  false,
+  false,
+  true,
+  false,
+  true,
+  true,
+  true,
+  false,
+  true,
+];
 
 function matchesFinderPenaltyPattern(bits: boolean[]): boolean {
   const eq = (pattern: boolean[]) => pattern.every((v, i) => v === bits[i]);
@@ -222,14 +290,31 @@ function computeVersionBits(version: number): number {
   return (version << 12) | remainder;
 }
 
-export function drawFormatInfo(modules: boolean[][], level: ErrorCorrectionLevel, maskId: number): void {
+export function drawFormatInfo(
+  modules: boolean[][],
+  level: ErrorCorrectionLevel,
+  maskId: number,
+): void {
   const size = modules.length;
   const bits = computeFormatBits(level, maskId);
   const bitAt = (k: number) => ((bits >> k) & 1) === 1;
 
   const group1: Array<[number, number]> = [
-    [8, 0], [8, 1], [8, 2], [8, 3], [8, 4], [8, 5], [8, 7], [8, 8],
-    [7, 8], [5, 8], [4, 8], [3, 8], [2, 8], [1, 8], [0, 8],
+    [8, 0],
+    [8, 1],
+    [8, 2],
+    [8, 3],
+    [8, 4],
+    [8, 5],
+    [8, 7],
+    [8, 8],
+    [7, 8],
+    [5, 8],
+    [4, 8],
+    [3, 8],
+    [2, 8],
+    [1, 8],
+    [0, 8],
   ];
   for (let k = 0; k < 15; k++) {
     const [r, c] = group1[k];
@@ -237,10 +322,21 @@ export function drawFormatInfo(modules: boolean[][], level: ErrorCorrectionLevel
   }
 
   const group2: Array<[number, number]> = [
-    [size - 1, 8], [size - 2, 8], [size - 3, 8], [size - 4, 8],
-    [size - 5, 8], [size - 6, 8], [size - 7, 8],
-    [8, size - 8], [8, size - 7], [8, size - 6], [8, size - 5],
-    [8, size - 4], [8, size - 3], [8, size - 2], [8, size - 1],
+    [size - 1, 8],
+    [size - 2, 8],
+    [size - 3, 8],
+    [size - 4, 8],
+    [size - 5, 8],
+    [size - 6, 8],
+    [size - 7, 8],
+    [8, size - 8],
+    [8, size - 7],
+    [8, size - 6],
+    [8, size - 5],
+    [8, size - 4],
+    [8, size - 3],
+    [8, size - 2],
+    [8, size - 1],
   ];
   for (let k = 0; k < 15; k++) {
     const [r, c] = group2[k];

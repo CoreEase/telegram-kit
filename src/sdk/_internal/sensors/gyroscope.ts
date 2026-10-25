@@ -1,6 +1,6 @@
-import { WebAppKernel } from '../core/kernel';
-import { MotionSensorBase } from './motion-sensor-base';
-import type { MotionSensorStartParams } from '../types';
+import { WebAppKernel } from "../core/kernel";
+import { MotionSensorBase } from "./motion-sensor-base";
+import type { MotionSensorStartParams } from "../types";
 
 interface GyroscopeValues {
   x: number | null;
@@ -13,20 +13,20 @@ export class Gyroscope extends MotionSensorBase<GyroscopeValues> {
     super(
       kernel,
       {
-        started: 'gyroscope_started',
-        stopped: 'gyroscope_stopped',
-        changed: 'gyroscope_changed',
-        failed: 'gyroscope_failed',
-        webViewStarted: 'gyroscopeStarted',
-        webViewStopped: 'gyroscopeStopped',
-        webViewChanged: 'gyroscopeChanged',
-        webViewFailed: 'gyroscopeFailed',
-        startCommand: 'web_app_start_gyroscope',
-        stopCommand: 'web_app_stop_gyroscope',
-        minVersion: '8.0',
-        displayName: 'Gyroscope',
+        started: "gyroscope_started",
+        stopped: "gyroscope_stopped",
+        changed: "gyroscope_changed",
+        failed: "gyroscope_failed",
+        webViewStarted: "gyroscopeStarted",
+        webViewStopped: "gyroscopeStopped",
+        webViewChanged: "gyroscopeChanged",
+        webViewFailed: "gyroscopeFailed",
+        startCommand: "web_app_start_gyroscope",
+        stopCommand: "web_app_stop_gyroscope",
+        minVersion: "8.0",
+        displayName: "Gyroscope",
       },
-      { x: null, y: null, z: null }
+      { x: null, y: null, z: null },
     );
   }
 

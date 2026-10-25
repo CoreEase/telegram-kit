@@ -6,7 +6,7 @@ import {
   useState,
   useLayoutEffect,
   type ReactNode,
-} from 'react';
+} from "react";
 import {
   getWebApp,
   isInTelegram,
@@ -17,9 +17,9 @@ import {
   setHeaderColor,
   setBackgroundColor,
   setBottomBarColor,
-} from '../../core';
-import { isDevMode } from '../../core/dev';
-import type { TgUser, TgWebApp } from '../../types';
+} from "../../core";
+import { isDevMode } from "../../core/dev";
+import type { TgUser, TgWebApp } from "../../types";
 
 export interface TelegramContextValue {
   ready: boolean;
@@ -27,7 +27,7 @@ export interface TelegramContextValue {
   isDevBypass: boolean;
   webApp: TgWebApp | null;
   user: TgUser | null;
-  colorScheme: 'light' | 'dark';
+  colorScheme: "light" | "dark";
   startParam: string | null;
 }
 
@@ -51,7 +51,7 @@ const defaultCtx: TelegramContextValue = {
   isDevBypass: false,
   webApp: null,
   user: null,
-  colorScheme: 'dark',
+  colorScheme: "dark",
   startParam: null,
 };
 
@@ -61,12 +61,12 @@ export function useTelegram(): TelegramContextValue {
   return useContext(TelegramContext);
 }
 
-function applyColorScheme(scheme: 'light' | 'dark') {
-  if (typeof document === 'undefined') return;
-  if (scheme === 'dark') {
-    document.documentElement.classList.add('dark');
+function applyColorScheme(scheme: "light" | "dark") {
+  if (typeof document === "undefined") return;
+  if (scheme === "dark") {
+    document.documentElement.classList.add("dark");
   } else {
-    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.remove("dark");
   }
 }
 
@@ -94,8 +94,12 @@ export function TelegramProvider({
   const onUserReadyRef = useRef(onUserReady);
   const onReadyRef = useRef(onReady);
 
-  useEffect(() => { onUserReadyRef.current = onUserReady; });
-  useEffect(() => { onReadyRef.current = onReady; });
+  useEffect(() => {
+    onUserReadyRef.current = onUserReady;
+  });
+  useEffect(() => {
+    onReadyRef.current = onReady;
+  });
 
   const [isInitialized, setIsInitialized] = useState(false);
   const [ctx, setCtx] = useState<TelegramContextValue>(defaultCtx);
@@ -107,14 +111,14 @@ export function TelegramProvider({
 
     let user: TgUser | null = null;
     let startParam: string | null = null;
-    let colorScheme: 'light' | 'dark' = 'dark';
+    let colorScheme: "light" | "dark" = "dark";
 
     if (wa) {
       if (autoExpand) expand();
       if (autoDisableVerticalSwipes) disableVerticalSwipes();
       if (autoEnableClosingConfirmation) enableClosingConfirmation();
 
-      colorScheme = wa.colorScheme ?? 'dark';
+      colorScheme = wa.colorScheme ?? "dark";
       user = wa.initDataUnsafe?.user ?? null;
       startParam = wa.initDataUnsafe?.start_param ?? null;
 
@@ -151,13 +155,13 @@ export function TelegramProvider({
     if (!wa) return;
 
     const handleThemeChanged = () => {
-      const scheme = wa.colorScheme ?? 'dark';
+      const scheme = wa.colorScheme ?? "dark";
       applyColorScheme(scheme);
       setCtx((prev) => (prev.colorScheme === scheme ? prev : { ...prev, colorScheme: scheme }));
     };
 
-    wa.onEvent('themeChanged', handleThemeChanged);
-    return () => wa.offEvent('themeChanged', handleThemeChanged);
+    wa.onEvent("themeChanged", handleThemeChanged);
+    return () => wa.offEvent("themeChanged", handleThemeChanged);
   }, [ctx.webApp]);
 
   if (!isInitialized) return <>{loadingComponent}</>;
@@ -166,9 +170,5 @@ export function TelegramProvider({
     return <>{notInTelegramComponent}</>;
   }
 
-  return (
-    <TelegramContext.Provider value={ctx}>
-      {children}
-    </TelegramContext.Provider>
-  );
+  return <TelegramContext.Provider value={ctx}>{children}</TelegramContext.Provider>;
 }

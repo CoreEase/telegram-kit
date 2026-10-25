@@ -1,5 +1,4 @@
-
-import { WebAppKernel } from '../core/kernel';
+import { WebAppKernel } from "../core/kernel";
 
 export interface MotionSensorEventNames {
   started: string;
@@ -29,7 +28,7 @@ export abstract class MotionSensorBase<TValues extends Record<string, any>> {
   protected constructor(
     protected readonly kernel: WebAppKernel,
     private readonly names: MotionSensorEventNames,
-    initialValues: TValues
+    initialValues: TValues,
   ) {
     this.values = initialValues;
     kernel.webView.onEvent(names.started, this.handleStarted);
@@ -83,8 +82,10 @@ export abstract class MotionSensorBase<TValues extends Record<string, any>> {
     const params: { refresh_rate?: number } = {};
     const rate = parseInt(String(refreshRate ?? 1000));
     if (isNaN(rate) || rate < 20 || rate > 1000) {
-
-      console.warn(`[@core-ease/telegram-kit] ${this.names.displayName} refresh_rate is invalid`, rate);
+      console.warn(
+        `[@core-ease/telegram-kit] ${this.names.displayName} refresh_rate is invalid`,
+        rate,
+      );
     } else {
       params.refresh_rate = rate;
     }

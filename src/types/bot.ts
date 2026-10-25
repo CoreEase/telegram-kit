@@ -17,7 +17,7 @@ export interface User {
   supports_join_request_queries?: boolean;
 }
 
-export type ChatType = 'private' | 'group' | 'supergroup' | 'channel';
+export type ChatType = "private" | "group" | "supergroup" | "channel";
 
 export interface Chat {
   id: number;
@@ -168,25 +168,25 @@ export interface MessageId {
 
 export interface MessageEntity {
   type:
-    | 'mention'
-    | 'hashtag'
-    | 'cashtag'
-    | 'bot_command'
-    | 'url'
-    | 'email'
-    | 'phone_number'
-    | 'bold'
-    | 'italic'
-    | 'underline'
-    | 'strikethrough'
-    | 'spoiler'
-    | 'blockquote'
-    | 'expandable_blockquote'
-    | 'code'
-    | 'pre'
-    | 'text_link'
-    | 'text_mention'
-    | 'custom_emoji';
+    | "mention"
+    | "hashtag"
+    | "cashtag"
+    | "bot_command"
+    | "url"
+    | "email"
+    | "phone_number"
+    | "bold"
+    | "italic"
+    | "underline"
+    | "strikethrough"
+    | "spoiler"
+    | "blockquote"
+    | "expandable_blockquote"
+    | "code"
+    | "pre"
+    | "text_link"
+    | "text_mention"
+    | "custom_emoji";
   offset: number;
   length: number;
   url?: string;
@@ -270,7 +270,7 @@ export interface VideoNote {
 export interface Sticker {
   file_id: string;
   file_unique_id: string;
-  type: 'regular' | 'mask' | 'custom_emoji';
+  type: "regular" | "mask" | "custom_emoji";
   width: number;
   height: number;
   is_animated: boolean;
@@ -286,7 +286,7 @@ export interface Sticker {
 }
 
 export interface MaskPosition {
-  point: 'forehead' | 'eyes' | 'mouth' | 'chin';
+  point: "forehead" | "eyes" | "mouth" | "chin";
   x_shift: number;
   y_shift: number;
   scale: number;
@@ -295,7 +295,7 @@ export interface MaskPosition {
 export interface StickerSet {
   name: string;
   title: string;
-  sticker_type: 'regular' | 'mask' | 'custom_emoji';
+  sticker_type: "regular" | "mask" | "custom_emoji";
   stickers: Sticker[];
   thumbnail?: PhotoSize;
 }
@@ -340,7 +340,7 @@ export interface Poll {
   total_voter_count: number;
   is_closed: boolean;
   is_anonymous: boolean;
-  type: 'regular' | 'quiz';
+  type: "regular" | "quiz";
   allows_multiple_answers: boolean;
   correct_option_id?: number;
   explanation?: string;
@@ -421,7 +421,7 @@ export interface InlineQuery {
   from: User;
   query: string;
   offset: string;
-  chat_type?: 'sender' | 'private' | 'group' | 'supergroup' | 'channel';
+  chat_type?: "sender" | "private" | "group" | "supergroup" | "channel";
   location?: Location;
 }
 
@@ -477,14 +477,14 @@ export type ChatMember =
   | ChatMemberBanned;
 
 export interface ChatMemberOwner {
-  status: 'creator';
+  status: "creator";
   user: User;
   is_anonymous: boolean;
   custom_title?: string;
 }
 
 export interface ChatMemberAdministrator {
-  status: 'administrator';
+  status: "administrator";
   user: User;
   can_be_edited: boolean;
   is_anonymous: boolean;
@@ -506,13 +506,13 @@ export interface ChatMemberAdministrator {
 }
 
 export interface ChatMemberMember {
-  status: 'member';
+  status: "member";
   user: User;
   until_date?: number;
 }
 
 export interface ChatMemberRestricted {
-  status: 'restricted';
+  status: "restricted";
   user: User;
   is_member: boolean;
   can_send_messages: boolean;
@@ -533,12 +533,12 @@ export interface ChatMemberRestricted {
 }
 
 export interface ChatMemberLeft {
-  status: 'left';
+  status: "left";
   user: User;
 }
 
 export interface ChatMemberBanned {
-  status: 'kicked';
+  status: "kicked";
   user: User;
   until_date: number;
 }
@@ -700,7 +700,7 @@ export interface KeyboardButtonRequestChat {
 }
 
 export interface KeyboardButtonPollType {
-  type?: 'quiz' | 'regular';
+  type?: "quiz" | "regular";
 }
 
 export interface ReplyKeyboardRemove {
@@ -715,10 +715,7 @@ export interface ForceReply {
 }
 
 export type ReplyMarkup =
-  | InlineKeyboardMarkup
-  | ReplyKeyboardMarkup
-  | ReplyKeyboardRemove
-  | ForceReply;
+  InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply;
 
 export interface ReplyParameters {
   message_id: number;
@@ -755,27 +752,67 @@ export type BotCommandScope =
   | BotCommandScopeChatAdministrators
   | BotCommandScopeChatMember;
 
-export interface BotCommandScopeDefault { type: 'default'; }
-export interface BotCommandScopeAllPrivateChats { type: 'all_private_chats'; }
-export interface BotCommandScopeAllGroupChats { type: 'all_group_chats'; }
-export interface BotCommandScopeAllChatAdministrators { type: 'all_chat_administrators'; }
-export interface BotCommandScopeChat { type: 'chat'; chat_id: number | string; }
-export interface BotCommandScopeChatAdministrators { type: 'chat_administrators'; chat_id: number | string; }
-export interface BotCommandScopeChatMember { type: 'chat_member'; chat_id: number | string; user_id: number; }
+export interface BotCommandScopeDefault {
+  type: "default";
+}
+export interface BotCommandScopeAllPrivateChats {
+  type: "all_private_chats";
+}
+export interface BotCommandScopeAllGroupChats {
+  type: "all_group_chats";
+}
+export interface BotCommandScopeAllChatAdministrators {
+  type: "all_chat_administrators";
+}
+export interface BotCommandScopeChat {
+  type: "chat";
+  chat_id: number | string;
+}
+export interface BotCommandScopeChatAdministrators {
+  type: "chat_administrators";
+  chat_id: number | string;
+}
+export interface BotCommandScopeChatMember {
+  type: "chat_member";
+  chat_id: number | string;
+  user_id: number;
+}
 
 export type MenuButton = MenuButtonCommands | MenuButtonWebApp | MenuButtonDefault;
-export interface MenuButtonCommands { type: 'commands'; }
-export interface MenuButtonWebApp { type: 'web_app'; text: string; web_app: WebAppInfo; }
-export interface MenuButtonDefault { type: 'default'; }
+export interface MenuButtonCommands {
+  type: "commands";
+}
+export interface MenuButtonWebApp {
+  type: "web_app";
+  text: string;
+  web_app: WebAppInfo;
+}
+export interface MenuButtonDefault {
+  type: "default";
+}
 
-export interface BotDescription { description: string; }
-export interface BotShortDescription { short_description: string; }
-export interface BotName { name: string; }
+export interface BotDescription {
+  description: string;
+}
+export interface BotShortDescription {
+  short_description: string;
+}
+export interface BotName {
+  name: string;
+}
 
 export type ReactionType = ReactionTypeEmoji | ReactionTypeCustomEmoji | ReactionTypePaid;
-export interface ReactionTypeEmoji { type: 'emoji'; emoji: string; }
-export interface ReactionTypeCustomEmoji { type: 'custom_emoji'; custom_emoji_id: string; }
-export interface ReactionTypePaid { type: 'paid'; }
+export interface ReactionTypeEmoji {
+  type: "emoji";
+  emoji: string;
+}
+export interface ReactionTypeCustomEmoji {
+  type: "custom_emoji";
+  custom_emoji_id: string;
+}
+export interface ReactionTypePaid {
+  type: "paid";
+}
 
 export interface MessageReactionUpdated {
   chat: Chat;
@@ -861,9 +898,20 @@ export interface PaidMediaInfo {
 }
 
 export type PaidMedia = PaidMediaPreview | PaidMediaPhoto | PaidMediaVideo;
-export interface PaidMediaPreview { type: 'preview'; width?: number; height?: number; duration?: number; }
-export interface PaidMediaPhoto { type: 'photo'; photo: PhotoSize[]; }
-export interface PaidMediaVideo { type: 'video'; video: Video; }
+export interface PaidMediaPreview {
+  type: "preview";
+  width?: number;
+  height?: number;
+  duration?: number;
+}
+export interface PaidMediaPhoto {
+  type: "photo";
+  photo: PhotoSize[];
+}
+export interface PaidMediaVideo {
+  type: "video";
+  video: Video;
+}
 
 export interface PaidMediaPurchased {
   from: User;
@@ -940,23 +988,65 @@ export interface TextQuote {
 }
 
 export type MessageOrigin =
-  | MessageOriginUser
-  | MessageOriginHiddenUser
-  | MessageOriginChat
-  | MessageOriginChannel;
+  MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel;
 
-export interface MessageOriginUser { type: 'user'; date: number; sender_user: User; }
-export interface MessageOriginHiddenUser { type: 'hidden_user'; date: number; sender_user_name: string; }
-export interface MessageOriginChat { type: 'chat'; date: number; sender_chat: Chat; author_signature?: string; }
-export interface MessageOriginChannel { type: 'channel'; date: number; chat: Chat; message_id: number; author_signature?: string; }
+export interface MessageOriginUser {
+  type: "user";
+  date: number;
+  sender_user: User;
+}
+export interface MessageOriginHiddenUser {
+  type: "hidden_user";
+  date: number;
+  sender_user_name: string;
+}
+export interface MessageOriginChat {
+  type: "chat";
+  date: number;
+  sender_chat: Chat;
+  author_signature?: string;
+}
+export interface MessageOriginChannel {
+  type: "channel";
+  date: number;
+  chat: Chat;
+  message_id: number;
+  author_signature?: string;
+}
 
-export interface ChatBoostUpdated { chat: Chat; boost: ChatBoost; }
-export interface ChatBoostRemoved { chat: Chat; boost_id: string; remove_date: number; source: ChatBoostSource; }
-export interface ChatBoost { boost_id: string; add_date: number; expiration_date: number; source: ChatBoostSource; }
-export type ChatBoostSource = ChatBoostSourcePremium | ChatBoostSourceGiftCode | ChatBoostSourceGiveaway;
-export interface ChatBoostSourcePremium { source: 'premium'; user: User; }
-export interface ChatBoostSourceGiftCode { source: 'gift_code'; user: User; }
-export interface ChatBoostSourceGiveaway { source: 'giveaway'; giveaway_message_id: number; user?: User; prize_star_count?: number; is_unclaimed?: boolean; }
+export interface ChatBoostUpdated {
+  chat: Chat;
+  boost: ChatBoost;
+}
+export interface ChatBoostRemoved {
+  chat: Chat;
+  boost_id: string;
+  remove_date: number;
+  source: ChatBoostSource;
+}
+export interface ChatBoost {
+  boost_id: string;
+  add_date: number;
+  expiration_date: number;
+  source: ChatBoostSource;
+}
+export type ChatBoostSource =
+  ChatBoostSourcePremium | ChatBoostSourceGiftCode | ChatBoostSourceGiveaway;
+export interface ChatBoostSourcePremium {
+  source: "premium";
+  user: User;
+}
+export interface ChatBoostSourceGiftCode {
+  source: "gift_code";
+  user: User;
+}
+export interface ChatBoostSourceGiveaway {
+  source: "giveaway";
+  giveaway_message_id: number;
+  user?: User;
+  prize_star_count?: number;
+  is_unclaimed?: boolean;
+}
 
 export interface InlineQueryResultsButton {
   text: string;
@@ -999,7 +1089,7 @@ export interface InputMessageContent {
 }
 
 export interface InlineQueryResultArticle extends InlineQueryResultBase {
-  type: 'article';
+  type: "article";
   title: string;
   input_message_content: InputMessageContent;
   url?: string;
@@ -1011,7 +1101,7 @@ export interface InlineQueryResultArticle extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultPhoto extends InlineQueryResultBase {
-  type: 'photo';
+  type: "photo";
   photo_url: string;
   thumbnail_url: string;
   photo_width?: number;
@@ -1026,7 +1116,7 @@ export interface InlineQueryResultPhoto extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultGif extends InlineQueryResultBase {
-  type: 'gif';
+  type: "gif";
   gif_url: string;
   gif_width?: number;
   gif_height?: number;
@@ -1040,7 +1130,7 @@ export interface InlineQueryResultGif extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultMpeg4Gif extends InlineQueryResultBase {
-  type: 'mpeg4_gif';
+  type: "mpeg4_gif";
   mpeg4_url: string;
   mpeg4_width?: number;
   mpeg4_height?: number;
@@ -1054,7 +1144,7 @@ export interface InlineQueryResultMpeg4Gif extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultVideo extends InlineQueryResultBase {
-  type: 'video';
+  type: "video";
   video_url: string;
   mime_type: string;
   thumbnail_url: string;
@@ -1069,7 +1159,7 @@ export interface InlineQueryResultVideo extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultAudio extends InlineQueryResultBase {
-  type: 'audio';
+  type: "audio";
   audio_url: string;
   title: string;
   caption?: string;
@@ -1080,7 +1170,7 @@ export interface InlineQueryResultAudio extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultVoice extends InlineQueryResultBase {
-  type: 'voice';
+  type: "voice";
   voice_url: string;
   title: string;
   caption?: string;
@@ -1090,7 +1180,7 @@ export interface InlineQueryResultVoice extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultDocument extends InlineQueryResultBase {
-  type: 'document';
+  type: "document";
   title: string;
   caption?: string;
   parse_mode?: string;
@@ -1104,7 +1194,7 @@ export interface InlineQueryResultDocument extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultLocation extends InlineQueryResultBase {
-  type: 'location';
+  type: "location";
   latitude: number;
   longitude: number;
   title: string;
@@ -1119,7 +1209,7 @@ export interface InlineQueryResultLocation extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultVenue extends InlineQueryResultBase {
-  type: 'venue';
+  type: "venue";
   latitude: number;
   longitude: number;
   title: string;
@@ -1135,7 +1225,7 @@ export interface InlineQueryResultVenue extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultContact extends InlineQueryResultBase {
-  type: 'contact';
+  type: "contact";
   phone_number: string;
   first_name: string;
   last_name?: string;
@@ -1147,12 +1237,12 @@ export interface InlineQueryResultContact extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultGame extends InlineQueryResultBase {
-  type: 'game';
+  type: "game";
   game_short_name: string;
 }
 
 export interface InlineQueryResultCachedPhoto extends InlineQueryResultBase {
-  type: 'photo';
+  type: "photo";
   photo_file_id: string;
   title?: string;
   description?: string;
@@ -1162,7 +1252,7 @@ export interface InlineQueryResultCachedPhoto extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultCachedGif extends InlineQueryResultBase {
-  type: 'gif';
+  type: "gif";
   gif_file_id: string;
   title?: string;
   caption?: string;
@@ -1171,7 +1261,7 @@ export interface InlineQueryResultCachedGif extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultCachedMpeg4Gif extends InlineQueryResultBase {
-  type: 'mpeg4_gif';
+  type: "mpeg4_gif";
   mpeg4_file_id: string;
   title?: string;
   caption?: string;
@@ -1180,13 +1270,13 @@ export interface InlineQueryResultCachedMpeg4Gif extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultCachedSticker extends InlineQueryResultBase {
-  type: 'sticker';
+  type: "sticker";
   sticker_file_id: string;
   input_message_content?: InputMessageContent;
 }
 
 export interface InlineQueryResultCachedDocument extends InlineQueryResultBase {
-  type: 'document';
+  type: "document";
   title: string;
   document_file_id: string;
   description?: string;
@@ -1196,7 +1286,7 @@ export interface InlineQueryResultCachedDocument extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultCachedVideo extends InlineQueryResultBase {
-  type: 'video';
+  type: "video";
   video_file_id: string;
   title: string;
   description?: string;
@@ -1206,7 +1296,7 @@ export interface InlineQueryResultCachedVideo extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultCachedVoice extends InlineQueryResultBase {
-  type: 'voice';
+  type: "voice";
   voice_file_id: string;
   title: string;
   caption?: string;
@@ -1215,7 +1305,7 @@ export interface InlineQueryResultCachedVoice extends InlineQueryResultBase {
 }
 
 export interface InlineQueryResultCachedAudio extends InlineQueryResultBase {
-  type: 'audio';
+  type: "audio";
   audio_file_id: string;
   caption?: string;
   parse_mode?: string;
@@ -1236,7 +1326,7 @@ export interface SendCommonParams {
 
 export interface SendMessageParams extends SendCommonParams {
   text: string;
-  parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   entities?: MessageEntity[];
   link_preview_options?: LinkPreviewOptions;
 }
@@ -1244,7 +1334,7 @@ export interface SendMessageParams extends SendCommonParams {
 export interface SendPhotoParams extends SendCommonParams {
   photo: string;
   caption?: string;
-  parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   caption_entities?: MessageEntity[];
   show_caption_above_media?: boolean;
   has_spoiler?: boolean;
@@ -1253,7 +1343,7 @@ export interface SendPhotoParams extends SendCommonParams {
 export interface SendAudioParams extends SendCommonParams {
   audio: string;
   caption?: string;
-  parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   caption_entities?: MessageEntity[];
   duration?: number;
   performer?: string;
@@ -1265,7 +1355,7 @@ export interface SendDocumentParams extends SendCommonParams {
   document: string;
   thumbnail?: string;
   caption?: string;
-  parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   caption_entities?: MessageEntity[];
   disable_content_type_detection?: boolean;
 }
@@ -1279,7 +1369,7 @@ export interface SendVideoParams extends SendCommonParams {
   cover?: string;
   start_timestamp?: number;
   caption?: string;
-  parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   caption_entities?: MessageEntity[];
   show_caption_above_media?: boolean;
   has_spoiler?: boolean;
@@ -1293,7 +1383,7 @@ export interface SendAnimationParams extends SendCommonParams {
   height?: number;
   thumbnail?: string;
   caption?: string;
-  parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   caption_entities?: MessageEntity[];
   show_caption_above_media?: boolean;
   has_spoiler?: boolean;
@@ -1302,7 +1392,7 @@ export interface SendAnimationParams extends SendCommonParams {
 export interface SendVoiceParams extends SendCommonParams {
   voice: string;
   caption?: string;
-  parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   caption_entities?: MessageEntity[];
   duration?: number;
 }
@@ -1348,11 +1438,11 @@ export interface SendContactParams extends SendCommonParams {
 
 export interface SendPollParams extends SendCommonParams {
   question: string;
-  question_parse_mode?: 'HTML' | 'Markdown' | 'MarkdownV2';
+  question_parse_mode?: "HTML" | "Markdown" | "MarkdownV2";
   question_entities?: MessageEntity[];
   options: InputPollOption[];
   is_anonymous?: boolean;
-  type?: 'quiz' | 'regular';
+  type?: "quiz" | "regular";
   allows_multiple_answers?: boolean;
   correct_option_id?: number;
   explanation?: string;
@@ -1370,7 +1460,7 @@ export interface InputPollOption {
 }
 
 export interface SendDiceParams extends SendCommonParams {
-  emoji?: '🎲' | '🎯' | '🏀' | '⚽' | '🎳' | '🎰';
+  emoji?: "🎲" | "🎯" | "🏀" | "⚽" | "🎳" | "🎰";
 }
 
 export interface SendChatActionParams {
@@ -1378,17 +1468,17 @@ export interface SendChatActionParams {
   message_thread_id?: number;
   business_connection_id?: string;
   action:
-    | 'typing'
-    | 'upload_photo'
-    | 'record_video'
-    | 'upload_video'
-    | 'record_voice'
-    | 'upload_voice'
-    | 'upload_document'
-    | 'choose_sticker'
-    | 'find_location'
-    | 'record_video_note'
-    | 'upload_video_note';
+    | "typing"
+    | "upload_photo"
+    | "record_video"
+    | "upload_video"
+    | "record_voice"
+    | "upload_voice"
+    | "upload_document"
+    | "choose_sticker"
+    | "find_location"
+    | "record_video_note"
+    | "upload_video_note";
 }
 
 export interface ForwardMessageParams {
@@ -1438,7 +1528,7 @@ export interface CopyMessagesParams {
 }
 
 export interface InputMediaPhoto {
-  type: 'photo';
+  type: "photo";
   media: string;
   caption?: string;
   parse_mode?: string;
@@ -1448,7 +1538,7 @@ export interface InputMediaPhoto {
 }
 
 export interface InputMediaVideo {
-  type: 'video';
+  type: "video";
   media: string;
   thumbnail?: string;
   caption?: string;
@@ -1463,7 +1553,7 @@ export interface InputMediaVideo {
 }
 
 export interface InputMediaAnimation {
-  type: 'animation';
+  type: "animation";
   media: string;
   thumbnail?: string;
   caption?: string;
@@ -1477,7 +1567,7 @@ export interface InputMediaAnimation {
 }
 
 export interface InputMediaAudio {
-  type: 'audio';
+  type: "audio";
   media: string;
   thumbnail?: string;
   caption?: string;
@@ -1489,7 +1579,7 @@ export interface InputMediaAudio {
 }
 
 export interface InputMediaDocument {
-  type: 'document';
+  type: "document";
   media: string;
   thumbnail?: string;
   caption?: string;
@@ -1499,11 +1589,7 @@ export interface InputMediaDocument {
 }
 
 export type InputMedia =
-  | InputMediaPhoto
-  | InputMediaVideo
-  | InputMediaAnimation
-  | InputMediaAudio
-  | InputMediaDocument;
+  InputMediaPhoto | InputMediaVideo | InputMediaAnimation | InputMediaAudio | InputMediaDocument;
 
 export interface SendMediaGroupParams {
   chat_id: number | string;
@@ -1825,7 +1911,7 @@ export interface ForumTopic {
 
 export interface InputSticker {
   sticker: string;
-  format: 'static' | 'animated' | 'video';
+  format: "static" | "animated" | "video";
   emoji_list: string[];
   mask_position?: MaskPosition;
   keywords?: string[];
@@ -1836,7 +1922,7 @@ export interface CreateNewStickerSetParams {
   name: string;
   title: string;
   stickers: InputSticker[];
-  sticker_type?: 'regular' | 'mask' | 'custom_emoji';
+  sticker_type?: "regular" | "mask" | "custom_emoji";
   needs_repainting?: boolean;
 }
 
@@ -1919,19 +2005,16 @@ export interface ChatBackground {
 }
 
 export type BackgroundType =
-  | BackgroundTypeFill
-  | BackgroundTypeWallpaper
-  | BackgroundTypePattern
-  | BackgroundTypeChatTheme;
+  BackgroundTypeFill | BackgroundTypeWallpaper | BackgroundTypePattern | BackgroundTypeChatTheme;
 
 export interface BackgroundTypeFill {
-  type: 'fill';
+  type: "fill";
   fill: BackgroundFill;
   dark_theme_dimming: number;
 }
 
 export interface BackgroundTypeWallpaper {
-  type: 'wallpaper';
+  type: "wallpaper";
   document: Document;
   dark_theme_dimming: number;
   is_blurred?: boolean;
@@ -1939,7 +2022,7 @@ export interface BackgroundTypeWallpaper {
 }
 
 export interface BackgroundTypePattern {
-  type: 'pattern';
+  type: "pattern";
   document: Document;
   fill: BackgroundFill;
   intensity: number;
@@ -1948,18 +2031,27 @@ export interface BackgroundTypePattern {
 }
 
 export interface BackgroundTypeChatTheme {
-  type: 'chat_theme';
+  type: "chat_theme";
   theme_name: string;
 }
 
 export type BackgroundFill =
-  | BackgroundFillSolid
-  | BackgroundFillGradient
-  | BackgroundFillFreeformGradient;
+  BackgroundFillSolid | BackgroundFillGradient | BackgroundFillFreeformGradient;
 
-export interface BackgroundFillSolid { type: 'solid'; color: number; }
-export interface BackgroundFillGradient { type: 'gradient'; top_color: number; bottom_color: number; rotation_angle: number; }
-export interface BackgroundFillFreeformGradient { type: 'freeform_gradient'; colors: number[]; }
+export interface BackgroundFillSolid {
+  type: "solid";
+  color: number;
+}
+export interface BackgroundFillGradient {
+  type: "gradient";
+  top_color: number;
+  bottom_color: number;
+  rotation_angle: number;
+}
+export interface BackgroundFillFreeformGradient {
+  type: "freeform_gradient";
+  colors: number[];
+}
 
 export interface ProximityAlertTriggered {
   traveler: User;
@@ -2070,7 +2162,7 @@ export type TransactionPartner =
   | TransactionPartnerOther;
 
 export interface TransactionPartnerUser {
-  type: 'user';
+  type: "user";
   user: User;
   transaction_type?: string;
   affiliate?: AffiliateInfo;
@@ -2082,20 +2174,30 @@ export interface TransactionPartnerUser {
   premium_subscription_duration?: number;
 }
 export interface TransactionPartnerChat {
-  type: 'chat';
+  type: "chat";
   chat: Chat;
   gift?: Gift;
 }
 export interface TransactionPartnerAffiliateProgram {
-  type: 'affiliate_program';
+  type: "affiliate_program";
   sponsor_user: User;
   commission_per_mille: number;
 }
 
-export interface TransactionPartnerFragment { type: 'fragment'; withdrawal_state?: RevenueWithdrawalState; }
-export interface TransactionPartnerTelegramAds { type: 'telegram_ads'; }
-export interface TransactionPartnerTelegramApi { type: 'telegram_api'; request_count: number; }
-export interface TransactionPartnerOther { type: 'other'; }
+export interface TransactionPartnerFragment {
+  type: "fragment";
+  withdrawal_state?: RevenueWithdrawalState;
+}
+export interface TransactionPartnerTelegramAds {
+  type: "telegram_ads";
+}
+export interface TransactionPartnerTelegramApi {
+  type: "telegram_api";
+  request_count: number;
+}
+export interface TransactionPartnerOther {
+  type: "other";
+}
 
 export interface AffiliateInfo {
   affiliate_user?: User;
@@ -2106,19 +2208,17 @@ export interface AffiliateInfo {
 }
 
 export type RevenueWithdrawalState =
-  | RevenueWithdrawalStatePending
-  | RevenueWithdrawalStateSucceeded
-  | RevenueWithdrawalStateFailed;
+  RevenueWithdrawalStatePending | RevenueWithdrawalStateSucceeded | RevenueWithdrawalStateFailed;
 export interface RevenueWithdrawalStatePending {
-  type: 'pending';
+  type: "pending";
 }
 export interface RevenueWithdrawalStateSucceeded {
-  type: 'succeeded';
+  type: "succeeded";
   date: number;
   url: string;
 }
 export interface RevenueWithdrawalStateFailed {
-  type: 'failed';
+  type: "failed";
   date: number;
   url: string;
 }
@@ -2159,7 +2259,7 @@ export interface SendPaidMediaParams {
 }
 
 export interface InputPaidMedia {
-  type: 'photo' | 'video';
+  type: "photo" | "video";
   media: string;
   thumbnail?: string;
   width?: number;
@@ -2294,10 +2394,10 @@ export class TelegramApiError extends Error {
   constructor(
     public readonly errorCode: number,
     public readonly description: string,
-    public readonly parameters?: ResponseParameters
+    public readonly parameters?: ResponseParameters,
   ) {
     super(`Telegram API error ${errorCode}: ${description}`);
-    this.name = 'TelegramApiError';
+    this.name = "TelegramApiError";
   }
 }
 
@@ -2313,7 +2413,7 @@ export interface LivePhoto {
 }
 
 export interface InputMediaLivePhoto {
-  type: 'live_photo';
+  type: "live_photo";
   media: string;
   photo?: string;
   caption?: string;
@@ -2351,35 +2451,35 @@ export type RichText =
   | RichTextLink;
 
 export interface RichTextText {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
 export interface RichTextCustomEmoji {
-  type: 'custom_emoji';
+  type: "custom_emoji";
   custom_emoji_id: string;
 }
 
 export interface RichTextUrl {
-  type: 'url';
+  type: "url";
   url: string;
   text: RichText;
 }
 
 export interface RichTextMention {
-  type: 'mention';
+  type: "mention";
   user?: User;
   text: RichText;
 }
 
 export interface RichTextPremium {
-  type: 'premium';
+  type: "premium";
   user?: User;
   text: RichText;
 }
 
 export interface RichTextLink {
-  type: 'link';
+  type: "link";
   url: string;
   text: RichText;
 }
@@ -2403,83 +2503,84 @@ export type InputRichBlock =
   | InputRichBlockPaidMedia;
 
 export interface InputRichBlockText {
-  type: 'text';
+  type: "text";
   text: RichText;
 }
 
 export interface InputRichBlockReaction {
-  type: 'reaction';
+  type: "reaction";
   text: RichText;
 }
 
 export interface InputRichBlockLink {
-  type: 'link';
+  type: "link";
   url: string;
   text: RichText;
 }
 
 export interface InputRichBlockMention {
-  type: 'mention';
+  type: "mention";
   user_id?: number;
   text: RichText;
 }
 
 export interface InputRichBlockCustomEmoji {
-  type: 'custom_emoji';
+  type: "custom_emoji";
   custom_emoji_id: string;
 }
 
 export interface InputRichBlockPremium {
-  type: 'premium';
+  type: "premium";
   user_id?: number;
   text: RichText;
 }
 
 export interface InputRichBlockPaidMedia {
-  type: 'paid_media';
+  type: "paid_media";
   media: string;
 }
 
 export interface InputRichMessageMedia {
   id: string;
-  media: InputMediaAnimation | InputMediaAudio | InputMediaPhoto | InputMediaVideo | InputMediaVoiceNote;
+  media:
+    InputMediaAnimation | InputMediaAudio | InputMediaPhoto | InputMediaVideo | InputMediaVoiceNote;
 }
 
 export interface InputRichMessageLink {
-  type: 'link';
+  type: "link";
   url: string;
   text: RichText;
 }
 
 export interface InputRichMessageReaction {
-  type: 'reaction';
+  type: "reaction";
   text: RichText;
 }
 
 export interface InputRichMessagePaidMedia {
-  type: 'paid_media';
+  type: "paid_media";
   media: InputMedia;
 }
 
 export interface InputRichMessageMention {
-  type: 'mention';
+  type: "mention";
   user_id?: number;
   text: RichText;
 }
 
 export interface InputRichMessageCustomEmoji {
-  type: 'custom_emoji';
+  type: "custom_emoji";
   custom_emoji_id: string;
 }
 
 export interface InputRichMessagePremium {
-  type: 'premium';
+  type: "premium";
   user_id?: number;
   text: RichText;
 }
 
 export interface InputMediaVoiceNote {
-  type: 'voice_note';
+  type: "voice_note";
   media: string;
   caption?: string;
   parse_mode?: string;
@@ -2736,33 +2837,33 @@ export type StoryAreaType =
   | StoryAreaTypeUniqueGift;
 
 export interface StoryAreaTypeLink {
-  type: 'link';
+  type: "link";
   url: string;
 }
 
 export interface StoryAreaTypeLocation {
-  type: 'location';
+  type: "location";
   latitude: number;
   longitude: number;
   address?: LocationAddress;
 }
 
 export interface StoryAreaTypeSuggestedReaction {
-  type: 'suggested_reaction';
+  type: "suggested_reaction";
   reaction_type: ReactionType;
   is_dark?: boolean;
   is_flipped?: boolean;
 }
 
 export interface StoryAreaTypeWeather {
-  type: 'weather';
+  type: "weather";
   temperature: number;
   emoji?: string;
   background_color?: number;
 }
 
 export interface StoryAreaTypeUniqueGift {
-  type: 'unique_gift';
+  type: "unique_gift";
   name: string;
 }
 
@@ -2871,7 +2972,7 @@ export type PassportElementError =
   | PassportElementErrorUnspecified;
 
 export interface PassportElementErrorDataField {
-  source: 'data';
+  source: "data";
   type: string;
   field_name: string;
   data_hash: string;
@@ -2879,56 +2980,56 @@ export interface PassportElementErrorDataField {
 }
 
 export interface PassportElementErrorFrontSide {
-  source: 'front_side';
+  source: "front_side";
   type: string;
   file_hash: string;
   message: string;
 }
 
 export interface PassportElementErrorReverseSide {
-  source: 'reverse_side';
+  source: "reverse_side";
   type: string;
   file_hash: string;
   message: string;
 }
 
 export interface PassportElementErrorSelfie {
-  source: 'selfie';
+  source: "selfie";
   type: string;
   file_hash: string;
   message: string;
 }
 
 export interface PassportElementErrorFile {
-  source: 'file';
+  source: "file";
   type: string;
   file_hash: string;
   message: string;
 }
 
 export interface PassportElementErrorFiles {
-  source: 'files';
+  source: "files";
   type: string;
   file_hashes: string[];
   message: string;
 }
 
 export interface PassportElementErrorTranslationFile {
-  source: 'translation_file';
+  source: "translation_file";
   type: string;
   file_hash: string;
   message: string;
 }
 
 export interface PassportElementErrorTranslationFiles {
-  source: 'translation_files';
+  source: "translation_files";
   type: string;
   file_hashes: string[];
   message: string;
 }
 
 export interface PassportElementErrorUnspecified {
-  source: 'unspecified';
+  source: "unspecified";
   type: string;
   element_hash: string;
   message: string;

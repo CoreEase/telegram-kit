@@ -1,52 +1,47 @@
+import { WebAppKernel } from "../core/kernel";
+import { isColorDark, parseColorToHex, sessionStorageGet, sessionStorageSet } from "../core/utils";
+import { WebAppErrorName, throwWebAppError } from "../core/errors";
+import type { ColorScheme, DefaultColors, ThemeParams } from "../types";
 
-import { WebAppKernel } from '../core/kernel';
-import { isColorDark, parseColorToHex, sessionStorageGet, sessionStorageSet } from '../core/utils';
-import { WebAppErrorName, throwWebAppError } from '../core/errors';
-import type { ColorScheme, DefaultColors, ThemeParams } from '../types';
-
-type ColorKey = 'bg_color' | 'secondary_bg_color';
+type ColorKey = "bg_color" | "secondary_bg_color";
 
 export class ThemeManager {
   private themeParams: ThemeParams = {};
-  private _colorScheme: ColorScheme = 'light';
+  private _colorScheme: ColorScheme = "light";
 
-  private backgroundColorValue: string | ColorKey = 'bg_color';
+  private backgroundColorValue: string | ColorKey = "bg_color";
   private appBackgroundColor: string | null = null;
 
-  private headerColorKey: ColorKey | null = 'bg_color';
+  private headerColorKey: ColorKey | null = "bg_color";
   private headerColorValue: string | null = null;
   private appHeaderColorKey: ColorKey | null = null;
   private appHeaderColorValue: string | null = null;
 
-  private bottomBarColorValue: string | ColorKey | 'bottom_bar_bg_color' = 'bottom_bar_bg_color';
+  private bottomBarColorValue: string | ColorKey | "bottom_bar_bg_color" = "bottom_bar_bg_color";
   private appBottomBarColor: string | null = null;
 
   onBottomBarColorApplied: (() => void) | null = null;
 
   constructor(private readonly kernel: WebAppKernel) {
-    const storedTheme = sessionStorageGet<ThemeParams>('themeParams');
+    const storedTheme = sessionStorageGet<ThemeParams>("themeParams");
     const rawTheme = kernel.initParams.tgWebAppThemeParams;
     if (rawTheme && rawTheme.length) {
       try {
         const parsed = JSON.parse(rawTheme);
         if (parsed) this.setThemeParams(parsed);
-      } catch (e) {
-
-      }
+      } catch (e) {}
     }
     if (storedTheme) {
       this.setThemeParams(storedTheme);
     }
 
-    const storedColors = sessionStorageGet<DefaultColors>('defaultColors');
+    const storedColors = sessionStorageGet<DefaultColors>("defaultColors");
     const rawColors = kernel.initParams.tgWebAppDefaultColors;
     if (rawColors && rawColors.length) {
       try {
         const parsed = JSON.parse(rawColors);
         if (parsed) this.setDefaultColors(parsed);
-      } catch (e) {
-
-      }
+      } catch (e) {}
     }
     if (storedColors) {
       this.setDefaultColors(storedColors);
@@ -62,27 +57,26 @@ export class ThemeManager {
   }
 
   setThemeParams(theme: ThemeParams): void {
-
-    if (theme.bg_color == '#1c1c1d' && theme.bg_color == theme.secondary_bg_color) {
-      theme.secondary_bg_color = '#2c2c2e';
+    if (theme.bg_color == "#1c1c1d" && theme.bg_color == theme.secondary_bg_color) {
+      theme.secondary_bg_color = "#2c2c2e";
     }
     for (const key in theme) {
       const color = parseColorToHex(theme[key]);
       if (color) {
         this.themeParams[key] = color;
-        if (key == 'bg_color') {
-          this._colorScheme = isColorDark(color) ? 'dark' : 'light';
-          this.kernel.setCssProperty('color-scheme', this._colorScheme);
+        if (key == "bg_color") {
+          this._colorScheme = isColorDark(color) ? "dark" : "light";
+          this.kernel.setCssProperty("color-scheme", this._colorScheme);
         }
-        const cssKey = 'theme-' + key.split('_').join('-');
+        const cssKey = "theme-" + key.split("_").join("-");
         this.kernel.setCssProperty(cssKey, color);
       }
     }
-    sessionStorageSet('themeParams', this.themeParams);
+    sessionStorageSet("themeParams", this.themeParams);
   }
 
   setDefaultColors(defColors: DefaultColors): void {
-    if (this._colorScheme == 'dark') {
+    if (this._colorScheme == "dark") {
       if (defColors.bg_dark_color) {
         this.backgroundColorValue = defColors.bg_dark_color;
       }
@@ -99,46 +93,51 @@ export class ThemeManager {
         this.headerColorValue = defColors.header_color;
       }
     }
-    sessionStorageSet('defaultColors', defColors);
+    sessionStorageSet("defaultColors", defColors);
   }
 
   getHeaderColor(): string | null | undefined {
-    if (this.headerColorKey == 'secondary_bg_color') {
+    if (this.headerColorKey == "secondary_bg_color") {
       return this.themeParams.secondary_bg_color;
-    } else if (this.headerColorKey == 'bg_color') {
+    } else if (this.headerColorKey == "bg_color") {
       return this.themeParams.bg_color;
     }
     return this.headerColorValue;
   }
 
   setHeaderColor(color: string): void {
-    if (!this.kernel.warnIfUnsupported('6.1', 'Header color')) {
+    if (!this.kernel.warnIfUnsupported("6.1", "Header color")) {
       return;
     }
-    if (!this.kernel.versionAtLeast('6.9')) {
+    if (!this.kernel.versionAtLeast("6.9")) {
       if (this.themeParams.bg_color && this.themeParams.bg_color == color) {
-        color = 'bg_color';
-      } else if (this.themeParams.secondary_bg_color && this.themeParams.secondary_bg_color == color) {
-        color = 'secondary_bg_color';
+        color = "bg_color";
+      } else if (
+        this.themeParams.secondary_bg_color &&
+        this.themeParams.secondary_bg_color == color
+      ) {
+        color = "secondary_bg_color";
       }
     }
     let headColor: string | false | null = null;
     let colorKey: ColorKey | null = null;
-    if (color == 'bg_color' || color == 'secondary_bg_color') {
+    if (color == "bg_color" || color == "secondary_bg_color") {
       colorKey = color;
-    } else if (this.kernel.versionAtLeast('6.9')) {
+    } else if (this.kernel.versionAtLeast("6.9")) {
       headColor = parseColorToHex(color);
       if (!headColor) {
-
-        console.error('[@core-ease/telegram-kit] Header color format is invalid', color);
+        console.error("[@core-ease/telegram-kit] Header color format is invalid", color);
         throwWebAppError(WebAppErrorName.HeaderColorInvalid);
       }
     }
-    if (!this.kernel.versionAtLeast('6.9') && colorKey != 'bg_color' && colorKey != 'secondary_bg_color') {
-
+    if (
+      !this.kernel.versionAtLeast("6.9") &&
+      colorKey != "bg_color" &&
+      colorKey != "secondary_bg_color"
+    ) {
       console.error(
         "[@core-ease/telegram-kit] Header color key should be one of Telegram.WebApp.themeParams.bg_color, Telegram.WebApp.themeParams.secondary_bg_color, 'bg_color', 'secondary_bg_color'",
-        color
+        color,
       );
       throwWebAppError(WebAppErrorName.HeaderColorKeyInvalid);
     }
@@ -148,38 +147,44 @@ export class ThemeManager {
   }
 
   updateHeaderColor(): void {
-    if (this.appHeaderColorKey != this.headerColorKey || this.appHeaderColorValue != this.headerColorValue) {
+    if (
+      this.appHeaderColorKey != this.headerColorKey ||
+      this.appHeaderColorValue != this.headerColorValue
+    ) {
       this.appHeaderColorKey = this.headerColorKey;
       this.appHeaderColorValue = this.headerColorValue;
       if (this.appHeaderColorValue) {
-        this.kernel.webView.postEvent('web_app_set_header_color', undefined, { color: this.appHeaderColorValue });
+        this.kernel.webView.postEvent("web_app_set_header_color", undefined, {
+          color: this.appHeaderColorValue,
+        });
       } else {
-        this.kernel.webView.postEvent('web_app_set_header_color', undefined, { color_key: this.appHeaderColorKey });
+        this.kernel.webView.postEvent("web_app_set_header_color", undefined, {
+          color_key: this.appHeaderColorKey,
+        });
       }
     }
   }
 
   getBackgroundColor(): string | undefined {
-    if (this.backgroundColorValue == 'secondary_bg_color') {
+    if (this.backgroundColorValue == "secondary_bg_color") {
       return this.themeParams.secondary_bg_color;
-    } else if (this.backgroundColorValue == 'bg_color') {
+    } else if (this.backgroundColorValue == "bg_color") {
       return this.themeParams.bg_color;
     }
     return this.backgroundColorValue as string;
   }
 
   setBackgroundColor(color: string): void {
-    if (!this.kernel.warnIfUnsupported('6.1', 'Background color')) {
+    if (!this.kernel.warnIfUnsupported("6.1", "Background color")) {
       return;
     }
     let bgColor: string | ColorKey;
-    if (color == 'bg_color' || color == 'secondary_bg_color') {
+    if (color == "bg_color" || color == "secondary_bg_color") {
       bgColor = color;
     } else {
       const parsed = parseColorToHex(color);
       if (!parsed) {
-
-        console.error('[@core-ease/telegram-kit] Background color format is invalid', color);
+        console.error("[@core-ease/telegram-kit] Background color format is invalid", color);
         throwWebAppError(WebAppErrorName.BackgroundColorInvalid);
       }
       bgColor = parsed as string;
@@ -192,33 +197,34 @@ export class ThemeManager {
     const color = this.getBackgroundColor();
     if (this.appBackgroundColor != color) {
       this.appBackgroundColor = color ?? null;
-      this.kernel.webView.postEvent('web_app_set_background_color', undefined, { color });
+      this.kernel.webView.postEvent("web_app_set_background_color", undefined, { color });
     }
   }
 
   getBottomBarColor(): string {
-    if (this.bottomBarColorValue == 'bottom_bar_bg_color') {
-      return this.themeParams.bottom_bar_bg_color || this.themeParams.secondary_bg_color || '#ffffff';
-    } else if (this.bottomBarColorValue == 'secondary_bg_color') {
+    if (this.bottomBarColorValue == "bottom_bar_bg_color") {
+      return (
+        this.themeParams.bottom_bar_bg_color || this.themeParams.secondary_bg_color || "#ffffff"
+      );
+    } else if (this.bottomBarColorValue == "secondary_bg_color") {
       return this.themeParams.secondary_bg_color as string;
-    } else if (this.bottomBarColorValue == 'bg_color') {
+    } else if (this.bottomBarColorValue == "bg_color") {
       return this.themeParams.bg_color as string;
     }
     return this.bottomBarColorValue as string;
   }
 
   setBottomBarColor(color: string): void {
-    if (!this.kernel.warnIfUnsupported('7.10', 'Bottom bar color')) {
+    if (!this.kernel.warnIfUnsupported("7.10", "Bottom bar color")) {
       return;
     }
     let bgColor: string;
-    if (color == 'bg_color' || color == 'secondary_bg_color' || color == 'bottom_bar_bg_color') {
+    if (color == "bg_color" || color == "secondary_bg_color" || color == "bottom_bar_bg_color") {
       bgColor = color;
     } else {
       const parsed = parseColorToHex(color);
       if (!parsed) {
-
-        console.error('[@core-ease/telegram-kit] Bottom bar color format is invalid', color);
+        console.error("[@core-ease/telegram-kit] Bottom bar color format is invalid", color);
         throwWebAppError(WebAppErrorName.BottomBarColorInvalid);
       }
       bgColor = parsed as string;
@@ -231,7 +237,7 @@ export class ThemeManager {
     const color = this.getBottomBarColor();
     if (this.appBottomBarColor != color) {
       this.appBottomBarColor = color;
-      this.kernel.webView.postEvent('web_app_set_bottom_bar_color', undefined, { color });
+      this.kernel.webView.postEvent("web_app_set_bottom_bar_color", undefined, { color });
     }
     this.onBottomBarColorApplied?.();
   }

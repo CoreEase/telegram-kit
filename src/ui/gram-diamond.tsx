@@ -9,10 +9,7 @@ import {
 } from "react";
 import { Appearance } from "../_internal/gram/animation";
 import type { DiamondStyle } from "../_internal/gram/style";
-import type {
-  RefractionGeometry,
-  RefractionSource,
-} from "../_internal/gram/renderer";
+import type { RefractionGeometry, RefractionSource } from "../_internal/gram/renderer";
 import type { HapticKind } from "../_internal/gram/layer";
 import {
   InteractiveDiamondView,
@@ -91,9 +88,7 @@ export const GramDiamond = forwardRef<GramDiamondHandle, GramDiamondProps>(
     } = props;
 
     const hostRef = useRef<HTMLDivElement>(null);
-    const viewRef = useRef<
-      InteractiveDiamondView | PremiumDiamondView | null
-    >(null);
+    const viewRef = useRef<InteractiveDiamondView | PremiumDiamondView | null>(null);
     const propsRef = useRef(props);
     propsRef.current = props;
 
@@ -107,8 +102,7 @@ export const GramDiamond = forwardRef<GramDiamondHandle, GramDiamondProps>(
       const el = hostRef.current;
       if (!el) return;
 
-      const measure = () =>
-        setBox({ width: el.clientWidth, height: el.clientHeight });
+      const measure = () => setBox({ width: el.clientWidth, height: el.clientHeight });
 
       measure();
       const observer = new ResizeObserver(measure);
@@ -144,15 +138,11 @@ export const GramDiamond = forwardRef<GramDiamondHandle, GramDiamondProps>(
       view.layer.onHaptic = (kind) => propsRef.current.onHaptic?.(kind);
 
       if (view instanceof InteractiveDiamondView) {
-        view.onHaptic = (kind, intensity) =>
-          propsRef.current.onHaptic?.(kind, intensity);
-        view.onExpansionChanged = (expanded) =>
-          propsRef.current.onExpansionChanged?.(expanded);
+        view.onHaptic = (kind, intensity) => propsRef.current.onHaptic?.(kind, intensity);
+        view.onExpansionChanged = (expanded) => propsRef.current.onExpansionChanged?.(expanded);
         view.onLanding = (power) => propsRef.current.onLanding?.(power);
-        view.onMotionUpdated = (state) =>
-          propsRef.current.onMotionUpdated?.(state);
-        view.onRefractionUpdated = (geometry) =>
-          propsRef.current.onRefractionUpdated?.(geometry);
+        view.onMotionUpdated = (state) => propsRef.current.onMotionUpdated?.(state);
+        view.onRefractionUpdated = (geometry) => propsRef.current.onRefractionUpdated?.(geometry);
       }
 
       setFailed(false);
@@ -222,10 +212,8 @@ export const GramDiamond = forwardRef<GramDiamondHandle, GramDiamondProps>(
     useImperativeHandle(
       ref,
       () => ({
-        spin: (velocity, decay = 0.7) =>
-          viewRef.current?.layer.spin(velocity, decay),
-        pushFromBelow: (strength = 1) =>
-          viewRef.current?.layer.pushFromBelow(strength),
+        spin: (velocity, decay = 0.7) => viewRef.current?.layer.spin(velocity, decay),
+        pushFromBelow: (strength = 1) => viewRef.current?.layer.pushFromBelow(strength),
         emitStarBurst: () => viewRef.current?.layer.emitStarBurst(),
         playOnce: () => {
           const view = viewRef.current;
@@ -236,23 +224,15 @@ export const GramDiamond = forwardRef<GramDiamondHandle, GramDiamondProps>(
           if (view instanceof InteractiveDiamondView) view.cancelInteraction();
         },
         updateTransferState: (isSending, animateCompletion) =>
-          viewRef.current?.layer.updateTransferState(
-            isSending,
-            animateCompletion,
-          ),
+          viewRef.current?.layer.updateTransferState(isSending, animateCompletion),
         beginReceivingTransfer: (startTimeSeconds, completionDelay) =>
-          viewRef.current?.layer.beginReceivingTransfer(
-            startTimeSeconds,
-            completionDelay,
-          ),
-        endReceivingTransfer: () =>
-          viewRef.current?.layer.endReceivingTransfer(),
+          viewRef.current?.layer.beginReceivingTransfer(startTimeSeconds, completionDelay),
+        endReceivingTransfer: () => viewRef.current?.layer.endReceivingTransfer(),
       }),
       [],
     );
 
-    const resolvedWidth =
-      width ?? (variant === "interactive" ? 96 : "100%");
+    const resolvedWidth = width ?? (variant === "interactive" ? 96 : "100%");
 
     const resolvedHeight =
       height ??

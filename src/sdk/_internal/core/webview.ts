@@ -1,4 +1,3 @@
-
 import {
   sessionStorageGet,
   sessionStorageSet,
@@ -6,8 +5,8 @@ import {
   urlParseQueryString,
   urlSafeDecode,
   urlAppendHashParams,
-} from './utils';
-import type { EventHandler, InitParams } from '../types';
+} from "./utils";
+import type { EventHandler, InitParams } from "../types";
 
 declare global {
   interface Window {
@@ -31,44 +30,38 @@ export class TelegramWebView {
   private iFrameStyleEl: HTMLStyleElement | undefined;
 
   constructor() {
-    let locationHash = '';
+    let locationHash = "";
     try {
       locationHash = location.hash.toString();
-    } catch (e) {
-
-    }
+    } catch (e) {}
 
     const parsedParams = urlParseHashParams(locationHash);
-    const storedParams = sessionStorageGet<InitParams>('initParams');
+    const storedParams = sessionStorageGet<InitParams>("initParams");
     if (storedParams) {
       for (const key in storedParams) {
-        if (typeof parsedParams[key] === 'undefined') {
+        if (typeof parsedParams[key] === "undefined") {
           parsedParams[key] = storedParams[key];
         }
       }
     }
-    sessionStorageSet('initParams', parsedParams);
+    sessionStorageSet("initParams", parsedParams);
     this.initParams = parsedParams as InitParams;
 
     let isIframe = false;
     try {
       isIframe = window.parent != null && window !== window.parent;
       if (isIframe) {
-        window.addEventListener('message', this.handleParentMessage);
-        this.iFrameStyleEl = document.createElement('style');
+        window.addEventListener("message", this.handleParentMessage);
+        this.iFrameStyleEl = document.createElement("style");
         document.head.appendChild(this.iFrameStyleEl);
         try {
           window.parent.postMessage(
-            JSON.stringify({ eventType: 'iframe_ready', eventData: { reload_supported: true } }),
-            '*'
+            JSON.stringify({ eventType: "iframe_ready", eventData: { reload_supported: true } }),
+            "*",
           );
-        } catch (e) {
-
-        }
+        } catch (e) {}
       }
-    } catch (e) {
-
-    }
+    } catch (e) {}
     this.isIframe = isIframe;
 
     window.TelegramGameProxy_receiveEvent = this.receiveEvent;
@@ -86,35 +79,32 @@ export class TelegramWebView {
     if (!dataParsed || !dataParsed.eventType) {
       return;
     }
-    if (dataParsed.eventType == 'set_custom_style') {
-      if (event.origin === 'https://web.telegram.org' && this.iFrameStyleEl) {
+    if (dataParsed.eventType == "set_custom_style") {
+      if (event.origin === "https://web.telegram.org" && this.iFrameStyleEl) {
         this.iFrameStyleEl.innerHTML = dataParsed.eventData;
       }
-    } else if (dataParsed.eventType == 'reload_iframe') {
+    } else if (dataParsed.eventType == "reload_iframe") {
       try {
-        window.parent.postMessage(JSON.stringify({ eventType: 'iframe_will_reload' }), '*');
-      } catch (e) {
-
-      }
+        window.parent.postMessage(JSON.stringify({ eventType: "iframe_will_reload" }), "*");
+      } catch (e) {}
       location.reload();
     } else {
       this.receiveEvent(dataParsed.eventType, dataParsed.eventData);
     }
   };
 
-  postEvent(eventType: string, callback?: PostEventCallback, eventData: unknown = ''): void {
+  postEvent(eventType: string, callback?: PostEventCallback, eventData: unknown = ""): void {
     const cb: PostEventCallback = callback || (() => {});
 
     if (window.TelegramWebviewProxy !== undefined) {
       window.TelegramWebviewProxy.postEvent(eventType, JSON.stringify(eventData));
       cb();
-    } else if (window.external && 'notify' in (window.external as any)) {
+    } else if (window.external && "notify" in (window.external as any)) {
       (window.external as any).notify(JSON.stringify({ eventType, eventData }));
       cb();
     } else if (this.isIframe) {
       try {
-
-        const trustedTarget = '*';
+        const trustedTarget = "*";
         window.parent.postMessage(JSON.stringify({ eventType, eventData }), trustedTarget);
         cb();
       } catch (e) {
@@ -137,9 +127,7 @@ export class TelegramWebView {
     for (let i = 0; i < handlers.length; i++) {
       try {
         func(handlers[i]);
-      } catch (e) {
-
-      }
+      } catch (e) {}
     }
   }
 
@@ -171,15 +159,15 @@ export function openProtoUrl(url: string): boolean {
   }
   const useIframe = /iOS|iPhone OS|iPhone|iPod|iPad/i.test(navigator.userAgent);
   if (useIframe) {
-    const iframeContEl = document.getElementById('tgme_frame_cont') || document.body;
-    const iframeEl = document.createElement('iframe');
+    const iframeContEl = document.getElementById("tgme_frame_cont") || document.body;
+    const iframeEl = document.createElement("iframe");
     iframeContEl.appendChild(iframeEl);
     let pageHidden = false;
     const enableHidden = () => {
       pageHidden = true;
     };
-    window.addEventListener('pagehide', enableHidden, false);
-    window.addEventListener('blur', enableHidden, false);
+    window.addEventListener("pagehide", enableHidden, false);
+    window.addEventListener("blur", enableHidden, false);
     if (iframeEl !== null) {
       iframeEl.src = url;
     }
@@ -187,8 +175,8 @@ export function openProtoUrl(url: string): boolean {
       if (!pageHidden) {
         window.location.href = url;
       }
-      window.removeEventListener('pagehide', enableHidden, false);
-      window.removeEventListener('blur', enableHidden, false);
+      window.removeEventListener("pagehide", enableHidden, false);
+      window.removeEventListener("blur", enableHidden, false);
     }, 2000);
   } else {
     window.location.href = url;

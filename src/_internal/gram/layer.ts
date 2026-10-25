@@ -7,11 +7,7 @@ import {
   DiamondTransferAnimation,
 } from "./animation";
 import { DiamondStyle, defaultDiamondStyle, styleEquals } from "./style";
-import {
-  DiamondRenderer,
-  RefractionGeometry,
-  RefractionSource,
-} from "./renderer";
+import { DiamondRenderer, RefractionGeometry, RefractionSource } from "./renderer";
 
 export interface DiamondPose {
   yaw: number;
@@ -49,8 +45,7 @@ export class InteractiveDiamondLayer {
   onError: ((e: unknown) => void) | null = null;
 
   private _externalMotion:
-    | ((time: number | null) => { rotation: number; isAnimating: boolean })
-    | null = null;
+    ((time: number | null) => { rotation: number; isAnimating: boolean }) | null = null;
 
   get externalMotion() {
     return this._externalMotion;
@@ -86,10 +81,7 @@ export class InteractiveDiamondLayer {
   set renderSize(v) {
     const o = this._renderSize;
     this._renderSize = v;
-    if (
-      !o !== !v ||
-      (o && v && (o.width !== v.width || o.height !== v.height))
-    ) {
+    if (!o !== !v || (o && v && (o.width !== v.width || o.height !== v.height))) {
       this.setNeedsUpdate();
     }
   }
@@ -121,9 +113,7 @@ export class InteractiveDiamondLayer {
   }
 
   private foreground =
-    typeof document === "undefined"
-      ? true
-      : document.visibilityState !== "hidden";
+    typeof document === "undefined" ? true : document.visibilityState !== "hidden";
 
   diamondStyle: DiamondStyle;
 
@@ -151,9 +141,7 @@ export class InteractiveDiamondLayer {
   }
 
   get isCompletingTransfer() {
-    return (
-      !this.reduceMotion && this.transferAnimation?.phase === "completion"
-    );
+    return !this.reduceMotion && this.transferAnimation?.phase === "completion";
   }
 
   get hasStarBursts() {
@@ -164,12 +152,7 @@ export class InteractiveDiamondLayer {
     time: number;
     transferEnergy: number | null;
   } | null {
-    if (
-      !this.isInHierarchy ||
-      !this.foreground ||
-      !this.isRenderingEnabled ||
-      this.reduceMotion
-    ) {
+    if (!this.isInHierarchy || !this.foreground || !this.isRenderingEnabled || this.reduceMotion) {
       return null;
     }
     return {
@@ -224,8 +207,7 @@ export class InteractiveDiamondLayer {
       yaw: this.motion.renderedYaw,
       pitch: this.motion.pitch,
       grow: this.grow * this.interactionScale,
-      shift:
-        this.diamondStyle.growShift * (this.grow * this.interactionScale - 1),
+      shift: this.diamondStyle.growShift * (this.grow * this.interactionScale - 1),
     };
   }
 
@@ -256,7 +238,10 @@ export class InteractiveDiamondLayer {
   private didSetReady = false;
   private disposed = false;
 
-  constructor(backgroundStars = true, private pixelRatioCap = 3) {
+  constructor(
+    backgroundStars = true,
+    private pixelRatioCap = 3,
+  ) {
     const style = defaultDiamondStyle();
     style.backgroundStars = backgroundStars;
     this.diamondStyle = style;
@@ -268,10 +253,7 @@ export class InteractiveDiamondLayer {
       this.starBursts.push(new DiamondStarBurst(0, 0));
     }
     this.canvas.addEventListener("webglcontextlost", this.onContextLost);
-    this.canvas.addEventListener(
-      "webglcontextrestored",
-      this.onContextRestored,
-    );
+    this.canvas.addEventListener("webglcontextrestored", this.onContextRestored);
     document.addEventListener("visibilitychange", this.onVisibility);
   }
 
@@ -315,10 +297,7 @@ export class InteractiveDiamondLayer {
     this.stopLink();
     if (this.pendingRender !== null) cancelAnimationFrame(this.pendingRender);
     this.canvas.removeEventListener("webglcontextlost", this.onContextLost);
-    this.canvas.removeEventListener(
-      "webglcontextrestored",
-      this.onContextRestored,
-    );
+    this.canvas.removeEventListener("webglcontextrestored", this.onContextRestored);
     document.removeEventListener("visibilitychange", this.onVisibility);
     this.externalMotion?.(null);
     try {
@@ -346,15 +325,8 @@ export class InteractiveDiamondLayer {
       this.resetAnimation();
     } else {
       this.updateMotionStyle();
-      if (
-        style.animationMode === "reference" &&
-        previous.appearance !== style.appearance
-      ) {
-        this.motion.changeReferenceAppearance(
-          previous.appearance,
-          style.appearance,
-          this.elapsed,
-        );
+      if (style.animationMode === "reference" && previous.appearance !== style.appearance) {
+        this.motion.changeReferenceAppearance(previous.appearance, style.appearance, this.elapsed);
       }
       this.onPoseUpdated?.(this.pose);
       if (modeChanged) this.updateAnimationState();
@@ -383,8 +355,7 @@ export class InteractiveDiamondLayer {
     this.elapsed = 0;
     this.lastTime = null;
     this.starBursts =
-      this.diamondStyle.backgroundStars &&
-      this.diamondStyle.animationMode === "entrance"
+      this.diamondStyle.backgroundStars && this.diamondStyle.animationMode === "entrance"
         ? [new DiamondStarBurst(0, 0)]
         : [];
     this.nextBurstSeed = 1;
@@ -394,12 +365,7 @@ export class InteractiveDiamondLayer {
   }
 
   private get canAnimate() {
-    return (
-      this.isInHierarchy &&
-      this.foreground &&
-      this.isRenderingEnabled &&
-      !this.reduceMotion
-    );
+    return this.isInHierarchy && this.foreground && this.isRenderingEnabled && !this.reduceMotion;
   }
 
   spin(velocity: number, decay = 0.7) {
@@ -430,19 +396,10 @@ export class InteractiveDiamondLayer {
     this.isSendingTransfer = isSending;
     this.cancelTransferCompletion();
     if (isSending) {
-      this.transferAnimation = new DiamondTransferAnimation(
-        "sending",
-        this.elapsed,
-      );
+      this.transferAnimation = new DiamondTransferAnimation("sending", this.elapsed);
     } else if (animateCompletion && this.canAnimate) {
-      this.transferAnimation = new DiamondTransferAnimation(
-        "completion",
-        this.elapsed,
-      );
-      this.motion.spin(
-        this.diamondStyle.rotationSpeed < 0 ? -11 : 11,
-        0.7,
-      );
+      this.transferAnimation = new DiamondTransferAnimation("completion", this.elapsed);
+      this.motion.spin(this.diamondStyle.rotationSpeed < 0 ? -11 : 11, 0.7);
       this.addStarBurst(this.elapsed);
       this.addStarBurst(this.elapsed + 0.2);
     } else {
@@ -478,12 +435,7 @@ export class InteractiveDiamondLayer {
   }
 
   private cancelTransferCompletion() {
-    if (
-      !(
-        this.transferAnimation?.phase === "completion" ||
-        this.receivingTransfer
-      )
-    ) {
+    if (!(this.transferAnimation?.phase === "completion" || this.receivingTransfer)) {
       return;
     }
     this.receivingTransfer = null;
@@ -508,9 +460,8 @@ export class InteractiveDiamondLayer {
 
   private updateExternalMotion(time: number | null) {
     const result = this._externalMotion?.(time);
-    this.motion.externalYaw = time === null ? 0 : result?.rotation ?? 0;
-    this.externalMotionIsAnimating =
-      time !== null && result?.isAnimating === true;
+    this.motion.externalYaw = time === null ? 0 : (result?.rotation ?? 0);
+    this.externalMotionIsAnimating = time !== null && result?.isAnimating === true;
   }
 
   requestExternalMotionUpdate() {
@@ -546,15 +497,10 @@ export class InteractiveDiamondLayer {
   }
 
   private updateAnimationState() {
-    const isVisible =
-      this.isInHierarchy && this.foreground && this.isRenderingEnabled;
+    const isVisible = this.isInHierarchy && this.foreground && this.isRenderingEnabled;
     if (!isVisible || this.reduceMotion) this.updateExternalMotion(null);
     else if (this.linkId === null) this.updateExternalMotion(now());
-    if (
-      isVisible &&
-      this.diamondStyle.animateOnAppear &&
-      !this.didAnimateAppearance
-    ) {
+    if (isVisible && this.diamondStyle.animateOnAppear && !this.didAnimateAppearance) {
       this.didAnimateAppearance = true;
       if (!this.reduceMotion) this.motion.pushFromBelow();
     }
@@ -589,11 +535,7 @@ export class InteractiveDiamondLayer {
   }
 
   setNeedsUpdate() {
-    if (
-      this.linkId !== null ||
-      this.pendingRender !== null ||
-      this.disposed
-    ) {
+    if (this.linkId !== null || this.pendingRender !== null || this.disposed) {
       return;
     }
     this.pendingRender = requestAnimationFrame(() => {
@@ -604,10 +546,7 @@ export class InteractiveDiamondLayer {
 
   private updateMotion(time: number) {
     this.updateExternalMotion(this.canAnimate ? time : null);
-    const dt =
-      this.lastTime === null
-        ? 0
-        : Math.min(Math.max(0, time - this.lastTime), 0.05);
+    const dt = this.lastTime === null ? 0 : Math.min(Math.max(0, time - this.lastTime), 0.05);
     this.lastTime = time;
     let animationDt = dt;
     if (
@@ -631,16 +570,14 @@ export class InteractiveDiamondLayer {
       } else {
         const phase = completionTime >= 0 ? "completion" : "receiving";
         const didComplete =
-          phase === "completion" &&
-          this.transferAnimation?.phase !== "completion";
+          phase === "completion" && this.transferAnimation?.phase !== "completion";
         this.transferAnimation = new DiamondTransferAnimation(
           phase,
           this.elapsed - (phase === "completion" ? completionTime : t),
         );
         if (didComplete) {
           this.motion.spin(
-            (this.diamondStyle.rotationSpeed < 0 ? -11 : 11) *
-              Math.exp(-completionTime / 0.7),
+            (this.diamondStyle.rotationSpeed < 0 ? -11 : 11) * Math.exp(-completionTime / 0.7),
             0.7,
           );
           this.addStarBurst(this.elapsed - completionTime);
@@ -661,9 +598,7 @@ export class InteractiveDiamondLayer {
     );
     const style = this.effectiveStyle;
     this.motion.swayScale = style.swayScale;
-    const scrollTilt = this.canAnimate
-      ? this.scrollTiltProvider?.(time) ?? 0
-      : 0;
+    const scrollTilt = this.canAnimate ? (this.scrollTiltProvider?.(time) ?? 0) : 0;
     this.motion.tilt = style.tilt + scrollTilt;
     this.motion.targetLean = style.lean;
     this.motion.step(
@@ -687,11 +622,7 @@ export class InteractiveDiamondLayer {
     if (this.reduceMotion) {
       this.grow = this.motion.isDragging ? this.diamondStyle.dragGrow : 1;
       this.growVelocity = 0;
-    } else if (
-      this.diamondStyle.dragGrow !== 1 ||
-      this.grow !== 1 ||
-      this.growVelocity !== 0
-    ) {
+    } else if (this.diamondStyle.dragGrow !== 1 || this.grow !== 1 || this.growVelocity !== 0) {
       const target = this.motion.isDragging ? this.diamondStyle.dragGrow : 1;
       let remaining = dt;
       while (remaining > 0) {
@@ -703,10 +634,7 @@ export class InteractiveDiamondLayer {
         this.grow += this.growVelocity * step;
         remaining = Math.max(0, remaining - step);
       }
-      if (
-        Math.abs(this.grow - target) < 0.0001 &&
-        Math.abs(this.growVelocity) < 0.0001
-      ) {
+      if (Math.abs(this.grow - target) < 0.0001 && Math.abs(this.growVelocity) < 0.0001) {
         this.grow = target;
         this.growVelocity = 0;
       }
@@ -754,31 +682,24 @@ export class InteractiveDiamondLayer {
 
   private addStarBurst(time: number | null = null, isFromTap = false) {
     if (!(this.diamondStyle.starOpacity > 0.001)) return;
-    if (
-      !(
-        this.diamondStyle.backgroundStars ||
-        this.isCompletingTransfer ||
-        (isFromTap && this.diamondStyle.tapToSpin)
-      )
-    ) {
+    if (!(
+      this.diamondStyle.backgroundStars ||
+      this.isCompletingTransfer ||
+      (isFromTap && this.diamondStyle.tapToSpin)
+    )) {
       return;
     }
     if (this.starBursts.length >= 3) this.starBursts.shift();
-    this.starBursts.push(
-      new DiamondStarBurst(time ?? this.elapsed, this.nextBurstSeed, isFromTap),
-    );
+    this.starBursts.push(new DiamondStarBurst(time ?? this.elapsed, this.nextBurstSeed, isFromTap));
     this.nextBurstSeed = (this.nextBurstSeed + 1) % 65536;
   }
 
   private tapSpin(direction: number, time: number) {
     const current = this.motion.spinAtPress;
-    const sign =
-      Math.abs(current) > 0.5 ? (current < 0 ? -1 : 1) : direction;
+    const sign = Math.abs(current) > 0.5 ? (current < 0 ? -1 : 1) : direction;
     const top = 16;
     this.tapStreak =
-      this.lastTapTime !== null && time - this.lastTapTime < 1
-        ? this.tapStreak + 1
-        : 1;
+      this.lastTapTime !== null && time - this.lastTapTime < 1 ? this.tapStreak + 1 : 1;
     this.lastTapTime = time;
     const streakSpeed = (top * this.tapStreak) / 4;
     const speed = Math.min(top, Math.max(Math.abs(current) + 5, streakSpeed));
@@ -839,10 +760,7 @@ export class InteractiveDiamondLayer {
           ) {
             this.tapSpin(o.tapSpinDirection, t);
           } else if (Math.abs(velocity.x) > 600 && !this.reduceMotion) {
-            this.motion.fling(
-              velocity.x < 0 ? -1 : 1,
-              o.releaseImpulse ?? null,
-            );
+            this.motion.fling(velocity.x < 0 ? -1 : 1, o.releaseImpulse ?? null);
             this.addStarBurst(null, o.allowsFlingBurst ?? false);
             if (playFlingHaptic) this.onHaptic?.("impact");
           }

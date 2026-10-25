@@ -1,4 +1,4 @@
-import type { Update, GetUpdatesParams } from '../../types/bot';
+import type { Update, GetUpdatesParams } from "../../types/bot";
 
 export interface PollingOptions {
   timeout?: number;
@@ -18,7 +18,7 @@ export class TelegramPoller {
   constructor(
     private readonly getUpdates: (params?: GetUpdatesParams) => Promise<Update[]>,
     private readonly handler: UpdateHandler,
-    private readonly options: PollingOptions = {}
+    private readonly options: PollingOptions = {},
   ) {}
 
   start(): void {

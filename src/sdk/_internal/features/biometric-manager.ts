@@ -1,8 +1,11 @@
-
-import { WebAppKernel } from '../core/kernel';
-import { strTrim } from '../core/utils';
-import { WebAppErrorName, throwWebAppError } from '../core/errors';
-import type { BiometricAuthenticateParams, BiometricRequestAccessParams, BiometricType } from '../types';
+import { WebAppKernel } from "../core/kernel";
+import { strTrim } from "../core/utils";
+import { WebAppErrorName, throwWebAppError } from "../core/errors";
+import type {
+  BiometricAuthenticateParams,
+  BiometricRequestAccessParams,
+  BiometricType,
+} from "../types";
 
 type InitCallback = () => void;
 type AccessCallback = (granted: boolean) => void;
@@ -12,11 +15,11 @@ type TokenCallback = (applied: boolean) => void;
 export class BiometricManager {
   private _isInited = false;
   private _isBiometricAvailable = false;
-  private _biometricType: BiometricType = 'unknown';
+  private _biometricType: BiometricType = "unknown";
   private _isAccessRequested = false;
   private _isAccessGranted = false;
   private _isBiometricTokenSaved = false;
-  private _deviceId = '';
+  private _deviceId = "";
 
   private initCallbacks: InitCallback[] = [];
   private accessRequestState: { callback?: AccessCallback } | false = false;
@@ -24,9 +27,9 @@ export class BiometricManager {
   private tokenRequestState: { callback?: TokenCallback } | false = false;
 
   constructor(private readonly kernel: WebAppKernel) {
-    kernel.webView.onEvent('biometry_info_received', this.handleInfoReceived);
-    kernel.webView.onEvent('biometry_auth_requested', this.handleAuthRequested);
-    kernel.webView.onEvent('biometry_token_updated', this.handleTokenUpdated);
+    kernel.webView.onEvent("biometry_info_received", this.handleInfoReceived);
+    kernel.webView.onEvent("biometry_auth_requested", this.handleAuthRequested);
+    kernel.webView.onEvent("biometry_token_updated", this.handleTokenUpdated);
   }
 
   get isInited(): boolean {
@@ -36,7 +39,7 @@ export class BiometricManager {
     return this._isInited && this._isBiometricAvailable;
   }
   get biometricType(): BiometricType {
-    return this._biometricType || 'unknown';
+    return this._biometricType || "unknown";
   }
   get isAccessRequested(): boolean {
     return this._isAccessRequested;
@@ -48,14 +51,14 @@ export class BiometricManager {
     return this._isBiometricTokenSaved;
   }
   get deviceId(): string {
-    return this._deviceId || '';
+    return this._deviceId || "";
   }
 
   private handleInfoReceived = (_eventType: string, eventData: any): void => {
     this._isInited = true;
     if (eventData.available) {
       this._isBiometricAvailable = true;
-      this._biometricType = eventData.type || 'unknown';
+      this._biometricType = eventData.type || "unknown";
       if (eventData.access_requested) {
         this._isAccessRequested = true;
         this._isAccessGranted = !!eventData.access_granted;
@@ -67,12 +70,12 @@ export class BiometricManager {
       }
     } else {
       this._isBiometricAvailable = false;
-      this._biometricType = 'unknown';
+      this._biometricType = "unknown";
       this._isAccessRequested = false;
       this._isAccessGranted = false;
       this._isBiometricTokenSaved = false;
     }
-    this._deviceId = eventData.device_id || '';
+    this._deviceId = eventData.device_id || "";
 
     if (this.initCallbacks.length > 0) {
       this.initCallbacks.forEach((cb) => cb());
@@ -83,30 +86,30 @@ export class BiometricManager {
       this.accessRequestState = false;
       state.callback?.(this._isAccessGranted);
     }
-    this.kernel.receiveWebViewEvent('biometricManagerUpdated');
+    this.kernel.receiveWebViewEvent("biometricManagerUpdated");
   };
 
   private handleAuthRequested = (_eventType: string, eventData: any): void => {
-    const isAuthenticated = eventData.status == 'authorized';
-    const biometricToken = eventData.token || '';
+    const isAuthenticated = eventData.status == "authorized";
+    const biometricToken = eventData.token || "";
     if (this.authRequestState) {
       const state = this.authRequestState;
       this.authRequestState = false;
       state.callback?.(isAuthenticated, isAuthenticated ? biometricToken : null);
     }
     this.kernel.receiveWebViewEvent(
-      'biometricAuthRequested',
-      isAuthenticated ? { isAuthenticated: true, biometricToken } : { isAuthenticated: false }
+      "biometricAuthRequested",
+      isAuthenticated ? { isAuthenticated: true, biometricToken } : { isAuthenticated: false },
     );
   };
 
   private handleTokenUpdated = (_eventType: string, eventData: any): void => {
     let applied = false;
     if (this._isBiometricAvailable && this._isAccessRequested) {
-      if (eventData.status == 'updated') {
+      if (eventData.status == "updated") {
         this._isBiometricTokenSaved = true;
         applied = true;
-      } else if (eventData.status == 'removed') {
+      } else if (eventData.status == "removed") {
         this._isBiometricTokenSaved = false;
         applied = true;
       }
@@ -116,17 +119,16 @@ export class BiometricManager {
       this.tokenRequestState = false;
       state.callback?.(applied);
     }
-    this.kernel.receiveWebViewEvent('biometricTokenUpdated', { isUpdated: applied });
+    this.kernel.receiveWebViewEvent("biometricTokenUpdated", { isUpdated: applied });
   };
 
   private checkVersion(): boolean {
-    return this.kernel.warnIfUnsupported('7.2', 'BiometricManager');
+    return this.kernel.warnIfUnsupported("7.2", "BiometricManager");
   }
 
   private checkInit(): true {
     if (!this._isInited) {
-
-      console.error('[@core-ease/telegram-kit] BiometricManager should be inited before using.');
+      console.error("[@core-ease/telegram-kit] BiometricManager should be inited before using.");
       throwWebAppError(WebAppErrorName.BiometricManagerNotInited);
     }
     return true;
@@ -136,7 +138,7 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     if (this._isInited) return this;
     if (callback) this.initCallbacks.push(callback);
-    this.kernel.webView.postEvent('web_app_biometry_get_info');
+    this.kernel.webView.postEvent("web_app_biometry_get_info");
     return this;
   }
 
@@ -144,27 +146,24 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isBiometricAvailable) {
-
-      console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
+      console.error("[@core-ease/telegram-kit] Biometrics is not available on this device.");
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (this.accessRequestState) {
-
-      console.error('[@core-ease/telegram-kit] Access is already requested');
+      console.error("[@core-ease/telegram-kit] Access is already requested");
       throwWebAppError(WebAppErrorName.BiometricManagerAccessRequested);
     }
     const popupParams: { reason?: string } = {};
-    if (typeof params.reason !== 'undefined') {
+    if (typeof params.reason !== "undefined") {
       const reason = strTrim(params.reason);
       if (reason.length > 128) {
-
-        console.error('[@core-ease/telegram-kit] Biometric reason is too long', reason);
+        console.error("[@core-ease/telegram-kit] Biometric reason is too long", reason);
         throwWebAppError(WebAppErrorName.BiometricRequestAccessParamInvalid);
       }
       if (reason.length > 0) popupParams.reason = reason;
     }
     this.accessRequestState = { callback };
-    this.kernel.webView.postEvent('web_app_biometry_request_access', undefined, popupParams);
+    this.kernel.webView.postEvent("web_app_biometry_request_access", undefined, popupParams);
     return this;
   }
 
@@ -172,61 +171,53 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isBiometricAvailable) {
-
-      console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
+      console.error("[@core-ease/telegram-kit] Biometrics is not available on this device.");
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (!this.isAccessGranted) {
-
-      console.error('[@core-ease/telegram-kit] Biometric access was not granted by the user.');
+      console.error("[@core-ease/telegram-kit] Biometric access was not granted by the user.");
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricAccessNotGranted);
     }
     if (this.authRequestState) {
-
-      console.error('[@core-ease/telegram-kit] Authentication request is already in progress.');
+      console.error("[@core-ease/telegram-kit] Authentication request is already in progress.");
       throwWebAppError(WebAppErrorName.BiometricManagerAuthenticationRequested);
     }
     const popupParams: { reason?: string } = {};
-    if (typeof params.reason !== 'undefined') {
+    if (typeof params.reason !== "undefined") {
       const reason = strTrim(params.reason);
       if (reason.length > 128) {
-
-        console.error('[@core-ease/telegram-kit] Biometric reason is too long', reason);
+        console.error("[@core-ease/telegram-kit] Biometric reason is too long", reason);
         throwWebAppError(WebAppErrorName.BiometricRequestAccessParamInvalid);
       }
       if (reason.length > 0) popupParams.reason = reason;
     }
     this.authRequestState = { callback };
-    this.kernel.webView.postEvent('web_app_biometry_request_auth', undefined, popupParams);
+    this.kernel.webView.postEvent("web_app_biometry_request_auth", undefined, popupParams);
     return this;
   }
 
   updateBiometricToken(token: string, callback?: TokenCallback): this {
     if (!this.checkVersion()) return this;
-    token = token || '';
+    token = token || "";
     if (token.length > 1024) {
-
-      console.error('[@core-ease/telegram-kit] Token is too long', token);
+      console.error("[@core-ease/telegram-kit] Token is too long", token);
       throwWebAppError(WebAppErrorName.BiometricManagerTokenInvalid);
     }
     this.checkInit();
     if (!this._isBiometricAvailable) {
-
-      console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
+      console.error("[@core-ease/telegram-kit] Biometrics is not available on this device.");
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (!this.isAccessGranted) {
-
-      console.error('[@core-ease/telegram-kit] Biometric access was not granted by the user.');
+      console.error("[@core-ease/telegram-kit] Biometric access was not granted by the user.");
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricAccessNotGranted);
     }
     if (this.tokenRequestState) {
-
-      console.error('[@core-ease/telegram-kit] Token request is already in progress.');
+      console.error("[@core-ease/telegram-kit] Token request is already in progress.");
       throwWebAppError(WebAppErrorName.BiometricManagerTokenUpdateRequested);
     }
     this.tokenRequestState = { callback };
-    this.kernel.webView.postEvent('web_app_biometry_update_token', undefined, { token });
+    this.kernel.webView.postEvent("web_app_biometry_update_token", undefined, { token });
     return this;
   }
 
@@ -234,21 +225,20 @@ export class BiometricManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isBiometricAvailable) {
-
-      console.error('[@core-ease/telegram-kit] Biometrics is not available on this device.');
+      console.error("[@core-ease/telegram-kit] Biometrics is not available on this device.");
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsNotAvailable);
     }
     if (!this._isAccessRequested) {
-
-      console.error('[@core-ease/telegram-kit] Biometric access was not requested yet.');
+      console.error("[@core-ease/telegram-kit] Biometric access was not requested yet.");
       throwWebAppError(WebAppErrorName.BiometricManagerBiometricsAccessNotRequested);
     }
     if (this._isAccessGranted) {
-
-      console.warn('[@core-ease/telegram-kit] Biometric access was granted by the user, no need to go to settings.');
+      console.warn(
+        "[@core-ease/telegram-kit] Biometric access was granted by the user, no need to go to settings.",
+      );
       return this;
     }
-    this.kernel.webView.postEvent('web_app_biometry_open_settings');
+    this.kernel.webView.postEvent("web_app_biometry_open_settings");
     return this;
   }
 }

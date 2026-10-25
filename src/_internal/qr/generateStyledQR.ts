@@ -1,10 +1,11 @@
-import { encodeQRCode } from './Qr';
-import type { ErrorCorrectionLevel } from './Qr';
+import { encodeQRCode } from "./Qr";
+import type { ErrorCorrectionLevel } from "./Qr";
 
-export type QRDotShape = 'square' | 'dots' | 'rounded' | 'extra-rounded' | 'classy' | 'classy-rounded';
-export type QRCornerSquareShape = 'square' | 'dot' | 'rounded' | 'classy';
-export type QRCornerDotShape = 'square' | 'dot' | 'rounded';
-export type QRLogoShape = 'circle' | 'square' | 'rounded' | 'none';
+export type QRDotShape =
+  "square" | "dots" | "rounded" | "extra-rounded" | "classy" | "classy-rounded";
+export type QRCornerSquareShape = "square" | "dot" | "rounded" | "classy";
+export type QRCornerDotShape = "square" | "dot" | "rounded";
+export type QRLogoShape = "circle" | "square" | "rounded" | "none";
 
 export interface GenerateStyledQROptions {
   value: string;
@@ -41,7 +42,7 @@ function roundedRectPath(
   cx: number,
   cy: number,
   halfSize: number,
-  radii: { tl: number; tr: number; br: number; bl: number }
+  radii: { tl: number; tr: number; br: number; bl: number },
 ): string {
   const x = cx - halfSize;
   const y = cy - halfSize;
@@ -52,17 +53,17 @@ function roundedRectPath(
   return [
     `M${x + tl},${y}`,
     `L${x + w - tr},${y}`,
-    tr > 0 ? `A${tr},${tr} 0 0 1 ${x + w},${y + tr}` : '',
+    tr > 0 ? `A${tr},${tr} 0 0 1 ${x + w},${y + tr}` : "",
     `L${x + w},${y + h - br}`,
-    br > 0 ? `A${br},${br} 0 0 1 ${x + w - br},${y + h}` : '',
+    br > 0 ? `A${br},${br} 0 0 1 ${x + w - br},${y + h}` : "",
     `L${x + bl},${y + h}`,
-    bl > 0 ? `A${bl},${bl} 0 0 1 ${x},${y + h - bl}` : '',
+    bl > 0 ? `A${bl},${bl} 0 0 1 ${x},${y + h - bl}` : "",
     `L${x},${y + tl}`,
-    tl > 0 ? `A${tl},${tl} 0 0 1 ${x + tl},${y}` : '',
-    'Z',
+    tl > 0 ? `A${tl},${tl} 0 0 1 ${x + tl},${y}` : "",
+    "Z",
   ]
     .filter(Boolean)
-    .join('');
+    .join("");
 }
 
 function dotPath(
@@ -70,21 +71,21 @@ function dotPath(
   cy: number,
   cellSize: number,
   shape: QRDotShape,
-  neighbors: { top: boolean; right: boolean; bottom: boolean; left: boolean }
+  neighbors: { top: boolean; right: boolean; bottom: boolean; left: boolean },
 ): { d?: string; circle?: boolean } {
   const half = cellSize / 2;
 
-  if (shape === 'square') {
+  if (shape === "square") {
     return { d: roundedRectPath(cx, cy, half * 0.98, { tl: 0, tr: 0, br: 0, bl: 0 }) };
   }
-  if (shape === 'dots') {
+  if (shape === "dots") {
     return { circle: true };
   }
 
   const isolatedCorner = (a: boolean, b: boolean) => (a ? 0 : 1) + (b ? 0 : 1) === 2;
 
-  if (shape === 'rounded' || shape === 'extra-rounded') {
-    const r = half * (shape === 'extra-rounded' ? 0.7 : 0.5);
+  if (shape === "rounded" || shape === "extra-rounded") {
+    const r = half * (shape === "extra-rounded" ? 0.7 : 0.5);
     return {
       d: roundedRectPath(cx, cy, half * 0.98, {
         tl: isolatedCorner(neighbors.top, neighbors.left) ? r : 0,
@@ -95,7 +96,7 @@ function dotPath(
     };
   }
 
-  const r = half * (shape === 'classy-rounded' ? 0.65 : 0.4);
+  const r = half * (shape === "classy-rounded" ? 0.65 : 0.4);
   return {
     d: roundedRectPath(cx, cy, half * 0.98, {
       tl: isolatedCorner(neighbors.top, neighbors.left) ? r : 0,
@@ -114,38 +115,37 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
     dotsOptions,
     cornersSquareOptions,
     cornersDotOptions,
-    dotColor = '#000000',
+    dotColor = "#000000",
     eyeColor,
-    backgroundColor = '#ffffff',
+    backgroundColor = "#ffffff",
     logo,
     logoSize,
     logoPadding = 2,
-    logoShape = 'circle',
-    logoBackgroundColor = 'transparent',
+    logoShape = "circle",
+    logoBackgroundColor = "transparent",
     quietZone = 4,
     borderRadius = 0,
   } = options;
 
   const resolvedDotColor = dotsOptions?.color ?? dotColor;
-  const resolvedDotShape: QRDotShape = dotsOptions?.style ?? 'square';
+  const resolvedDotShape: QRDotShape = dotsOptions?.style ?? "square";
   const resolvedCornerSquareColor = cornersSquareOptions?.color ?? eyeColor ?? resolvedDotColor;
-  const resolvedCornerSquareShape: QRCornerSquareShape = cornersSquareOptions?.style ?? 'square';
+  const resolvedCornerSquareShape: QRCornerSquareShape = cornersSquareOptions?.style ?? "square";
   const resolvedCornerDotColor = cornersDotOptions?.color ?? resolvedCornerSquareColor;
-  const resolvedCornerDotShape: QRCornerDotShape = cornersDotOptions?.style ?? 'square';
+  const resolvedCornerDotShape: QRCornerDotShape = cornersDotOptions?.style ?? "square";
   const resolvedCornerOuterSize = cornersSquareOptions?.outerSize ?? 3.5;
   const resolvedCornerInnerSize = cornersSquareOptions?.innerSize ?? 2.5;
   const resolvedCornerDotSize = cornersDotOptions?.dotSize ?? 1.5;
 
   const isStylized =
-    resolvedDotShape !== 'square' ||
-    resolvedCornerSquareShape !== 'square' ||
-    resolvedCornerDotShape !== 'square';
+    resolvedDotShape !== "square" ||
+    resolvedCornerSquareShape !== "square" ||
+    resolvedCornerDotShape !== "square";
 
-  const resolvedLevel: ErrorCorrectionLevel =
-    errorCorrectionLevel ?? (isStylized ? 'Q' : 'M');
+  const resolvedLevel: ErrorCorrectionLevel = errorCorrectionLevel ?? (isStylized ? "Q" : "M");
 
   const result = encodeQRCode(value, { errorCorrectionLevel: resolvedLevel });
-  if (!result) throw new Error('Failed to encode QR');
+  if (!result) throw new Error("Failed to encode QR");
 
   const { modules } = result;
   const matrixSize = modules.length;
@@ -153,9 +153,7 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
   const cellSize = size / dimension;
 
   const isEyeModule = (r: number, c: number) =>
-    (r < 7 && c < 7) ||
-    (r < 7 && c >= matrixSize - 7) ||
-    (r >= matrixSize - 7 && c < 7);
+    (r < 7 && c < 7) || (r < 7 && c >= matrixSize - 7) || (r >= matrixSize - 7 && c < 7);
 
   let logoClearRadiusPx = 0;
   let effectiveLogoImageSize = 0;
@@ -193,7 +191,7 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
     const dy = r + 0.5 - centerModule;
     const radiusModules = logoClearRadiusPx / cellSize;
 
-    if (logoShape === 'circle' || logoShape === 'none') {
+    if (logoShape === "circle" || logoShape === "none") {
       return Math.sqrt(dx * dx + dy * dy) < radiusModules;
     }
     return Math.abs(dx) < radiusModules && Math.abs(dy) < radiusModules;
@@ -202,8 +200,8 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
   const isRenderable = (r: number, c: number) =>
     modules[r]?.[c] === true && !isEyeModule(r, c) && !isInLogoClearZone(r, c);
 
-  let paths = '';
-  let circles = '';
+  let paths = "";
+  let circles = "";
 
   for (let r = 0; r < matrixSize; r++) {
     for (let c = 0; c < matrixSize; c++) {
@@ -235,7 +233,7 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
     { x: 0, y: matrixSize - 7 },
   ];
 
-  let eyes = '';
+  let eyes = "";
 
   for (const pos of eyePositions) {
     const cx = (pos.x + quietZone + 3.5) * cellSize;
@@ -246,12 +244,12 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
     const strokeMid = (outerHalf + innerHalf) / 2;
     const strokeWidth = outerHalf - innerHalf;
 
-    if (resolvedCornerSquareShape === 'dot') {
+    if (resolvedCornerSquareShape === "dot") {
       eyes += `<circle cx="${cx}" cy="${cy}" r="${strokeMid}" fill="none" stroke="${resolvedCornerSquareColor}" stroke-width="${strokeWidth}"/>`;
     } else {
-      const radius = resolvedCornerSquareShape === 'classy' ? outerHalf * 0.35 : outerHalf * 0.3;
+      const radius = resolvedCornerSquareShape === "classy" ? outerHalf * 0.35 : outerHalf * 0.3;
       const outerRadii =
-        resolvedCornerSquareShape === 'classy'
+        resolvedCornerSquareShape === "classy"
           ? { tl: radius, tr: 0, br: radius, bl: 0 }
           : { tl: radius, tr: radius, br: radius, bl: radius };
 
@@ -260,33 +258,33 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
     }
 
     const half = cellSize * resolvedCornerDotSize;
-    if (resolvedCornerDotShape === 'dot') {
+    if (resolvedCornerDotShape === "dot") {
       eyes += `<circle cx="${cx}" cy="${cy}" r="${half}" fill="${resolvedCornerDotColor}"/>`;
     } else {
-      const r = resolvedCornerDotShape === 'rounded' ? half * 0.4 : 0;
+      const r = resolvedCornerDotShape === "rounded" ? half * 0.4 : 0;
       eyes += `<path d="${roundedRectPath(cx, cy, half, { tl: r, tr: r, br: r, bl: r })}" fill="${resolvedCornerDotColor}"/>`;
     }
   }
 
-  let logoSvg = '';
+  let logoSvg = "";
   if (logo && logoClearRadiusPx > 0) {
     const center = size / 2;
 
-    if (logoBackgroundColor && logoBackgroundColor !== 'transparent') {
-      if (logoShape === 'circle') {
+    if (logoBackgroundColor && logoBackgroundColor !== "transparent") {
+      if (logoShape === "circle") {
         logoSvg += `<circle cx="${center}" cy="${center}" r="${logoClearRadiusPx}" fill="${logoBackgroundColor}"/>`;
       } else {
-        const r = logoShape === 'rounded' ? logoClearRadiusPx * 0.25 : 0;
+        const r = logoShape === "rounded" ? logoClearRadiusPx * 0.25 : 0;
         logoSvg += `<path d="${roundedRectPath(center, center, logoClearRadiusPx, { tl: r, tr: r, br: r, bl: r })}" fill="${logoBackgroundColor}"/>`;
       }
     }
 
     const clipId = `logo-clip-${Math.random().toString(36).slice(2, 9)}`;
-    let clipPath = '';
+    let clipPath = "";
 
-    if (logoShape === 'circle') {
+    if (logoShape === "circle") {
       clipPath = `<clipPath id="${clipId}"><circle cx="${center}" cy="${center}" r="${logoClearRadiusPx}"/></clipPath>`;
-    } else if (logoShape === 'rounded') {
+    } else if (logoShape === "rounded") {
       const r = logoClearRadiusPx * 0.25;
       clipPath = `<clipPath id="${clipId}"><rect x="${center - logoClearRadiusPx}" y="${center - logoClearRadiusPx}" width="${logoClearRadiusPx * 2}" height="${logoClearRadiusPx * 2}" rx="${r}" ry="${r}"/></clipPath>`;
     } else {
@@ -301,7 +299,7 @@ export function generateStyledQRSVG(options: GenerateStyledQROptions): string {
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  ${backgroundColor !== 'transparent' ? `<rect width="${size}" height="${size}" fill="${backgroundColor}" rx="${borderRadius}" ry="${borderRadius}"/>` : ''}
+  ${backgroundColor !== "transparent" ? `<rect width="${size}" height="${size}" fill="${backgroundColor}" rx="${borderRadius}" ry="${borderRadius}"/>` : ""}
   ${paths}
   ${circles}
   ${eyes}

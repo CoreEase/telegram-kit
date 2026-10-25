@@ -1,4 +1,4 @@
-import { gfMultiply, generatorPolynomial } from './galoisField';
+import { gfMultiply, generatorPolynomial } from "./galoisField";
 
 export function reedSolomonEncode(dataCodewords: number[], eccLength: number): number[] {
   const generator = generatorPolynomial(eccLength);

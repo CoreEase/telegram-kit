@@ -1,0 +1,4 @@
+dist
+node_modules
+src/_internal/star/data
+src/_internal/animation/lottie/core

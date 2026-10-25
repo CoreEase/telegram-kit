@@ -4,11 +4,7 @@ import { InteractiveDiamondLayer, DiamondPose, HapticKind } from "./layer";
 import type { RefractionGeometry, RefractionSource } from "./renderer";
 
 export type ExpansionStyle = "centered" | "downward" | "wallet";
-export type InteractiveAnimationMode =
-  | "continuous"
-  | "idle"
-  | "lottie"
-  | "lottie-once";
+export type InteractiveAnimationMode = "continuous" | "idle" | "lottie" | "lottie-once";
 export interface Point {
   x: number;
   y: number;
@@ -156,10 +152,7 @@ export class InteractiveDiamondView {
   }
 
   private onReduceMotion = () => {
-    const enabled =
-      this.reduceMotionMode === "auto"
-        ? !!this.mq?.matches
-        : this.reduceMotionMode;
+    const enabled = this.reduceMotionMode === "auto" ? !!this.mq?.matches : this.reduceMotionMode;
     this.layer.setReduceMotion(enabled);
     if (enabled) {
       this.expansion = null;
@@ -183,12 +176,8 @@ export class InteractiveDiamondView {
   private hitTest(p: Point): boolean {
     if (this.animationMode !== "continuous") return true;
     if (this.expansionStyle === "wallet") {
-      const radius =
-        this.restingSize.width * ((30 * 0.9) / 96) * this.walletScale;
-      return (
-        Math.hypot(p.x - this.layerPosition.x, p.y - this.layerPosition.y) <=
-        radius
-      );
+      const radius = this.restingSize.width * ((30 * 0.9) / 96) * this.walletScale;
+      return Math.hypot(p.x - this.layerPosition.x, p.y - this.layerPosition.y) <= radius;
     }
     const cx = this.restingSize.width / 2;
     const cy = this.restingSize.height / 2;
@@ -233,10 +222,7 @@ export class InteractiveDiamondView {
       y: position.y - previous.y,
     };
     this.dragSamples.push({ x: position.x, time: t });
-    while (
-      this.dragSamples.length > 2 &&
-      this.dragSamples[0].time < t - 0.08
-    )
+    while (this.dragSamples.length > 2 && this.dragSamples[0].time < t - 0.08)
       this.dragSamples.shift();
     const sample = this.dragSamples[0];
     const interval = Math.max(t - sample.time, 1 / 240);
@@ -247,15 +233,11 @@ export class InteractiveDiamondView {
       this.layer.diamondStyle.tapToSpin &&
       this.pressStart &&
       t - this.pressStart.time < 0.25 &&
-      Math.hypot(
-        position.x - this.pressStart.position.x,
-        position.y - this.pressStart.position.y,
-      ) < 10
+      Math.hypot(position.x - this.pressStart.position.x, position.y - this.pressStart.position.y) <
+        10
     ) {
       const centerX =
-        this.expansionStyle === "wallet"
-          ? this.layerPosition.x
-          : this.restingSize.width / 2;
+        this.expansionStyle === "wallet" ? this.layerPosition.x : this.restingSize.width / 2;
       tapDirection = position.x < centerX ? -1 : 1;
     }
     this.dragPosition = state === "ended" ? null : position;
@@ -267,18 +249,14 @@ export class InteractiveDiamondView {
     this.layer.updateDrag(state, {
       translation,
       velocity,
-      scale: wallet
-        ? Math.min(this.restingSize.width, this.restingSize.height)
-        : 220,
+      scale: wallet ? Math.min(this.restingSize.width, this.restingSize.height) : 220,
       releaseImpulse: wallet ? null : 3 * 6.5,
       playFlingHaptic: wallet,
       allowsFlingBurst: wallet,
       tapSpinDirection: tapDirection,
     });
-    if (wallet && tapDirection !== null && !this.layer.reduceMotion)
-      this.onHaptic?.("impact", 0.4);
-    if (state === "ended" && wasHolding && !wallet)
-      this.scheduleLandingFeedback(releasePower);
+    if (wallet && tapDirection !== null && !this.layer.reduceMotion) this.onHaptic?.("impact", 0.4);
+    if (state === "ended" && wasHolding && !wallet) this.scheduleLandingFeedback(releasePower);
   }
 
   private onPointerMove = (e: PointerEvent) => {
@@ -310,14 +288,7 @@ export class InteractiveDiamondView {
 
   private scheduleLandingFeedback(power: number) {
     this.cancelLandingFeedback();
-    if (
-      !(
-        power > 0 &&
-        (power > 0.2 || this.onLanding) &&
-        !this.isHolding
-      )
-    )
-      return;
+    if (!(power > 0 && (power > 0.2 || this.onLanding) && !this.isHolding)) return;
     this.landingTimer = setTimeout(() => {
       this.landingTimer = null;
       if (
@@ -327,8 +298,7 @@ export class InteractiveDiamondView {
         this.isHolding
       )
         return;
-      if (power > 0.2)
-        this.onHaptic?.("impact", 0.35 + 0.4 * Math.min(1, power));
+      if (power > 0.2) this.onHaptic?.("impact", 0.35 + 0.4 * Math.min(1, power));
       this.onLanding?.(Math.min(1, power));
     }, 200);
   }
@@ -364,10 +334,7 @@ export class InteractiveDiamondView {
     if (ex.holding) {
       const t = Math.min(1, elapsed / 0.46);
       const u = t * t * (3 - 2 * t);
-      const settle =
-        1 -
-        Math.exp(-5.6 * u) *
-          (Math.cos(6.2 * u) + (5.6 / 6.2) * Math.sin(6.2 * u));
+      const settle = 1 - Math.exp(-5.6 * u) * (Math.cos(6.2 * u) + (5.6 / 6.2) * Math.sin(6.2 * u));
       this.grip = ex.from + (1 - ex.from) * settle;
       if (t === 1) {
         this.grip = 1;
@@ -412,16 +379,12 @@ export class InteractiveDiamondView {
       this.placeCanvas();
       return;
     }
-    const expanded =
-      this.isHolding || this.expansion !== null || layer.isGrowthAnimating;
-    layer.usesHighFrameRate =
-      expanded || this.openingScale !== null || layer.hasTransferAnimation;
+    const expanded = this.isHolding || this.expansion !== null || layer.isGrowthAnimating;
+    layer.usesHighFrameRate = expanded || this.openingScale !== null || layer.hasTransferAnimation;
     layer.interactionScale =
-      (this.expansionStyle !== "centered" ? 1 : 1 + 2.75 * this.grip) *
-      (this.openingScale ?? 1);
+      (this.expansionStyle !== "centered" ? 1 : 1 + 2.75 * this.grip) * (this.openingScale ?? 1);
     const refractionStrength =
-      this.expansionStyle !== "centered" &&
-      layer.diamondStyle.dragGrow !== 1
+      this.expansionStyle !== "centered" && layer.diamondStyle.dragGrow !== 1
         ? (layer.pose.grow - 1) / (layer.diamondStyle.dragGrow - 1)
         : this.grip;
     layer.refractionStrength = Math.min(1, Math.max(0, refractionStrength));
@@ -436,27 +399,19 @@ export class InteractiveDiamondView {
     };
     if (this.expansionStyle === "wallet") {
       const halfWidth =
-        this.diamondWidth *
-        (layer.pose.grow * layer.zoom) *
-        this.walletScale *
-        0.55;
+        this.diamondWidth * (layer.pose.grow * layer.zoom) * this.walletScale * 0.55;
       pos.x = rc.x + Math.max(0, halfWidth - this.walletLeftInset);
     }
     this.layerPosition = pos;
     layer.starOffset =
-      this.expansionStyle === "wallet"
-        ? { x: rc.x - pos.x, y: rc.y - pos.y }
-        : { x: 0, y: 0 };
+      this.expansionStyle === "wallet" ? { x: rc.x - pos.x, y: rc.y - pos.y } : { x: 0, y: 0 };
     this.updateRefractionPosition();
     if (this.openingScale !== null) layer.renderSize = { width: 320, height: 320 };
     else if (layer.isCompletingTransfer || layer.hasStarBursts) {
       layer.renderSize =
-        this.expansionStyle === "wallet"
-          ? this.walletStarCanvasSize
-          : { width: 240, height: 240 };
+        this.expansionStyle === "wallet" ? this.walletStarCanvasSize : { width: 240, height: 240 };
     } else if (expanded) layer.renderSize = { width: 220, height: 220 };
-    else if (layer.hasTransferAnimation)
-      layer.renderSize = { width: 96, height: 96 };
+    else if (layer.hasTransferAnimation) layer.renderSize = { width: 96, height: 96 };
     else layer.renderSize = { ...this.restingSize };
     this.placeCanvas();
     layer.setNeedsUpdate();
@@ -476,14 +431,7 @@ export class InteractiveDiamondView {
   cancelInteraction() {
     this.cancelLandingFeedback();
     this.layer.cancelTapSpin();
-    if (
-      !(
-        this.isHolding ||
-        this.expansion ||
-        this.dragPosition ||
-        this.layer.isGrowthAnimating
-      )
-    ) {
+    if (!(this.isHolding || this.expansion || this.dragPosition || this.layer.isGrowthAnimating)) {
       this.applyExpansion();
       return;
     }
@@ -527,9 +475,7 @@ export class InteractiveDiamondView {
     this.layer.endReceivingTransfer();
   }
 
-  set externalMotion(
-    v: ((t: number | null) => { rotation: number; isAnimating: boolean }) | null,
-  ) {
+  set externalMotion(v: ((t: number | null) => { rotation: number; isAnimating: boolean }) | null) {
     this.layer.externalMotion = v;
   }
 
@@ -692,23 +638,15 @@ export class InteractiveDiamondView {
         break;
     }
     style.swayScale = isInteractive ? 1 : 0;
-    style.floatAmplitude =
-      isInteractive && o.expansionStyle === "downward" ? 1.5 : 0;
+    style.floatAmplitude = isInteractive && o.expansionStyle === "downward" ? 1.5 : 0;
     style.floatPeriod = 3.2;
     this.layer.highlightBoost = isInteractive ? 0.4 : 0;
     style.mainSparkleOnRotation = isInteractive;
-    style.widthPoints =
-      o.diamondWidth * (o.expansionStyle === "wallet" ? this.walletScale : 1);
+    style.widthPoints = o.diamondWidth * (o.expansionStyle === "wallet" ? this.walletScale : 1);
     style.appearance = o.appearance;
     style.widthCompensation = o.expansionStyle !== "wallet";
-    style.dragGrow =
-      o.expansionStyle === "wallet"
-        ? 2.6
-        : o.expansionStyle === "downward"
-          ? 3
-          : 1;
-    style.growShift =
-      o.expansionStyle === "downward" && !o.expandedCenter ? 12 : 0;
+    style.dragGrow = o.expansionStyle === "wallet" ? 2.6 : o.expansionStyle === "downward" ? 3 : 1;
+    style.growShift = o.expansionStyle === "downward" && !o.expandedCenter ? 12 : 0;
     style.growDamping = o.expansionStyle !== "centered" ? 0.62 : 0.42;
     style.releaseDecay = o.expansionStyle !== "centered" ? 1.1 : 0;
     style.releaseTilt = o.expansionStyle !== "centered" ? 0 : 2.6;
@@ -721,8 +659,7 @@ export class InteractiveDiamondView {
       style.lean = 0;
     }
     this.layer.update(style);
-    this.layer.lightBackground =
-      o.expansionStyle === "centered" && o.lightBackground;
+    this.layer.lightBackground = o.expansionStyle === "centered" && o.lightBackground;
     this.optionsVisible = o.isVisible;
     this.isRenderingEnabled = o.isVisible;
     this.applyExpansion();
@@ -788,8 +725,7 @@ export class PremiumDiamondView {
   private enabled = true;
 
   private sync() {
-    this.layer.isInHierarchy =
-      this.visibleOnScreen && this.element.isConnected && this.enabled;
+    this.layer.isInHierarchy = this.visibleOnScreen && this.element.isConnected && this.enabled;
   }
 
   setReduceMotionMode(mode: "auto" | boolean) {
@@ -816,11 +752,7 @@ export class PremiumDiamondView {
   }
 
   private onDown = (e: PointerEvent) => {
-    if (
-      this.pointerId !== null ||
-      (e.pointerType === "mouse" && e.button !== 0)
-    )
-      return;
+    if (this.pointerId !== null || (e.pointerType === "mouse" && e.button !== 0)) return;
     this.pointerId = e.pointerId;
     try {
       this.element.setPointerCapture(e.pointerId);
@@ -837,14 +769,9 @@ export class PremiumDiamondView {
     const p = this.local(e);
     const t = performance.now() / 1000;
     this.samples.push({ ...p, time: t });
-    while (this.samples.length > 2 && this.samples[0].time < t - 0.1)
-      this.samples.shift();
+    while (this.samples.length > 2 && this.samples[0].time < t - 0.1) this.samples.shift();
     if (!this.panning) {
-      if (
-        Math.hypot(p.x - this.down.x, p.y - this.down.y) <
-        PremiumDiamondView.slop
-      )
-        return;
+      if (Math.hypot(p.x - this.down.x, p.y - this.down.y) < PremiumDiamondView.slop) return;
       this.panning = true;
       this.last = p;
       this.layer.updateDrag("began");

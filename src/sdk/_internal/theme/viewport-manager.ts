@@ -1,7 +1,6 @@
-
-import { WebAppKernel } from '../core/kernel';
-import { sessionStorageGet, sessionStorageSet } from '../core/utils';
-import type { SafeAreaInset } from '../types';
+import { WebAppKernel } from "../core/kernel";
+import { sessionStorageGet, sessionStorageSet } from "../core/utils";
+import type { SafeAreaInset } from "../types";
 
 export class ViewportManager {
   private viewportHeightPx: number | false = false;
@@ -16,20 +15,20 @@ export class ViewportManager {
   private _isClosingConfirmationEnabled = false;
   private _isVerticalSwipesEnabled = true;
 
-  private lastWindowHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
+  private lastWindowHeight = typeof window !== "undefined" ? window.innerHeight : 0;
 
   constructor(private readonly kernel: WebAppKernel) {
     if (kernel.initParams.tgWebAppFullscreen) {
       this.setFullscreen(true);
     }
-    const storedFullscreen = sessionStorageGet<string>('isFullscreen');
+    const storedFullscreen = sessionStorageGet<string>("isFullscreen");
     if (storedFullscreen) {
-      this.setFullscreen(storedFullscreen == 'yes');
+      this.setFullscreen(storedFullscreen == "yes");
     }
 
-    const storedOrientationLock = sessionStorageGet<string>('isOrientationLocked');
+    const storedOrientationLock = sessionStorageGet<string>("isOrientationLocked");
     if (storedOrientationLock) {
-      this.setOrientationLock(storedOrientationLock == 'yes');
+      this.setOrientationLock(storedOrientationLock == "yes");
     }
 
     this.onWindowResize = this.onWindowResize.bind(this);
@@ -45,7 +44,8 @@ export class ViewportManager {
   }
 
   get viewportStableHeight(): number {
-    const raw = this.viewportStableHeightPx === false ? window.innerHeight : this.viewportStableHeightPx;
+    const raw =
+      this.viewportStableHeightPx === false ? window.innerHeight : this.viewportStableHeightPx;
     return raw - this.kernel.bottomBarHeightPx;
   }
 
@@ -73,9 +73,13 @@ export class ViewportManager {
     return this._isVerticalSwipesEnabled;
   }
 
-  setViewportHeight(data?: { height: number; is_expanded?: boolean; is_state_stable?: boolean }): void {
+  setViewportHeight(data?: {
+    height: number;
+    is_expanded?: boolean;
+    is_state_stable?: boolean;
+  }): void {
     let emitEvent = false;
-    if (typeof data !== 'undefined') {
+    if (typeof data !== "undefined") {
       this._isExpanded = !!data.is_expanded;
       this.viewportHeightPx = data.height;
       if (data.is_state_stable) {
@@ -86,27 +90,29 @@ export class ViewportManager {
     const bottomBarHeight = this.kernel.bottomBarHeightPx;
     const height =
       this.viewportHeightPx !== false
-        ? this.viewportHeightPx - bottomBarHeight + 'px'
+        ? this.viewportHeightPx - bottomBarHeight + "px"
         : bottomBarHeight
-        ? `calc(100vh - ${bottomBarHeight}px)`
-        : '100vh';
+          ? `calc(100vh - ${bottomBarHeight}px)`
+          : "100vh";
     const stableHeight =
       this.viewportStableHeightPx !== false
-        ? this.viewportStableHeightPx - bottomBarHeight + 'px'
+        ? this.viewportStableHeightPx - bottomBarHeight + "px"
         : bottomBarHeight
-        ? `calc(100vh - ${bottomBarHeight}px)`
-        : '100vh';
-    this.kernel.setCssProperty('viewport-height', height);
-    this.kernel.setCssProperty('viewport-stable-height', stableHeight);
+          ? `calc(100vh - ${bottomBarHeight}px)`
+          : "100vh";
+    this.kernel.setCssProperty("viewport-height", height);
+    this.kernel.setCssProperty("viewport-stable-height", stableHeight);
 
     if (emitEvent) {
-      this.kernel.receiveWebViewEvent('viewportChanged', { isStateStable: !!data!.is_state_stable });
+      this.kernel.receiveWebViewEvent("viewportChanged", {
+        isStateStable: !!data!.is_state_stable,
+      });
     }
   }
 
   handleViewportChanged = (_eventType: string, eventData: any): void => {
     if (eventData.height) {
-      window.removeEventListener('resize', this.onWindowResize);
+      window.removeEventListener("resize", this.onWindowResize);
       this.setViewportHeight(eventData);
     }
   };
@@ -114,22 +120,22 @@ export class ViewportManager {
   onWindowResize(): void {
     if (this.lastWindowHeight != window.innerHeight) {
       this.lastWindowHeight = window.innerHeight;
-      this.kernel.receiveWebViewEvent('viewportChanged', { isStateStable: true });
+      this.kernel.receiveWebViewEvent("viewportChanged", { isStateStable: true });
     }
   }
 
   setSafeAreaInset(data?: Partial<SafeAreaInset>): void {
-    if (typeof data !== 'undefined') {
-      if (typeof data.top !== 'undefined') this._safeAreaInset.top = data.top;
-      if (typeof data.bottom !== 'undefined') this._safeAreaInset.bottom = data.bottom;
-      if (typeof data.left !== 'undefined') this._safeAreaInset.left = data.left;
-      if (typeof data.right !== 'undefined') this._safeAreaInset.right = data.right;
-      this.kernel.receiveWebViewEvent('safeAreaChanged');
+    if (typeof data !== "undefined") {
+      if (typeof data.top !== "undefined") this._safeAreaInset.top = data.top;
+      if (typeof data.bottom !== "undefined") this._safeAreaInset.bottom = data.bottom;
+      if (typeof data.left !== "undefined") this._safeAreaInset.left = data.left;
+      if (typeof data.right !== "undefined") this._safeAreaInset.right = data.right;
+      this.kernel.receiveWebViewEvent("safeAreaChanged");
     }
-    this.kernel.setCssProperty('safe-area-inset-top', this._safeAreaInset.top + 'px');
-    this.kernel.setCssProperty('safe-area-inset-bottom', this._safeAreaInset.bottom + 'px');
-    this.kernel.setCssProperty('safe-area-inset-left', this._safeAreaInset.left + 'px');
-    this.kernel.setCssProperty('safe-area-inset-right', this._safeAreaInset.right + 'px');
+    this.kernel.setCssProperty("safe-area-inset-top", this._safeAreaInset.top + "px");
+    this.kernel.setCssProperty("safe-area-inset-bottom", this._safeAreaInset.bottom + "px");
+    this.kernel.setCssProperty("safe-area-inset-left", this._safeAreaInset.left + "px");
+    this.kernel.setCssProperty("safe-area-inset-right", this._safeAreaInset.right + "px");
   }
 
   handleSafeAreaChanged = (_eventType: string, eventData: any): void => {
@@ -137,17 +143,29 @@ export class ViewportManager {
   };
 
   setContentSafeAreaInset(data?: Partial<SafeAreaInset>): void {
-    if (typeof data !== 'undefined') {
-      if (typeof data.top !== 'undefined') this._contentSafeAreaInset.top = data.top;
-      if (typeof data.bottom !== 'undefined') this._contentSafeAreaInset.bottom = data.bottom;
-      if (typeof data.left !== 'undefined') this._contentSafeAreaInset.left = data.left;
-      if (typeof data.right !== 'undefined') this._contentSafeAreaInset.right = data.right;
-      this.kernel.receiveWebViewEvent('contentSafeAreaChanged');
+    if (typeof data !== "undefined") {
+      if (typeof data.top !== "undefined") this._contentSafeAreaInset.top = data.top;
+      if (typeof data.bottom !== "undefined") this._contentSafeAreaInset.bottom = data.bottom;
+      if (typeof data.left !== "undefined") this._contentSafeAreaInset.left = data.left;
+      if (typeof data.right !== "undefined") this._contentSafeAreaInset.right = data.right;
+      this.kernel.receiveWebViewEvent("contentSafeAreaChanged");
     }
-    this.kernel.setCssProperty('content-safe-area-inset-top', this._contentSafeAreaInset.top + 'px');
-    this.kernel.setCssProperty('content-safe-area-inset-bottom', this._contentSafeAreaInset.bottom + 'px');
-    this.kernel.setCssProperty('content-safe-area-inset-left', this._contentSafeAreaInset.left + 'px');
-    this.kernel.setCssProperty('content-safe-area-inset-right', this._contentSafeAreaInset.right + 'px');
+    this.kernel.setCssProperty(
+      "content-safe-area-inset-top",
+      this._contentSafeAreaInset.top + "px",
+    );
+    this.kernel.setCssProperty(
+      "content-safe-area-inset-bottom",
+      this._contentSafeAreaInset.bottom + "px",
+    );
+    this.kernel.setCssProperty(
+      "content-safe-area-inset-left",
+      this._contentSafeAreaInset.left + "px",
+    );
+    this.kernel.setCssProperty(
+      "content-safe-area-inset-right",
+      this._contentSafeAreaInset.right + "px",
+    );
   }
 
   handleContentSafeAreaChanged = (_eventType: string, eventData: any): void => {
@@ -155,63 +173,63 @@ export class ViewportManager {
   };
 
   setClosingConfirmation(needConfirmation: boolean): void {
-    if (!this.kernel.warnIfUnsupported('6.2', 'Closing confirmation')) {
+    if (!this.kernel.warnIfUnsupported("6.2", "Closing confirmation")) {
       return;
     }
     this._isClosingConfirmationEnabled = !!needConfirmation;
-    this.kernel.webView.postEvent('web_app_setup_closing_behavior', undefined, {
+    this.kernel.webView.postEvent("web_app_setup_closing_behavior", undefined, {
       need_confirmation: this._isClosingConfirmationEnabled,
     });
   }
 
   toggleVerticalSwipes(enableSwipes: boolean): void {
-    if (!this.kernel.warnIfUnsupported('7.7', 'Changing swipes behavior')) {
+    if (!this.kernel.warnIfUnsupported("7.7", "Changing swipes behavior")) {
       return;
     }
     this._isVerticalSwipesEnabled = !!enableSwipes;
-    this.kernel.webView.postEvent('web_app_setup_swipe_behavior', undefined, {
+    this.kernel.webView.postEvent("web_app_setup_swipe_behavior", undefined, {
       allow_vertical_swipe: this._isVerticalSwipesEnabled,
     });
   }
 
   private setFullscreen(isFullscreen: boolean): void {
     this._isFullscreen = !!isFullscreen;
-    sessionStorageSet('isFullscreen', this._isFullscreen ? 'yes' : 'no');
+    sessionStorageSet("isFullscreen", this._isFullscreen ? "yes" : "no");
   }
 
   handleFullscreenChanged = (_eventType: string, eventData: any): void => {
     this.setFullscreen(eventData.is_fullscreen);
-    this.kernel.receiveWebViewEvent('fullscreenChanged');
+    this.kernel.receiveWebViewEvent("fullscreenChanged");
   };
 
   handleFullscreenFailed = (_eventType: string, eventData: any): void => {
-    if (eventData.error == 'ALREADY_FULLSCREEN' && !this._isFullscreen) {
+    if (eventData.error == "ALREADY_FULLSCREEN" && !this._isFullscreen) {
       this.setFullscreen(true);
     }
-    this.kernel.receiveWebViewEvent('fullscreenFailed', { error: eventData.error });
+    this.kernel.receiveWebViewEvent("fullscreenFailed", { error: eventData.error });
   };
 
   requestFullscreen(): void {
-    this.kernel.requireVersion('8.0', 'requestFullscreen');
-    this.kernel.webView.postEvent('web_app_request_fullscreen');
+    this.kernel.requireVersion("8.0", "requestFullscreen");
+    this.kernel.webView.postEvent("web_app_request_fullscreen");
   }
 
   exitFullscreen(): void {
-    this.kernel.requireVersion('8.0', 'exitFullscreen');
-    this.kernel.webView.postEvent('web_app_exit_fullscreen');
+    this.kernel.requireVersion("8.0", "exitFullscreen");
+    this.kernel.webView.postEvent("web_app_exit_fullscreen");
   }
 
   private setOrientationLock(isLocked: boolean): void {
     this._isOrientationLocked = !!isLocked;
-    sessionStorageSet('isOrientationLocked', this._isOrientationLocked ? 'yes' : 'no');
+    sessionStorageSet("isOrientationLocked", this._isOrientationLocked ? "yes" : "no");
   }
 
   toggleOrientationLock(locked: boolean): void {
-    if (!this.kernel.warnIfUnsupported('8.0', 'Orientation locking')) {
+    if (!this.kernel.warnIfUnsupported("8.0", "Orientation locking")) {
       return;
     }
     this.setOrientationLock(locked);
-    this.kernel.webView.postEvent('web_app_toggle_orientation_lock', undefined, {
+    this.kernel.webView.postEvent("web_app_toggle_orientation_lock", undefined, {
       locked: this._isOrientationLocked,
     });
   }

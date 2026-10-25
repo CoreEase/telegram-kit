@@ -45,7 +45,10 @@ export const mix4 = (a: V4, b: V4, t: number): V4 => [
   a[3] + (b[3] - a[3]) * t,
 ];
 
-export const mix2 = (a: V2, b: V2, t: number): V2 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+export const mix2 = (a: V2, b: V2, t: number): V2 => [
+  a[0] + (b[0] - a[0]) * t,
+  a[1] + (b[1] - a[1]) * t,
+];
 
 export function ieeeRemainder(x: number, y: number): number {
   const q = x / y;
@@ -97,12 +100,16 @@ export const DiamondMath = {
     return [world[0] / w, world[1] / w];
   },
   cameraRay(point: V2): { origin: V4; direction: V4 } {
-    const s = DiamondMath.cameraScale, d = DiamondMath.cameraDistance;
+    const s = DiamondMath.cameraScale,
+      d = DiamondMath.cameraDistance;
     const dir = norm3([point[0] / s, point[1] / s, -d]);
     return { origin: [0, 0, d, 1], direction: [dir[0], dir[1], dir[2], 0] };
   },
   rotation(x: number, y: number): Mat4 {
-    const cp = Math.cos(x), sp = Math.sin(x), cy = Math.cos(y), sy = Math.sin(y);
+    const cp = Math.cos(x),
+      sp = Math.sin(x),
+      cy = Math.cos(y),
+      sy = Math.sin(y);
     const rx = new Float32Array([1, 0, 0, 0, 0, cp, sp, 0, 0, -sp, cp, 0, 0, 0, 0, 1]);
     const ry = new Float32Array([cy, 0, -sy, 0, 0, 1, 0, 0, sy, 0, cy, 0, 0, 0, 0, 1]);
     return mat4Mul(rx, ry);
@@ -112,11 +119,46 @@ export const DiamondMath = {
     const halfWidth = halfHeight * aspect;
     const m = new Float32Array(16);
     if (perspective) {
-      const w0 = 1 / DiamondMath.cameraScale, wz = -w0 / DiamondMath.cameraDistance;
+      const w0 = 1 / DiamondMath.cameraScale,
+        wz = -w0 / DiamondMath.cameraDistance;
       const framing = 0.12 / halfHeight;
-      m.set([1 / halfWidth, 0, 0, 0, 0, 1 / halfHeight, 0, 0, 0, framing * wz, -w0 / 6, wz, 0, framing * w0, 0.5 * w0, w0]);
+      m.set([
+        1 / halfWidth,
+        0,
+        0,
+        0,
+        0,
+        1 / halfHeight,
+        0,
+        0,
+        0,
+        framing * wz,
+        -w0 / 6,
+        wz,
+        0,
+        framing * w0,
+        0.5 * w0,
+        w0,
+      ]);
     } else {
-      m.set([1 / halfWidth, 0, 0, 0, 0, 1 / halfHeight, 0, 0, 0, 0, -1 / 12, 0, 0, 0.12 / halfHeight, 0.5, 1]);
+      m.set([
+        1 / halfWidth,
+        0,
+        0,
+        0,
+        0,
+        1 / halfHeight,
+        0,
+        0,
+        0,
+        0,
+        -1 / 12,
+        0,
+        0,
+        0.12 / halfHeight,
+        0.5,
+        1,
+      ]);
     }
     return m;
   },

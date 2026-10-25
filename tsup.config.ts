@@ -1,12 +1,12 @@
-import { defineConfig } from 'tsup';
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'fs';
-import { join, resolve } from 'path';
-import { copyFileSync, mkdirSync } from 'fs';
+import { defineConfig } from "tsup";
+import { readFileSync, writeFileSync, readdirSync, existsSync } from "fs";
+import { join, resolve } from "path";
+import { copyFileSync, mkdirSync } from "fs";
 
 function prependUseClient(files: string[]): void {
   for (const file of files) {
     if (!existsSync(file)) continue;
-    const content = readFileSync(file, 'utf-8');
+    const content = readFileSync(file, "utf-8");
     if (!content.startsWith('"use client"')) {
       writeFileSync(file, '"use client";\n' + content);
     }
@@ -16,61 +16,83 @@ function prependUseClient(files: string[]): void {
 export default defineConfig([
   {
     entry: {
-      index: 'src/index.ts',
-      'hooks/index': 'src/react/hooks.ts',
-      'animation/index': 'src/ui/animation.ts',
-      'gram-diamond/index': 'src/ui/gram-diamond.tsx',
-      'animation/lottie/index': 'src/ui/lottie.tsx',
-      'animation/tgs/index': 'src/ui/tgs.tsx',
-      'animation/vanilla/index': 'src/ui/lottie-vanilla.ts',
-      'lottie.worker': 'src/_internal/animation/lottie/worker/lottie.worker.ts',
-      'tgs/index': 'src/ui/tgs.tsx',
-      'lottie/index': 'src/ui/lottie.tsx',
+      index: "src/index.ts",
+      "hooks/index": "src/react/hooks.ts",
+      "animation/index": "src/ui/animation.ts",
+      "gram-diamond/index": "src/ui/gram-diamond.tsx",
+      "premium-star/index": "src/ui/premium-star.tsx",
+      "animation/lottie/index": "src/ui/lottie.tsx",
+      "animation/tgs/index": "src/ui/tgs.tsx",
+      "animation/vanilla/index": "src/ui/lottie-vanilla.ts",
+      "lottie.worker": "src/_internal/animation/lottie/worker/lottie.worker.ts",
+      "tgs/index": "src/ui/tgs.tsx",
+      "lottie/index": "src/ui/lottie.tsx",
     },
-    format: ['cjs', 'esm'],
+    format: ["cjs", "esm"],
     dts: true,
-    external: ['react', 'react-dom', 'node:crypto', 'crypto'],
+    external: ["react", "react-dom", "node:crypto", "crypto"],
     clean: true,
     treeshake: true,
-    target: 'es2020',
+    target: "es2020",
     async onSuccess() {
-      const dist = 'dist';
-      const wasm = resolve('src/_internal/animation/lottie/core/lottie.wasm');
-      const worker = join(dist, 'lottie.worker.js');
+      const dist = "dist";
+      const wasm = resolve("src/_internal/animation/lottie/core/lottie.wasm");
+      const worker = join(dist, "lottie.worker.js");
       mkdirSync(dist, { recursive: true });
-      copyFileSync(wasm, join(dist, 'lottie.wasm'));
-      const wasmDirectories = ['core', 'animation', 'animation/core', 'animation/lottie', 'animation/tgs', 'animation/vanilla', 'lottie', 'lottie/core', 'tgs', 'tgs/core'];
-      const workerDirectories = ['.', 'animation', 'animation/lottie', 'animation/tgs', 'animation/vanilla', 'lottie', 'tgs'];
+      copyFileSync(wasm, join(dist, "lottie.wasm"));
+      const wasmDirectories = [
+        "core",
+        "animation",
+        "animation/core",
+        "animation/lottie",
+        "animation/tgs",
+        "animation/vanilla",
+        "lottie",
+        "lottie/core",
+        "tgs",
+        "tgs/core",
+      ];
+      const workerDirectories = [
+        ".",
+        "animation",
+        "animation/lottie",
+        "animation/tgs",
+        "animation/vanilla",
+        "lottie",
+        "tgs",
+      ];
       for (const directory of wasmDirectories) {
         mkdirSync(join(dist, directory), { recursive: true });
-        copyFileSync(wasm, join(dist, directory, 'lottie.wasm'));
+        copyFileSync(wasm, join(dist, directory, "lottie.wasm"));
       }
       for (const directory of workerDirectories) {
         mkdirSync(join(dist, directory), { recursive: true });
-        copyFileSync(worker, join(dist, directory, 'lottie.worker.js'));
+        copyFileSync(worker, join(dist, directory, "lottie.worker.js"));
       }
       const entryFiles = [
-        join(dist, 'index.js'),
-        join(dist, 'index.mjs'),
-        join(dist, 'hooks', 'index.js'),
-        join(dist, 'hooks', 'index.mjs'),
-        join(dist, 'animation', 'index.js'),
-        join(dist, 'animation', 'index.mjs'),
-        join(dist, 'animation', 'lottie', 'index.js'),
-        join(dist, 'animation', 'lottie', 'index.mjs'),
-        join(dist, 'animation', 'tgs', 'index.js'),
-        join(dist, 'animation', 'tgs', 'index.mjs'),
-        join(dist, 'animation', 'vanilla', 'index.js'),
-        join(dist, 'animation', 'vanilla', 'index.mjs'),
-        join(dist, 'gram-diamond', 'index.js'),
-        join(dist, 'gram-diamond', 'index.mjs'),
-        join(dist, 'tgs', 'index.js'),
-        join(dist, 'tgs', 'index.mjs'),
-        join(dist, 'lottie', 'index.js'),
-        join(dist, 'lottie', 'index.mjs'),
+        join(dist, "index.js"),
+        join(dist, "index.mjs"),
+        join(dist, "hooks", "index.js"),
+        join(dist, "hooks", "index.mjs"),
+        join(dist, "animation", "index.js"),
+        join(dist, "animation", "index.mjs"),
+        join(dist, "animation", "lottie", "index.js"),
+        join(dist, "animation", "lottie", "index.mjs"),
+        join(dist, "animation", "tgs", "index.js"),
+        join(dist, "animation", "tgs", "index.mjs"),
+        join(dist, "animation", "vanilla", "index.js"),
+        join(dist, "animation", "vanilla", "index.mjs"),
+        join(dist, "gram-diamond", "index.js"),
+        join(dist, "gram-diamond", "index.mjs"),
+        join(dist, "premium-star", "index.js"),
+        join(dist, "premium-star", "index.mjs"),
+        join(dist, "tgs", "index.js"),
+        join(dist, "tgs", "index.mjs"),
+        join(dist, "lottie", "index.js"),
+        join(dist, "lottie", "index.mjs"),
       ];
       const chunks = readdirSync(dist).filter(
-        (f) => f.startsWith('chunk-') && (f.endsWith('.mjs') || f.endsWith('.js'))
+        (f) => f.startsWith("chunk-") && (f.endsWith(".mjs") || f.endsWith(".js")),
       );
       prependUseClient([...entryFiles, ...chunks.map((f) => join(dist, f))]);
       console.log('[@core-ease/telegram-kit] "use client" injected into client bundles.');
@@ -78,32 +100,32 @@ export default defineConfig([
   },
   {
     entry: {
-      'bot/index': 'src/bot/index.ts',
-      'sdk/index': 'src/sdk/index.ts',
-      'dev/index': 'src/core/dev.ts',
-      'core/index': 'src/core/index.ts',
-      'server/index': 'src/core/server.ts',
-      'qr/index': 'src/ui/qr.ts',
-      'format/index': 'src/utils/format.ts',
-      'links/index': 'src/utils/links.ts',
-      'keyboards/index': 'src/utils/keyboards.ts',
+      "bot/index": "src/bot/index.ts",
+      "sdk/index": "src/sdk/index.ts",
+      "dev/index": "src/core/dev.ts",
+      "core/index": "src/core/index.ts",
+      "server/index": "src/core/server.ts",
+      "qr/index": "src/ui/qr.ts",
+      "format/index": "src/utils/format.ts",
+      "links/index": "src/utils/links.ts",
+      "keyboards/index": "src/utils/keyboards.ts",
     },
-    format: ['cjs', 'esm'],
+    format: ["cjs", "esm"],
     dts: true,
-    external: ['react', 'react-dom', 'node:crypto', 'crypto'],
+    external: ["react", "react-dom", "node:crypto", "crypto"],
     clean: false,
     treeshake: true,
-    target: 'es2020',
+    target: "es2020",
   },
   {
-    entry: { browser: 'src/browser.ts' },
-    format: ['iife'],
-    globalName: 'TelegramKit',
-    platform: 'browser',
+    entry: { browser: "src/browser.ts" },
+    format: ["iife"],
+    globalName: "TelegramKit",
+    platform: "browser",
     dts: false,
     clean: false,
     treeshake: true,
-    target: 'es2020',
+    target: "es2020",
     minify: true,
   },
 ]);

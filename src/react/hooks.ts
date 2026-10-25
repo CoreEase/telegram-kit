@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from "react";
 import {
   getWebApp,
   haptic,
@@ -26,7 +26,7 @@ import {
   biometric,
   location as coreLocation,
   safeInvoke,
-} from '../core';
+} from "../core";
 import type {
   TgUser,
   TgWebApp,
@@ -36,11 +36,13 @@ import type {
   StoryShareParams,
   LocationData,
   SafeAreaInset,
-} from '../types/webapp';
+} from "../types/webapp";
 
 export function useTelegramWebApp(): TgWebApp | null {
   const [wa, setWa] = useState<TgWebApp | null>(null);
-  useEffect(() => { setWa(getWebApp()); }, []);
+  useEffect(() => {
+    setWa(getWebApp());
+  }, []);
   return wa;
 }
 
@@ -72,7 +74,7 @@ export function useShowPopup(): (params: {
   message: string;
   buttons?: Array<{
     id?: string;
-    type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive';
+    type?: "default" | "ok" | "close" | "cancel" | "destructive";
     text?: string;
   }>;
 }) => Promise<string | null> {
@@ -97,7 +99,7 @@ export function useReadTextFromClipboard(): () => Promise<string | null> {
 
 export function useTelegramEvent(
   eventType: WebAppEventType | string,
-  handler: (...args: unknown[]) => void
+  handler: (...args: unknown[]) => void,
 ): void {
   const handlerRef = useRef(handler);
   handlerRef.current = handler;
@@ -186,8 +188,14 @@ export function useTelegramMainButton(options: {
   showProgress?: boolean;
 }): void {
   const {
-    text, onClick, isVisible = true, isActive = true,
-    color, textColor, hasShineEffect, showProgress,
+    text,
+    onClick,
+    isVisible = true,
+    isActive = true,
+    color,
+    textColor,
+    hasShineEffect,
+    showProgress,
   } = options;
 
   useEffect(() => {
@@ -221,13 +229,18 @@ export function useTelegramSecondaryButton(options: {
   onClick: () => void;
   isVisible?: boolean;
   isActive?: boolean;
-  position?: 'left' | 'right' | 'top' | 'bottom';
+  position?: "left" | "right" | "top" | "bottom";
   color?: string;
   textColor?: string;
 }): void {
   const {
-    text, onClick, isVisible = true, isActive = true,
-    position = 'left', color, textColor,
+    text,
+    onClick,
+    isVisible = true,
+    isActive = true,
+    position = "left",
+    color,
+    textColor,
   } = options;
 
   useEffect(() => {
@@ -268,10 +281,10 @@ export function useTelegramSettingsButton(onClick: () => void): void {
 
 export function useHapticFeedback() {
   return {
-    impact: useCallback((style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' = 'medium') => {
+    impact: useCallback((style: "light" | "medium" | "heavy" | "rigid" | "soft" = "medium") => {
       haptic[style]();
     }, []),
-    notification: useCallback((type: 'error' | 'success' | 'warning') => {
+    notification: useCallback((type: "error" | "success" | "warning") => {
       haptic[type]();
     }, []),
     selectionChanged: useCallback(() => {
@@ -281,21 +294,19 @@ export function useHapticFeedback() {
 }
 
 export function useTelegramTheme() {
-  const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(
-    () => getWebApp()?.colorScheme ?? 'dark'
+  const [colorScheme, setColorScheme] = useState<"light" | "dark">(
+    () => getWebApp()?.colorScheme ?? "dark",
   );
-  const [themeParams, setThemeParams] = useState(
-    () => getWebApp()?.themeParams ?? {}
-  );
+  const [themeParams, setThemeParams] = useState(() => getWebApp()?.themeParams ?? {});
 
-  useTelegramEvent('themeChanged', () => {
+  useTelegramEvent("themeChanged", () => {
     const wa = getWebApp();
     if (!wa) return;
     setColorScheme(wa.colorScheme);
     setThemeParams(wa.themeParams);
   });
 
-  return { colorScheme, themeParams, isDark: colorScheme === 'dark' };
+  return { colorScheme, themeParams, isDark: colorScheme === "dark" };
 }
 
 export function useTelegramViewport() {
@@ -305,7 +316,7 @@ export function useTelegramViewport() {
     isExpanded: getWebApp()?.isExpanded ?? false,
   }));
 
-  useTelegramEvent('viewportChanged', () => {
+  useTelegramEvent("viewportChanged", () => {
     const wa = getWebApp();
     if (!wa) return;
     setViewport({
@@ -315,23 +326,23 @@ export function useTelegramViewport() {
     });
   });
 
-  const expand = useCallback(() => { safeInvoke(() => getWebApp()?.expand()); }, []);
+  const expand = useCallback(() => {
+    safeInvoke(() => getWebApp()?.expand());
+  }, []);
   return { ...viewport, expand };
 }
 
 export function useTelegramFullscreen() {
-  const [isFullscreen, setIsFullscreen] = useState(
-    () => Boolean(getWebApp()?.isFullscreen)
-  );
+  const [isFullscreen, setIsFullscreen] = useState(() => Boolean(getWebApp()?.isFullscreen));
   const [error, setError] = useState<{ error: string } | null>(null);
 
-  useTelegramEvent('fullscreenChanged', () => {
+  useTelegramEvent("fullscreenChanged", () => {
     setIsFullscreen(Boolean(getWebApp()?.isFullscreen));
   });
 
-  useTelegramEvent('fullscreenFailed', (...args) => {
+  useTelegramEvent("fullscreenFailed", (...args) => {
     const err = args[0];
-    if (err && typeof err === 'object' && 'error' in err) {
+    if (err && typeof err === "object" && "error" in err) {
       setError(err as { error: string });
     }
   });
@@ -341,20 +352,21 @@ export function useTelegramFullscreen() {
     fullscreen.enter();
   }, []);
 
-  const exit = useCallback(() => { fullscreen.exit(); }, []);
+  const exit = useCallback(() => {
+    fullscreen.exit();
+  }, []);
   const toggle = useCallback(() => {
-    if (isFullscreen) exit(); else enter();
+    if (isFullscreen) exit();
+    else enter();
   }, [isFullscreen, enter, exit]);
 
   return { isFullscreen, error, enter, exit, toggle };
 }
 
 export function useOrientationLock() {
-  const [isLocked, setIsLocked] = useState(
-    () => Boolean(getWebApp()?.isOrientationLocked)
-  );
+  const [isLocked, setIsLocked] = useState(() => Boolean(getWebApp()?.isOrientationLocked));
 
-  useTelegramEvent('fullscreenChanged', () => {
+  useTelegramEvent("fullscreenChanged", () => {
     setIsLocked(Boolean(getWebApp()?.isOrientationLocked));
   });
 
@@ -373,19 +385,17 @@ export function useOrientationLock() {
 
 export function useSafeArea() {
   const zero: SafeAreaInset = { top: 0, bottom: 0, left: 0, right: 0 };
-  const [safeArea, setSafeArea] = useState<SafeAreaInset>(
-    () => getWebApp()?.safeAreaInset ?? zero
-  );
+  const [safeArea, setSafeArea] = useState<SafeAreaInset>(() => getWebApp()?.safeAreaInset ?? zero);
   const [contentSafeArea, setContentSafeArea] = useState<SafeAreaInset>(
-    () => getWebApp()?.contentSafeAreaInset ?? zero
+    () => getWebApp()?.contentSafeAreaInset ?? zero,
   );
 
-  useTelegramEvent('safeAreaChanged', () => {
+  useTelegramEvent("safeAreaChanged", () => {
     const inset = getWebApp()?.safeAreaInset;
     if (inset) setSafeArea(inset);
   });
 
-  useTelegramEvent('contentSafeAreaChanged', () => {
+  useTelegramEvent("contentSafeAreaChanged", () => {
     const inset = getWebApp()?.contentSafeAreaInset;
     if (inset) setContentSafeArea(inset);
   });
@@ -395,8 +405,8 @@ export function useSafeArea() {
 
 export function useIsActive(): boolean {
   const [isActive, setIsActive] = useState(() => Boolean(getWebApp()?.isActive));
-  useTelegramEvent('activated', () => setIsActive(true));
-  useTelegramEvent('deactivated', () => setIsActive(false));
+  useTelegramEvent("activated", () => setIsActive(true));
+  useTelegramEvent("deactivated", () => setIsActive(false));
   return isActive;
 }
 
@@ -435,26 +445,31 @@ export function useAccelerometer(options?: { refreshRate?: number; autoStart?: b
   const [data, setData] = useState({ x: 0, y: 0, z: 0 });
   const [isStarted, setIsStarted] = useState(() => Boolean(getWebApp()?.Accelerometer?.isStarted));
 
-  useTelegramEvent('accelerometerChanged', () => {
+  useTelegramEvent("accelerometerChanged", () => {
     const acc = getWebApp()?.Accelerometer;
-    if (acc) setData({
-      x: acc.x ?? 0,
-      y: acc.y ?? 0,
-      z: acc.z ?? 0
-    });
+    if (acc)
+      setData({
+        x: acc.x ?? 0,
+        y: acc.y ?? 0,
+        z: acc.z ?? 0,
+      });
   });
-  useTelegramEvent('accelerometerStarted', () => setIsStarted(true));
-  useTelegramEvent('accelerometerStopped', () => setIsStarted(false));
+  useTelegramEvent("accelerometerStarted", () => setIsStarted(true));
+  useTelegramEvent("accelerometerStopped", () => setIsStarted(false));
 
   const start = useCallback(() => {
     getWebApp()?.Accelerometer?.start({ refresh_rate: refreshRate });
   }, [refreshRate]);
 
-  const stop = useCallback(() => { getWebApp()?.Accelerometer?.stop(); }, []);
+  const stop = useCallback(() => {
+    getWebApp()?.Accelerometer?.stop();
+  }, []);
 
   useEffect(() => {
     if (autoStart) start();
-    return () => { if (autoStart) stop(); };
+    return () => {
+      if (autoStart) stop();
+    };
   }, [autoStart, start, stop]);
 
   return { ...data, isStarted, start, stop };
@@ -465,26 +480,31 @@ export function useGyroscope(options?: { refreshRate?: number; autoStart?: boole
   const [data, setData] = useState({ x: 0, y: 0, z: 0 });
   const [isStarted, setIsStarted] = useState(() => Boolean(getWebApp()?.Gyroscope?.isStarted));
 
-  useTelegramEvent('gyroscopeChanged', () => {
+  useTelegramEvent("gyroscopeChanged", () => {
     const g = getWebApp()?.Gyroscope;
-    if (g) setData({
-      x: g.x ?? 0,
-      y: g.y ?? 0,
-      z: g.z ?? 0
-    });
+    if (g)
+      setData({
+        x: g.x ?? 0,
+        y: g.y ?? 0,
+        z: g.z ?? 0,
+      });
   });
-  useTelegramEvent('gyroscopeStarted', () => setIsStarted(true));
-  useTelegramEvent('gyroscopeStopped', () => setIsStarted(false));
+  useTelegramEvent("gyroscopeStarted", () => setIsStarted(true));
+  useTelegramEvent("gyroscopeStopped", () => setIsStarted(false));
 
   const start = useCallback(() => {
     getWebApp()?.Gyroscope?.start({ refresh_rate: refreshRate });
   }, [refreshRate]);
 
-  const stop = useCallback(() => { getWebApp()?.Gyroscope?.stop(); }, []);
+  const stop = useCallback(() => {
+    getWebApp()?.Gyroscope?.stop();
+  }, []);
 
   useEffect(() => {
     if (autoStart) start();
-    return () => { if (autoStart) stop(); };
+    return () => {
+      if (autoStart) stop();
+    };
   }, [autoStart, start, stop]);
 
   return { ...data, isStarted, start, stop };
@@ -497,24 +517,39 @@ export function useDeviceOrientation(options?: {
 }) {
   const { refreshRate = 100, needAbsolute = false, autoStart = false } = options ?? {};
   const [data, setData] = useState({ alpha: 0, beta: 0, gamma: 0, absolute: false });
-  const [isStarted, setIsStarted] = useState(() => Boolean(getWebApp()?.DeviceOrientation?.isStarted));
+  const [isStarted, setIsStarted] = useState(() =>
+    Boolean(getWebApp()?.DeviceOrientation?.isStarted),
+  );
 
-  useTelegramEvent('deviceOrientationChanged', () => {
+  useTelegramEvent("deviceOrientationChanged", () => {
     const ori = getWebApp()?.DeviceOrientation;
-    if (ori) setData({ alpha: ori.alpha ?? 0, beta: ori.beta ?? 0, gamma: ori.gamma ?? 0, absolute: ori.absolute });
+    if (ori)
+      setData({
+        alpha: ori.alpha ?? 0,
+        beta: ori.beta ?? 0,
+        gamma: ori.gamma ?? 0,
+        absolute: ori.absolute,
+      });
   });
-  useTelegramEvent('deviceOrientationStarted', () => setIsStarted(true));
-  useTelegramEvent('deviceOrientationStopped', () => setIsStarted(false));
+  useTelegramEvent("deviceOrientationStarted", () => setIsStarted(true));
+  useTelegramEvent("deviceOrientationStopped", () => setIsStarted(false));
 
   const start = useCallback(() => {
-    getWebApp()?.DeviceOrientation?.start({ refresh_rate: refreshRate, need_absolute: needAbsolute });
+    getWebApp()?.DeviceOrientation?.start({
+      refresh_rate: refreshRate,
+      need_absolute: needAbsolute,
+    });
   }, [refreshRate, needAbsolute]);
 
-  const stop = useCallback(() => { getWebApp()?.DeviceOrientation?.stop(); }, []);
+  const stop = useCallback(() => {
+    getWebApp()?.DeviceOrientation?.stop();
+  }, []);
 
   useEffect(() => {
     if (autoStart) start();
-    return () => { if (autoStart) stop(); };
+    return () => {
+      if (autoStart) stop();
+    };
   }, [autoStart, start, stop]);
 
   return { ...data, isStarted, start, stop };
@@ -523,9 +558,9 @@ export function useDeviceOrientation(options?: {
 export function useBiometric() {
   const [isInited, setIsInited] = useState(false);
   const [isAvailable, setIsAvailable] = useState(false);
-  const [biometricType, setBiometricType] = useState<'finger' | 'face' | 'unknown'>('unknown');
+  const [biometricType, setBiometricType] = useState<"finger" | "face" | "unknown">("unknown");
 
-  useTelegramEvent('biometricManagerUpdated', () => {
+  useTelegramEvent("biometricManagerUpdated", () => {
     const bio = getWebApp()?.BiometricManager;
     if (!bio) return;
     setIsInited(bio.isInited);
@@ -533,30 +568,49 @@ export function useBiometric() {
     setBiometricType(bio.biometricType);
   });
 
-  const init = useCallback((): Promise<void> =>
-    biometric.init().then(() => {
-      const bio = getWebApp()?.BiometricManager;
-      if (bio) {
-        setIsInited(bio.isInited);
-        setIsAvailable(bio.isBiometricAvailable);
-        setBiometricType(bio.biometricType);
-      }
-    }), []);
-
-  const requestAccess = useCallback((reason?: string): Promise<boolean> => biometric.requestAccess(reason), []);
-
-  const authenticate = useCallback(
-    (reason?: string): Promise<{ authenticated: boolean; token?: string }> => biometric.authenticate(reason),
-    []
+  const init = useCallback(
+    (): Promise<void> =>
+      biometric.init().then(() => {
+        const bio = getWebApp()?.BiometricManager;
+        if (bio) {
+          setIsInited(bio.isInited);
+          setIsAvailable(bio.isBiometricAvailable);
+          setBiometricType(bio.biometricType);
+        }
+      }),
+    [],
   );
 
-  const updateBiometricToken = useCallback((token: string): Promise<boolean> => biometric.updateBiometricToken(token), []);
+  const requestAccess = useCallback(
+    (reason?: string): Promise<boolean> => biometric.requestAccess(reason),
+    [],
+  );
+
+  const authenticate = useCallback(
+    (reason?: string): Promise<{ authenticated: boolean; token?: string }> =>
+      biometric.authenticate(reason),
+    [],
+  );
+
+  const updateBiometricToken = useCallback(
+    (token: string): Promise<boolean> => biometric.updateBiometricToken(token),
+    [],
+  );
 
   const openSettings = useCallback(() => {
     biometric.openSettings();
   }, []);
 
-  return { isInited, isAvailable, biometricType, init, requestAccess, authenticate, updateBiometricToken, openSettings };
+  return {
+    isInited,
+    isAvailable,
+    biometricType,
+    init,
+    requestAccess,
+    authenticate,
+    updateBiometricToken,
+    openSettings,
+  };
 }
 
 export function useLocation() {
@@ -564,34 +618,40 @@ export function useLocation() {
   const [isInited, setIsInited] = useState(false);
   const [isGranted, setIsGranted] = useState(false);
 
-  useTelegramEvent('locationManagerUpdated', () => {
+  useTelegramEvent("locationManagerUpdated", () => {
     const loc = getWebApp()?.LocationManager;
     if (!loc) return;
     setIsInited(loc.isInited);
     setIsGranted(loc.isAccessGranted);
   });
 
-  useTelegramEvent('locationRequested', (...args) => {
+  useTelegramEvent("locationRequested", (...args) => {
     const data = args[0];
-    if (data && typeof data === 'object' && 'locationData' in data) {
+    if (data && typeof data === "object" && "locationData" in data) {
       setLocationData((data as { locationData: LocationData }).locationData);
     }
   });
 
-  const init = useCallback((): Promise<void> =>
-    coreLocation.init().then(() => {
-      const loc = getWebApp()?.LocationManager;
-      if (loc) {
-        setIsInited(loc.isInited);
-        setIsGranted(loc.isAccessGranted);
-      }
-    }), []);
+  const init = useCallback(
+    (): Promise<void> =>
+      coreLocation.init().then(() => {
+        const loc = getWebApp()?.LocationManager;
+        if (loc) {
+          setIsInited(loc.isInited);
+          setIsGranted(loc.isAccessGranted);
+        }
+      }),
+    [],
+  );
 
-  const getLocation = useCallback((): Promise<LocationData | null> =>
-    coreLocation.getLocation().then((data) => {
-      setLocationData(data);
-      return data;
-    }), []);
+  const getLocation = useCallback(
+    (): Promise<LocationData | null> =>
+      coreLocation.getLocation().then((data) => {
+        setLocationData(data);
+        return data;
+      }),
+    [],
+  );
 
   const openSettings = useCallback(() => {
     coreLocation.openSettings();
@@ -601,13 +661,13 @@ export function useLocation() {
 }
 
 export function useHomeScreen() {
-  const [status, setStatus] = useState<'unsupported' | 'unknown' | 'added' | 'missed' | null>(null);
+  const [status, setStatus] = useState<"unsupported" | "unknown" | "added" | "missed" | null>(null);
 
-  useTelegramEvent('homeScreenAdded', () => setStatus('added'));
-  useTelegramEvent('homeScreenChecked', (...args) => {
+  useTelegramEvent("homeScreenAdded", () => setStatus("added"));
+  useTelegramEvent("homeScreenChecked", (...args) => {
     const data = args[0];
-    if (data && typeof data === 'object' && 'status' in data) {
-      setStatus((data as { status: 'unsupported' | 'unknown' | 'added' | 'missed' }).status);
+    if (data && typeof data === "object" && "status" in data) {
+      setStatus((data as { status: "unsupported" | "unknown" | "added" | "missed" }).status);
     }
   });
 
@@ -634,8 +694,9 @@ export function useShareMessage() {
 
 export function useSetEmojiStatus() {
   return useCallback(
-    (customEmojiId: string, params?: EmojiStatusParams): Promise<boolean> => coreSetEmojiStatus(customEmojiId, params),
-    []
+    (customEmojiId: string, params?: EmojiStatusParams): Promise<boolean> =>
+      coreSetEmojiStatus(customEmojiId, params),
+    [],
   );
 }
 
@@ -644,7 +705,10 @@ export function useRequestEmojiStatusAccess() {
 }
 
 export function useDownloadFile() {
-  return useCallback((params: DownloadFileParams): Promise<boolean> => coreDownloadFile(params), []);
+  return useCallback(
+    (params: DownloadFileParams): Promise<boolean> => coreDownloadFile(params),
+    [],
+  );
 }
 
 export function useRequestWriteAccess() {
@@ -656,12 +720,12 @@ export function useRequestContact() {
 }
 
 export function useSwitchInlineQuery() {
-  return useCallback((
-    query: string,
-    chooseChatTypes?: Array<'users' | 'bots' | 'groups' | 'channels'>
-  ) => {
-    coreSwitchInlineQuery(query, chooseChatTypes);
-  }, []);
+  return useCallback(
+    (query: string, chooseChatTypes?: Array<"users" | "bots" | "groups" | "channels">) => {
+      coreSwitchInlineQuery(query, chooseChatTypes);
+    },
+    [],
+  );
 }
 
 export function useRequestChat() {
@@ -676,7 +740,8 @@ export function useHideKeyboard() {
 
 export function useInvokeCustomMethod() {
   return useCallback(
-    (method: string, params: object = {}): Promise<unknown> => coreInvokeCustomMethod(method, params),
-    []
+    (method: string, params: object = {}): Promise<unknown> =>
+      coreInvokeCustomMethod(method, params),
+    [],
   );
 }

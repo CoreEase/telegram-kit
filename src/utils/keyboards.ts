@@ -11,7 +11,7 @@ import type {
   ReplyKeyboardMarkup,
   ReplyKeyboardRemove,
   SwitchInlineQueryChosenChat,
-} from '../types/bot';
+} from "../types/bot";
 
 export class InlineKeyboardBuilder {
   private rows: InlineKeyboardButton[][] = [[]];
@@ -38,14 +38,17 @@ export class InlineKeyboardBuilder {
   }
 
   login(text: string, loginUrl: string | LoginUrl): this {
-    return this.add({ text, login_url: typeof loginUrl === 'string' ? { url: loginUrl } : loginUrl });
+    return this.add({
+      text,
+      login_url: typeof loginUrl === "string" ? { url: loginUrl } : loginUrl,
+    });
   }
 
-  switchInline(text: string, query = ''): this {
+  switchInline(text: string, query = ""): this {
     return this.add({ text, switch_inline_query: query });
   }
 
-  switchInlineCurrentChat(text: string, query = ''): this {
+  switchInlineCurrentChat(text: string, query = ""): this {
     return this.add({ text, switch_inline_query_current_chat: query });
   }
 
@@ -54,10 +57,13 @@ export class InlineKeyboardBuilder {
   }
 
   copyText(text: string, copyText: string | CopyTextButton): this {
-    return this.add({ text, copy_text: typeof copyText === 'string' ? { text: copyText } : copyText });
+    return this.add({
+      text,
+      copy_text: typeof copyText === "string" ? { text: copyText } : copyText,
+    });
   }
 
-  pay(text = 'Pay'): this {
+  pay(text = "Pay"): this {
     return this.add({ text, pay: true });
   }
 
@@ -121,7 +127,7 @@ export class ReplyKeyboardBuilder {
     return this.add({ text: label, request_location: true });
   }
 
-  requestPoll(label: string, type?: KeyboardButtonPollType['type']): this {
+  requestPoll(label: string, type?: KeyboardButtonPollType["type"]): this {
     return this.add({ text: label, request_poll: { type } });
   }
 
@@ -164,5 +170,9 @@ export function removeKeyboard(selective?: boolean): ReplyKeyboardRemove {
 }
 
 export function forceReply(options?: { placeholder?: string; selective?: boolean }): ForceReply {
-  return { force_reply: true, input_field_placeholder: options?.placeholder, selective: options?.selective };
+  return {
+    force_reply: true,
+    input_field_placeholder: options?.placeholder,
+    selective: options?.selective,
+  };
 }

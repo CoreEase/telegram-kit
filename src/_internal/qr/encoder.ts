@@ -1,4 +1,4 @@
-import { buildDataCodewords, interleaveBlocks, splitIntoBlocksWithEcc } from './dataCodewords';
+import { buildDataCodewords, interleaveBlocks, splitIntoBlocksWithEcc } from "./dataCodewords";
 import {
   applyMask,
   computeMaskPenalty,
@@ -8,15 +8,15 @@ import {
   drawVersionInfo,
   placeDataBits,
   symbolSize,
-} from './matrix';
-import { chooseMode } from './segments';
-import type { QrEncodeOptions, QrEncodeResult } from './types';
+} from "./matrix";
+import { chooseMode } from "./segments";
+import type { QrEncodeOptions, QrEncodeResult } from "./types";
 
 const MIN_VERSION = 1;
 const MAX_VERSION = 40;
 
 export function encodeQrMatrix(text: string, options: QrEncodeOptions = {}): QrEncodeResult {
-  const level = options.errorCorrectionLevel ?? 'M';
+  const level = options.errorCorrectionLevel ?? "M";
   const mode = chooseMode(text);
 
   const minVersion = options.version ?? options.minVersion ?? MIN_VERSION;
@@ -36,7 +36,9 @@ export function encodeQrMatrix(text: string, options: QrEncodeOptions = {}): QrE
   if (version === null || dataCodewords === null) {
     throw new Error(
       `[@core-ease/telegram-kit] Unable to encode a QR code: the input is too long for error correction level "${level}"` +
-        (options.version ? ` at version ${options.version}.` : ' within the allowed version range.')
+        (options.version
+          ? ` at version ${options.version}.`
+          : " within the allowed version range."),
     );
   }
 
@@ -57,7 +59,7 @@ export function encodeQrMatrix(text: string, options: QrEncodeOptions = {}): QrE
   let bestMask = 0;
   let bestModules = modules;
 
-  if (typeof options.maskPattern === 'number') {
+  if (typeof options.maskPattern === "number") {
     bestMask = options.maskPattern;
     bestModules = applyMask(modules, isFunction, bestMask);
   } else {

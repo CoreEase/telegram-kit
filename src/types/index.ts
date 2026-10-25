@@ -19,7 +19,7 @@ export type {
   HomeScreenStatus,
   TgPlatform,
   RuntimeMode,
-} from './webapp';
+} from "./webapp";
 
 export type {
   User,
@@ -173,6 +173,6 @@ export type {
   AddStickerToSetParams,
   TelegramApiResponse,
   ResponseParameters,
-} from './bot';
+} from "./bot";
 
-export { TelegramApiError } from './bot';
+export { TelegramApiError } from "./bot";

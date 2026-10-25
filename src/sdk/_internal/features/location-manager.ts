@@ -1,7 +1,6 @@
-
-import { WebAppKernel } from '../core/kernel';
-import { WebAppErrorName, throwWebAppError } from '../core/errors';
-import type { LocationData } from '../types';
+import { WebAppKernel } from "../core/kernel";
+import { WebAppErrorName, throwWebAppError } from "../core/errors";
+import type { LocationData } from "../types";
 
 type InitCallback = () => void;
 type GetLocationCallback = (data: LocationData | null) => void;
@@ -16,8 +15,8 @@ export class LocationManager {
   private getRequestCallbacks: GetLocationCallback[] = [];
 
   constructor(private readonly kernel: WebAppKernel) {
-    kernel.webView.onEvent('location_checked', this.handleLocationChecked);
-    kernel.webView.onEvent('location_requested', this.handleLocationRequested);
+    kernel.webView.onEvent("location_checked", this.handleLocationChecked);
+    kernel.webView.onEvent("location_requested", this.handleLocationRequested);
   }
 
   get isInited(): boolean {
@@ -54,7 +53,7 @@ export class LocationManager {
       this.initCallbacks.forEach((cb) => cb());
       this.initCallbacks = [];
     }
-    this.kernel.receiveWebViewEvent('locationManagerUpdated');
+    this.kernel.receiveWebViewEvent("locationManagerUpdated");
   };
 
   private handleLocationRequested = (_eventType: string, eventData: any): void => {
@@ -71,32 +70,43 @@ export class LocationManager {
         course_accuracy: null,
         speed_accuracy: null,
       };
-      if (typeof eventData.altitude !== 'undefined' && eventData.altitude !== null) {
+      if (typeof eventData.altitude !== "undefined" && eventData.altitude !== null) {
         locationData.altitude = eventData.altitude;
       }
-      if (typeof eventData.course !== 'undefined' && eventData.course !== null) {
+      if (typeof eventData.course !== "undefined" && eventData.course !== null) {
         locationData.course = eventData.course % 360;
       }
-      if (typeof eventData.speed !== 'undefined' && eventData.speed !== null) {
+      if (typeof eventData.speed !== "undefined" && eventData.speed !== null) {
         locationData.speed = eventData.speed;
       }
-      if (typeof eventData.horizontal_accuracy !== 'undefined' && eventData.horizontal_accuracy !== null) {
+      if (
+        typeof eventData.horizontal_accuracy !== "undefined" &&
+        eventData.horizontal_accuracy !== null
+      ) {
         locationData.horizontal_accuracy = eventData.horizontal_accuracy;
       }
-      if (typeof eventData.vertical_accuracy !== 'undefined' && eventData.vertical_accuracy !== null) {
+      if (
+        typeof eventData.vertical_accuracy !== "undefined" &&
+        eventData.vertical_accuracy !== null
+      ) {
         locationData.vertical_accuracy = eventData.vertical_accuracy;
       }
-      if (typeof eventData.course_accuracy !== 'undefined' && eventData.course_accuracy !== null) {
+      if (typeof eventData.course_accuracy !== "undefined" && eventData.course_accuracy !== null) {
         locationData.course_accuracy = eventData.course_accuracy;
       }
-      if (typeof eventData.speed_accuracy !== 'undefined' && eventData.speed_accuracy !== null) {
+      if (typeof eventData.speed_accuracy !== "undefined" && eventData.speed_accuracy !== null) {
         locationData.speed_accuracy = eventData.speed_accuracy;
       }
     }
 
-    if (!eventData.available || !this._isLocationAvailable || !this._isAccessRequested || !this._isAccessGranted) {
+    if (
+      !eventData.available ||
+      !this._isLocationAvailable ||
+      !this._isAccessRequested ||
+      !this._isAccessGranted
+    ) {
       this.initCallbacks.push(() => this.locationResponse(locationData));
-      this.kernel.webView.postEvent('web_app_check_location');
+      this.kernel.webView.postEvent("web_app_check_location");
     } else {
       this.locationResponse(locationData);
     }
@@ -108,18 +118,17 @@ export class LocationManager {
       this.getRequestCallbacks = [];
     }
     if (response !== null) {
-      this.kernel.receiveWebViewEvent('locationRequested', { locationData: response });
+      this.kernel.receiveWebViewEvent("locationRequested", { locationData: response });
     }
   }
 
   private checkVersion(): boolean {
-    return this.kernel.warnIfUnsupported('8.0', 'LocationManager');
+    return this.kernel.warnIfUnsupported("8.0", "LocationManager");
   }
 
   private checkInit(): true {
     if (!this._isInited) {
-
-      console.error('[@core-ease/telegram-kit] LocationManager should be inited before using.');
+      console.error("[@core-ease/telegram-kit] LocationManager should be inited before using.");
       throwWebAppError(WebAppErrorName.LocationManagerNotInited);
     }
     return true;
@@ -129,7 +138,7 @@ export class LocationManager {
     if (!this.checkVersion()) return this;
     if (this._isInited) return this;
     if (callback) this.initCallbacks.push(callback);
-    this.kernel.webView.postEvent('web_app_check_location');
+    this.kernel.webView.postEvent("web_app_check_location");
     return this;
   }
 
@@ -137,12 +146,11 @@ export class LocationManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isLocationAvailable) {
-
-      console.error('[@core-ease/telegram-kit] Location is not available on this device.');
+      console.error("[@core-ease/telegram-kit] Location is not available on this device.");
       throwWebAppError(WebAppErrorName.LocationManagerLocationNotAvailable);
     }
     this.getRequestCallbacks.push(callback);
-    this.kernel.webView.postEvent('web_app_request_location');
+    this.kernel.webView.postEvent("web_app_request_location");
     return this;
   }
 
@@ -150,21 +158,20 @@ export class LocationManager {
     if (!this.checkVersion()) return this;
     this.checkInit();
     if (!this._isLocationAvailable) {
-
-      console.error('[@core-ease/telegram-kit] Location is not available on this device.');
+      console.error("[@core-ease/telegram-kit] Location is not available on this device.");
       throwWebAppError(WebAppErrorName.LocationManagerLocationNotAvailable);
     }
     if (!this._isAccessRequested) {
-
-      console.error('[@core-ease/telegram-kit] Location access was not requested yet.');
+      console.error("[@core-ease/telegram-kit] Location access was not requested yet.");
       throwWebAppError(WebAppErrorName.LocationManagerLocationAccessNotRequested);
     }
     if (this._isAccessGranted) {
-
-      console.warn('[@core-ease/telegram-kit] Location access was granted by the user, no need to go to settings.');
+      console.warn(
+        "[@core-ease/telegram-kit] Location access was granted by the user, no need to go to settings.",
+      );
       return this;
     }
-    this.kernel.webView.postEvent('web_app_open_location_settings');
+    this.kernel.webView.postEvent("web_app_open_location_settings");
     return this;
   }
 }

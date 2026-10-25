@@ -1,22 +1,18 @@
-import { BitBuffer } from './bitBuffer';
-import { reedSolomonEncode } from './reedSolomon';
-import {
-  type ErrorCorrectionLevel,
-  getBlockStructure,
-  getNumDataCodewords,
-} from './tables';
+import { BitBuffer } from "./bitBuffer";
+import { reedSolomonEncode } from "./reedSolomon";
+import { type ErrorCorrectionLevel, getBlockStructure, getNumDataCodewords } from "./tables";
 import {
   type QrMode,
   charCountBitLength,
   encodeSegmentBits,
   segmentCharacterCount,
-} from './segments';
+} from "./segments";
 
 export function buildDataCodewords(
   text: string,
   version: number,
   level: ErrorCorrectionLevel,
-  mode: QrMode
+  mode: QrMode,
 ): number[] | null {
   const bb = new BitBuffer();
   bb.push(mode, 4);
@@ -49,7 +45,7 @@ export interface BlockedCodewords {
 export function splitIntoBlocksWithEcc(
   dataCodewords: number[],
   version: number,
-  level: ErrorCorrectionLevel
+  level: ErrorCorrectionLevel,
 ): BlockedCodewords {
   const { eccLength, numBlocks } = getBlockStructure(version, level);
   const totalData = dataCodewords.length;

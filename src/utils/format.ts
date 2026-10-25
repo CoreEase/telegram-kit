@@ -12,7 +12,7 @@ function isFragment(part: TextPart): part is TelegramFormattedText {
 }
 
 function joinParts(parts: TextPart[], escape: (text: string) => string): string {
-  return parts.map((part) => (isFragment(part) ? part.raw : escape(part))).join('');
+  return parts.map((part) => (isFragment(part) ? part.raw : escape(part))).join("");
 }
 
 const MARKDOWN_V2_RESERVED = /[_*[\]()~`>#+\-=|{}.!\\]/g;
@@ -47,9 +47,11 @@ function createMarkdownV2Formatter() {
     spoiler: (...parts: TextPart[]) => wrap(`||${t(parts)}||`),
     code: (text: string) => wrap(`\`${escapeMarkdownV2Code(text)}\``),
     pre: (text: string, language?: string) =>
-      wrap(`\`\`\`${language ?? ''}\n${escapeMarkdownV2Code(text)}\n\`\`\``),
-    link: (url: string, ...parts: TextPart[]) => wrap(`[${t(parts)}](${escapeMarkdownV2LinkUrl(url)})`),
-    mentionUser: (userId: number, ...parts: TextPart[]) => wrap(`[${t(parts)}](tg://user?id=${userId})`),
+      wrap(`\`\`\`${language ?? ""}\n${escapeMarkdownV2Code(text)}\n\`\`\``),
+    link: (url: string, ...parts: TextPart[]) =>
+      wrap(`[${t(parts)}](${escapeMarkdownV2LinkUrl(url)})`),
+    mentionUser: (userId: number, ...parts: TextPart[]) =>
+      wrap(`[${t(parts)}](tg://user?id=${userId})`),
     customEmoji: (emojiId: string, fallbackEmoji: string) =>
       wrap(`![${escapeMarkdownV2(fallbackEmoji)}](tg://emoji?id=${emojiId})`),
     raw: (raw: string) => wrap(raw),
@@ -57,11 +59,11 @@ function createMarkdownV2Formatter() {
 }
 
 export function escapeHTML(text: string): string {
-  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 export function escapeHTMLAttribute(text: string): string {
-  return escapeHTML(text).replace(/"/g, '&quot;');
+  return escapeHTML(text).replace(/"/g, "&quot;");
 }
 
 function createHtmlFormatter() {
@@ -82,15 +84,19 @@ function createHtmlFormatter() {
       wrap(
         language
           ? `<pre><code class="language-${escapeHTMLAttribute(language)}">${escapeHTML(text)}</code></pre>`
-          : `<pre>${escapeHTML(text)}</pre>`
+          : `<pre>${escapeHTML(text)}</pre>`,
       ),
-    link: (url: string, ...parts: TextPart[]) => wrap(`<a href="${escapeHTMLAttribute(url)}">${t(parts)}</a>`),
+    link: (url: string, ...parts: TextPart[]) =>
+      wrap(`<a href="${escapeHTMLAttribute(url)}">${t(parts)}</a>`),
     mentionUser: (userId: number, ...parts: TextPart[]) =>
       wrap(`<a href="tg://user?id=${userId}">${t(parts)}</a>`),
     blockquote: (...parts: TextPart[]) => wrap(`<blockquote>${t(parts)}</blockquote>`),
-    expandableBlockquote: (...parts: TextPart[]) => wrap(`<blockquote expandable>${t(parts)}</blockquote>`),
+    expandableBlockquote: (...parts: TextPart[]) =>
+      wrap(`<blockquote expandable>${t(parts)}</blockquote>`),
     customEmoji: (emojiId: string, fallbackEmoji: string) =>
-      wrap(`<tg-emoji emoji-id="${escapeHTMLAttribute(emojiId)}">${escapeHTML(fallbackEmoji)}</tg-emoji>`),
+      wrap(
+        `<tg-emoji emoji-id="${escapeHTMLAttribute(emojiId)}">${escapeHTML(fallbackEmoji)}</tg-emoji>`,
+      ),
     raw: (rawHtml: string) => wrap(rawHtml),
   };
 }
@@ -118,10 +124,14 @@ function isLowSurrogate(code: number): boolean {
   return code >= 0xdc00 && code <= 0xdfff;
 }
 
-export function truncateText(text: string, maxLength: number, ellipsis = '…'): string {
+export function truncateText(text: string, maxLength: number, ellipsis = "…"): string {
   if (text.length <= maxLength) return text;
   let cut = Math.max(0, maxLength - ellipsis.length);
-  if (cut > 0 && isHighSurrogate(text.charCodeAt(cut - 1)) && isLowSurrogate(text.charCodeAt(cut))) {
+  if (
+    cut > 0 &&
+    isHighSurrogate(text.charCodeAt(cut - 1)) &&
+    isLowSurrogate(text.charCodeAt(cut))
+  ) {
     cut -= 1;
   }
   return text.slice(0, cut) + ellipsis;
